@@ -1,7 +1,7 @@
 # Cryptr
 Cryptr is a secret store GUI built for secrets managed by SaltStack's [GPG renderer](http://docs.saltstack.com/en/latest/ref/renderers/all/salt.renderers.gpg.html). Using Salt's gpg renderer, you can securely save passwords, certificates, or other secrets on the salt master, where minions may request them as needed. This repo houses the front-end GUI to integrate with cryptr-server, which runs on a salt-master housing salt gpg-encrypted passwords. Using Cryptr, a user may easily interact with the secrets in the saltstore, including reading and (eventually) modifying secrets easily.
 
-![alt text](images/cryptr-demo.png "Cryptr")
+![alt text](app/images/cryptr-demo.png "Cryptr")
 
 Download Binaries
 -----------------
