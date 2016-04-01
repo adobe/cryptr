@@ -1,0 +1,30 @@
+<link rel="import" href="../paper-input/paper-input.html">
+
+<dom-module id="data-table-column-filter">
+  <style is="custom-style">
+    paper-input {
+      margin-bottom: 20px;
+      --paper-input-container-label: {
+        font-size: inherit;
+      }
+    }
+  </style>
+
+  <template>
+    <paper-input label="[[label]]" value="{{value}}" hidden=[[hidden]]></paper-input>
+  </template>
+  <script>
+    Polymer({
+      is: 'data-table-column-filter',
+
+      properties: {
+        label: String,
+        value: {
+          type: String,
+          notify: true
+        },
+        hidden: Boolean
+      }
+    });
+  </script>
+</dom-module>

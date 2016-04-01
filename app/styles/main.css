@@ -1,0 +1,30 @@
+body {
+	background: #fafafa;
+	font-family: 'Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+	color: #333;
+}
+
+
+#drawerMenuText {
+	font-size: 0.8em;
+	font-weight: 500;
+	margin: 22px 0px 3px 11px;
+	display: block;
+	color: #777;
+}
+
+.noselect {
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	-webkit-user-drag: none;
+    -khtml-user-drag: none;
+    -moz-user-drag: none;
+    -o-user-drag: none;
+    user-drag: none;
+}
+
+#topBar {
+	padding: 0px;
+}

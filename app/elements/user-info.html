@@ -1,0 +1,59 @@
+<dom-module id="user-info">
+	<template>
+		<style>
+			.name {
+				padding-right:16px;
+				padding-left: 5px;
+			}
+		</style>
+
+		<iron-ajax id="logout"
+			url="{{logoutURL}}"
+			handle-as="json"
+            on-response="checkStatus">
+		</iron-ajax>
+
+        <paper-item>
+            <iron-icon icon="account-circle" style="color: #888"></iron-icon>
+            <span class="noselect name">{{upperUser}}</span>
+            <paper-button raised on-click="logoutUser">Logout</paper-button>
+        </paper-item>
+
+	</template>
+
+	<script>
+		(function() {
+			'use strict';
+			Polymer({
+				is: 'user-info',
+				properties: {
+					username: {
+						type: String
+					},
+                    upperUser: {
+                        type: String,
+                        computed: 'computeToUpper(username)'
+                    },
+					url: {
+						type: String
+					},
+					logoutURL: {
+						computed: 'computeURL(url)'
+					}
+				},
+				computeURL: function(url) {
+					return this.url + 'logout'
+				},
+                computeToUpper: function(username) {
+                    return this.username.toUpperCase();
+                },
+                logoutUser: function() {
+                    this.$.logout.generateRequest();
+                },
+                checkStatus: function() {
+                    document.querySelector('#checkStatus').generateRequest();
+                }
+			});
+		})();
+	</script>
+</dom-module>

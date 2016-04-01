@@ -1,0 +1,186 @@
+<html>
+
+<head>
+  <script type="text/javascript" src="../../webcomponentsjs/webcomponents-lite.js"></script>
+  <link rel="import" href="common.html">
+</head>
+
+<body unresolved>
+  <span id="forkongithub"><a href="https://github.com/Saulis/iron-data-table/">Fork me on GitHub</a></span>
+  <div class="vertical-section-container centered">
+    <nav class="vertical-section">
+      <ul class="layout horizontal wrap">
+        <li><a href="index.html">Data Binding</a></li>
+        <li><a href="columns.html">Column Properties</a></li>
+        <li><b>Styling</b></li>
+        <li><a href="filtering.html">Filtering, Sorting and Grouping</a></li>
+      </ul>
+    </nav>
+
+    <h3>Style Mixins</h3>
+    <demo-snippet>
+      <template>
+        <template is="dom-bind">
+          <style is="custom-style">
+            #grid1 {
+              --default-primary-color: red;
+              font-family: 'Roboto', 'Noto', sans-serif;
+              --iron-data-table-header: {
+                background-color: #37474F;
+                color: #ccc;
+                font-size: 1.2em;
+                font-weight: 400;
+              }
+              --iron-data-table-row: {
+                height: 60px;
+                align-items: center;
+              }
+              --iron-data-table-row-odd: {
+                background-color: #fff;
+              }
+              --iron-data-table-row-even: {
+                background-color: #fafafa;
+              }
+              --iron-data-table-row-hover: {
+                background-color: #eee !important;
+              }
+              --iron-data-table-row-selected: {
+                background-color: var(--default-primary-color) !important;
+                color: #fff;
+              }
+              --iron-data-table-row-after: {
+                background-color: #fff;
+                bottom: 16px;
+                content: "";
+                height: 2px;
+                left: 13px;
+                pointer-events: none;
+                position: absolute;
+                right: 0px;
+                transition: all 1s ease-in-out;
+                -webkit-transform: scaleX(0.0);
+                transform: scaleX(0.0);
+                z-index: 1;
+              }
+            }
+          </style>
+          <iron-ajax url="users.json" last-response="{{users}}" auto></iron-ajax>
+          <iron-data-table id="grid1" items="[[users.results]]" selection-enabled>
+            <data-table-column name="First Name">
+              <template>[[item.user.name.first]]</template>
+            </data-table-column>
+            <data-table-column name="Last Name">
+              <template>[[item.user.name.last]]</template>
+            </data-table-column>
+            <data-table-column name="Email" width="200px">
+              <template>[[item.user.email]]</template>
+            </data-table-column>
+          </iron-data-table>
+        </template>
+      </template>
+    </demo-snippet>
+
+    <h4>Custom Classes</h4>
+    <demo-snippet>
+      <template>
+        <style is="custom-style">
+          #grid2 .index {
+            color: red;
+          }
+        </style>
+        <template is="dom-bind" id="t1">
+          <iron-ajax url="users.json" last-response="{{users}}" auto></iron-ajax>
+          <iron-data-table id="grid2" items="[[users.results]]">
+            <data-table-column name="#" width="20px" flex="0">
+              <template>
+                <div class="index">[[index]]</div>
+              </template>
+            </data-table-column>
+            <data-table-column name="First Name">
+              <template>
+                <div>[[item.user.name.first]]</div>
+              </template>
+            </data-table-column>
+            <data-table-column name="Last Name">
+              <template>[[item.user.name.last]]</template>
+            </data-table-column>
+          </iron-data-table>
+        </template>
+      </template>
+    </demo-snippet>
+
+    <h3>Variable Row Height</h3>
+    <demo-snippet>
+      <template>
+        <template is="dom-bind">
+          <style is="custom-style">
+            #grid3 {
+              --iron-data-table-cell-height: auto;
+            }
+          </style>
+
+          <style>
+            #grid3 .hawaii {
+              display: flex;
+              align-items: center;
+              height: 40px;
+            }
+
+            #grid3 .iowa {
+              display: flex;
+              align-items: center;
+              height: 80px;
+            }
+
+            #grid3 div[selected] {
+              display: flex;
+              align-items: center;
+              height: 100px;
+            }
+          </style>
+
+          <iron-ajax url="users.json" last-response="{{users}}" auto></iron-ajax>
+          <iron-data-table id="grid3" items="[[users.results]]" selection-enabled>
+            <data-table-column name="First Name">
+              <template>[[item.user.name.first]]</template>
+            </data-table-column>
+            <data-table-column name="Last Name">
+              <template>[[item.user.name.last]]</template>
+            </data-table-column>
+            <data-table-column name="State">
+              <template>
+                <div class$="[[item.user.location.state]]" selected$="[[selected]]">[[item.user.location.state]]</div>
+              </template>
+            </data-table-column>
+          </iron-data-table>
+        </template>
+      </template>
+    </demo-snippet>
+
+    <h3>Alternative Alignment</h3>
+    <demo-snippet>
+      <template>
+        <template is="dom-bind">
+          <iron-ajax url="users.json" last-response="{{users}}" auto></iron-ajax>
+          <iron-data-table items="[[users.results]]">
+            <data-table-column name="First Name" align-right sort-by="user.name.first">
+              <template>[[item.user.name.first]]</template>
+            </data-table-column>
+            <data-table-column name="Last Name" sort-by="user.name.last">
+              <template>[[item.user.name.last]]</template>
+            </data-table-column>
+          </iron-data-table>
+        </template>
+      </template>
+    </demo-snippet>
+  </div>
+  <script>
+    document.addEventListener('WebComponentsReady', function() {
+      document.querySelector('#grid3').$.list.addEventListener('selected-item-changed', function(e) {
+        document.querySelector('#grid3').$.list.notifyResize();
+      });
+    });
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<meta name="description" content="">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="generator" content="Cryptr">
+	<title>Cryptr</title>
+	<link rel="stylesheet" href="styles/main.css">
+	<script src="bower_components/webcomponentsjs/webcomponents-lite.js"></script>
+	<link rel="import" href="elements/elements.html">
+</head>
+
+<body unresolved>
+	<template is="dom-bind" id="app">
+		<login-form status="{{status}}" username="{{u}}" url="{{url}}"></login-form>
+		<login-status timer="{{timer}}" status="{{status}}" url="{{url}}"></login-status>
+		<request-data status="{{status}}" response="{{response}}" url="{{url}}"></request-data>
+
+		<paper-drawer-panel id="paperDrawerPanel" drawer-width="170px">
+			<!-- Drawer Area -->
+			<paper-scroll-header-panel drawer fixed>
+				<paper-toolbar id="drawerToolbar">
+					<span class="menu-name noselect" style="padding:0 16px">Cryptr</span>
+				</paper-toolbar>
+
+				<span id="drawerMenuText" class="noselect">Home</span>
+				<paper-menu attr-for-selected="data-route" selected="[[route]]">
+					<a data-route="home" href="{{baseUrl}}" class="noselect">
+						<iron-icon icon="dashboard"></iron-icon>
+						<span>Dashboard</span>
+					</a>
+					<span id="drawerMenuText" class="noselect">Folders</span>
+					<a data-route="all" href="{{baseUrl}}all" class="noselect">
+						<iron-icon icon="folder-open"></iron-icon>
+						<span>All</span>
+					</a>
+
+					<template is="dom-repeat" items="{{response.folders}}">
+						<a data-route="folder{{index}}" href="{{baseUrl}}folder/{{index}}" class="noselect">
+							<iron-icon icon="folder-open"></iron-icon>
+							<span>{{item}}</span>
+						</a>
+					</template>
+				</paper-menu>
+			</paper-scroll-header-panel>
+
+			<!-- Main Area -->
+			<paper-scroll-header-panel main id="headerPanelMain" fixed>
+				<!-- Topbar -->
+				<paper-toolbar id="mainToolbar">
+					<!-- For future developments -->
+					<!-- <refresh-keys></refresh-keys> -->
+
+					<search-box query="{{query}}"></search-box>
+					<span class="space"></span>
+
+
+					<user-info username="{{u}}" url="{{url}}"></user-info>
+					<!-- <paper-icon-button icon="search"></paper-icon-button> -->
+
+					<!-- Application name -->
+					<div class="middle middle-container">
+						<div class="app-name"></div>
+					</div>
+
+					<!-- Application sub title -->
+					<div class="bottom bottom-container">
+						<div class="bottom-title"></div>
+					</div>
+				</paper-toolbar>
+
+				<!-- Main Content -->
+				<div class="content">
+					<iron-pages attr-for-selected="data-route" selected="{{route}}">
+						<section data-route="home">
+							<paper-material elevation="1">
+								<h2 class="page-title">Dashboard</h2>
+								<p>Placeholder for future content. This may include keys nearing the end of their 90 day lifespan and recently modified keys. </p>
+							</paper-material>
+						</section>
+
+						<section data-route="all">
+							<salt-data titlevalue="all" response="{{response}}" url="{{url}}"></salt-data>
+						</section>
+
+						<section data-route="search">
+							<salt-data response="{{response}}" query="{{query}}" url="{{url}}"></salt-data>
+						</section>
+
+						<template is="dom-repeat" items="{{response.folders}}">
+							<section data-route$="folder{{index}}">
+								<salt-data titlevalue="{{item}}" response="{{response}}" url="{{url}}"></salt-data>
+							</section>
+						</template>
+
+					</iron-pages>
+				</div>
+			</paper-header-panel>
+		</paper-scroll-drawer-panel>
+
+		<paper-toast id="toast">
+			<span class="toast-hide-button" role="button" tabindex="0" onclick="app.$.toast.hide()">Ok</span>
+		</paper-toast>
+
+	</template>
+
+	<script src="scripts/app.js"></script>
+	<script>
+		const clipboard = require('electron').clipboard;
+		const ipcRenderer = require('electron').ipcRenderer;
+		app.url = 'start';
+		ipcRenderer.on('url', function(event, arg) { app.url = arg; });
+		ipcRenderer.send('initialized', 'ping');
+	</script>
+</body>
+</html>

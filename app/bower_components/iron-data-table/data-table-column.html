@@ -1,0 +1,214 @@
+<link rel="import" href="data-table-column-filter.html">
+
+<dom-module id="data-table-column">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+
+    <template id="header">
+      <data-table-column-filter label="[[column.name]]" value="{{column.filterValue}}" hidden="[[!column.filterBy]]"></data-table-column-filter>
+      <div hidden="[[column.filterBy]]">[[column.name]]</div>
+    </template>
+
+  </template>
+  <script>
+    Polymer({
+      is: 'data-table-column',
+
+      behaviors: [
+        Polymer.Templatizer,
+      ],
+
+      properties: {
+        /**
+         * If `true`, cell contents will be aligned on the right
+         */
+        alignRight: {
+          type: Boolean,
+          value: false
+        },
+
+        /**
+         * Name of the column. This value is displayed in the header cell of the column
+         */
+        name: {
+          type: String,
+          notify: true,
+          value: ''
+        },
+
+        /**
+         * Path to a property that will be filtered by this column. If set, a filter input
+         * will be automaticelly placed on the header cell of the column.
+         */
+        filterBy: {
+          type: String
+        },
+
+        /**
+         * Filter value that will be used to filter the items using the property defined
+         * in `filterBy` property.
+         */
+        filterValue: {
+          type: String,
+          notify: true
+        },
+
+        /**
+         * Minimum width of the column
+         */
+        width: {
+          type: String,
+          notify: true,
+          value: "100px"
+        },
+
+        /**
+         * Ratio of how the extra space between columns is distributed. If every cell
+         * has the same `flex` value, the space will be distributed evenly.
+         */
+        flex: {
+          type: Number,
+          notify: true,
+          value: 1
+        },
+
+        /**
+         * If `true`, the cells of this column will be hidden.
+         */
+        hidden: {
+          type: Boolean,
+          notify: true,
+          value: false
+        },
+
+        /**
+         * Display order of the column in relation with the other columns.
+         */
+        order: {
+          type: Number,
+          notify: true
+        },
+
+        /**
+         * Path to a property that will be sorted by this column. If set, a sorting
+         * indicator will be automatically placed in the header cell of this column.
+         */
+        sortBy: {
+          type: String
+        },
+
+        /**
+         * Template for the header cell
+         */
+        headerTemplate: {
+          type: Object,
+          readOnly: true,
+          value: function() {
+            var custom = Polymer.dom(this).querySelector('template[is=header]');
+
+            if (custom) {
+              return custom;
+            }
+
+            return Polymer.dom(this.root).querySelector('#header');
+          }
+        },
+
+        /**
+         * Template for the row item cell
+         */
+        template: {
+          type: Object,
+          readOnly: true,
+          value: function() {
+            return Polymer.dom(this).querySelector('template:not([is=header])');
+          }
+        },
+
+        _templateInstances: {
+          type: Array,
+          value: function() {
+            return [];
+          }
+        },
+
+        _forwardedParentProps: {
+          type: Object,
+          value: function() {
+            return {};
+          }
+        }
+      },
+
+      observers: ['_forwardedParentPropsChanged(_forwardedParentProps.*)',
+        '_templateInstancesChanged(_templateInstances.splices)'
+      ],
+
+      _forwardParentProp: function(prop, value) {
+        this.set('_forwardedParentProps.' + prop, value);
+      },
+
+      _forwardedParentPropsChanged: function(changeRecord) {
+        // TODO: need to make sure this works with nested paths also. [[foo.bar]] etc.
+        for (var prop in changeRecord.base) {
+          this._templateInstances.forEach(function(t) {
+            t[prop] = changeRecord.base[prop];
+          });
+        }
+      },
+
+      _forwardInstancePath: function(inst, path, value) {
+        // prevent propagating column specific values to other columns.
+        if (path.startsWith('column')) {
+          return;
+        }
+
+        var columns = Polymer.dom(this).parentNode.columns;
+
+        for (var c = 0; c < columns.length; c++) {
+          var instances = columns[c]._templateInstances;
+
+          for (var i = 0; i < instances.length; i++) {
+            var instance = instances[i];
+            if (instance.index == inst.index) {
+              instance.notifyPath(path, value);
+            }
+          }
+        }
+      },
+
+      _templateInstancesChanged: function(changeRecord) {
+        // TODO: (Saulis) make sure _templateInstances length is correct. Earlier testing seems producing weird results.
+        if (changeRecord && changeRecord.indexSplices) {
+
+          changeRecord.indexSplices.forEach(function(s) {
+            var addedInstance = s.object[s.index];
+
+            for (var prop in this._forwardedParentProps) {
+              addedInstance[prop] = this._forwardedParentProps[prop];
+            }
+          });
+        }
+      },
+
+      ready: function() {
+        // we need to templatize all user-provided templates asap to prevent [[item...]] from being
+        // bound to a parent dom-bind template or a parent web component.
+        // Note (Saulis): if the internal templates have something else than [[item..]] they will get screwed when setting properi
+        this._instanceProps = {
+          item: true,
+          index: true,
+          selected: true,
+          column: true
+        };
+
+        this.templatize(this.headerTemplate);
+        this.templatize(this.template);
+      }
+    });
+  </script>
+</dom-module>

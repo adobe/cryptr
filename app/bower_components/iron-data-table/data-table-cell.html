@@ -1,0 +1,138 @@
+<dom-module id="data-table-cell">
+  <template>
+    <content></content>
+  </template>
+  <script>
+    window.Polymer = window.Polymer || {};
+    Polymer.IronDataTable = Polymer.IronDataTable || {};
+    Polymer.IronDataTable.cell = Polymer.IronDataTable.cell || 0;
+
+    Polymer({
+      is: 'data-table-cell',
+
+      properties: {
+        template: {
+          type: Object
+        },
+
+        bind: {
+          type: Object
+        },
+
+        column: {
+          type: Object,
+          observer: '_columnChanged'
+        },
+
+        _instance: {
+          type: Object,
+          computed: '_templatize(column, template)'
+        },
+
+        order: Number,
+        width: String,
+
+        _contentElement: Object,
+        _content: Object
+      },
+
+      observers: ['_bindData(_instance, bind)', '_render(_content, _instance)'],
+
+      attached: function() {
+        var id = Polymer.IronDataTable.cell++;
+
+        this._contentElement = document.createElement('content');
+        this._contentElement.setAttribute('select', '#cell' + id);
+
+        this._content = document.createElement('div');
+        this._content.id = 'cell' + id;
+
+        Polymer.dom(this).insertBefore(this._contentElement, Polymer.dom(this).firstChild);
+        Polymer.dom(this.domHost).appendChild(this._content);
+        Polymer.dom.flush();
+      },
+
+      detached: function() {
+        // Polymer.dom(this._content.parentElement) has different childs depending if Shady or native Shadow DOM is used.
+        // TODO: see if there's a need to use Polymer.dom here and can it be done somehow.
+
+        if (this._content.parentElement) {
+          this._content.parentElement.removeChild(this._content);
+        }
+
+        if (this._contentElement.parentElement) {
+          Polymer.dom(this).removeChild(this._contentElement);
+          Polymer.dom.flush();
+        }
+      },
+
+      _orderChanged: function(e) {
+        this.style.order = e.detail.value;
+      },
+
+      _widthChanged: function(e) {
+        this.style.flexBasis = e.detail.value;
+
+        this.domHost.notifyResize();
+      },
+
+      _flexChanged: function(e) {
+        this.style.flexGrow = e.detail.value;
+      },
+
+      _hiddenChanged: function(e) {
+        this.hidden = e.detail.value;
+      },
+
+      _templatize: function(column, template) {
+        column.templatize(template);
+        var instance = column.stamp();
+        column.push('_templateInstances', instance);
+
+        return instance;
+      },
+
+      _bindData: function(instance, data) {
+        for (var prop in data) {
+          instance[prop] = data[prop];
+        }
+      },
+
+      _columnChanged: function(column, oldColumn) {
+        this.style.flexDirection = column.alignRight ? 'row-reverse' : 'row';
+
+        this.style.flexBasis = column.width;
+        this._addListener(column, oldColumn, 'width');
+
+        this.style.flexGrow = column.flex;
+        this._addListener(column, oldColumn, 'flex');
+
+        this.style.order = column.order;
+        this._addListener(column, oldColumn, 'order');
+
+        this.hidden = column.hidden;
+        this._addListener(column, oldColumn, 'hidden');
+      },
+
+      // Adding listeners manually *seems* to work better with forwarded parent props
+      // than normal data-binding. Something to do with notifying the paths correctly.
+      _addListener: function(column, oldColumn, prop) {
+        var eventName = prop + '-changed';
+        var observerName = '_' + prop + 'Changed';
+
+        if (oldColumn) {
+          this.unlisten(oldColumn, eventName);
+        }
+
+        this.listen(column, eventName, observerName);
+      },
+
+      _render: function(content, instance) {
+        content.innerHTML = '';
+
+        Polymer.dom(content).appendChild(instance.root);
+        Polymer.dom.flush();
+      }
+    });
+  </script>
+</dom-module>

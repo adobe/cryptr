@@ -1,0 +1,178 @@
+<dom-module id="button-actions">
+	<template>
+		<style>
+            :root {
+                --paper-menu-background-color: white;
+        		--menu-link-color: #929498;
+        		--drawer-menu-text-color: white;
+        		--paper-menu-focused-item: {
+        			background-color: #EEE;
+        			color: #333;
+        		};
+        		--paper-item-selected: {
+        			background-color: white;
+        		}
+        		--paper-item-focused-before: {
+        			background-color: white;
+        		}
+            }
+            paper-menu-button {
+                padding: 8px 8px 3px 8px;
+            }
+            paper-button {
+                padding: 0px;
+            }
+            .foldertext {
+                font-size: 14px;
+            }
+            paper-toast {
+    			right: 10px;
+    			left: auto;
+    		}
+            paper-toast.red {
+                border: 2px solid;
+                border-color: var(--paper-red-500);
+                background-color: var(--paper-red-200);
+                color: #7c0b0b;
+            }
+            paper-toast.green {
+                border: 2px solid;
+                border-color: var(--paper-green-500);
+                background-color: var(--paper-light-green-300);
+                color: var(--paper-green-900);
+            }
+		</style>
+
+        <iron-ajax id="moveKeys"
+			url="{{moveURL}}"
+			body="{{moveData}}"
+			method="POST"
+			handle-as="json"
+			last-response="{{moveKeysResponse}}">
+		</iron-ajax>
+
+		<iron-ajax id="removeKeys"
+			url="{{removeURL}}"
+			body="{{removeData}}"
+			method="POST"
+			handle-as="json"
+			last-response="{{removeKeysResponse}}">
+		</iron-ajax>
+
+        <paper-menu-button id="moveButton" vertical-offset="35" horizontal-offset="70" style="display: inline-block;">
+            <paper-button class="dropdown-trigger">
+                <iron-icon icon="add" style="padding-right: 3px; padding-bottom: 3px;"></iron-icon>
+                <span class="foldertext">Add to Folder</span>
+            </paper-button>
+            <paper-menu class="dropdown-content">
+                <template is="dom-repeat" items="[[folders]]">
+                    <paper-item on-tap="move">[[item]]</paper-item>
+                </template>
+            </paper-menu>
+        </paper-menu-button>
+
+        <paper-button id="removeButton" style="display: none;" on-tap="remove">
+            <iron-icon icon="delete" style="padding: 0px 3px 3px 15px;"></iron-icon>
+            <span class="foldertext">Remove from folder</span>
+        </paper-button>
+
+        <paper-menu-button id="newFolder" vertical-offset="35" horizontal-offset="52" style="display: inline-block;">
+            <paper-button class="dropdown-trigger">
+                <iron-icon icon="create-new-folder" style="padding-right: 3px; padding-bottom: 3px;"></iron-icon>
+                <span class="foldertext">Create Folder from items</span>
+            </paper-button>
+            <paper-menu class="dropdown-content" style="padding: 0px">
+                <paper-input id="newFolderInput" label="Folder Name" style="padding: 0px 10px;" always-float-label></paper-input>
+                <iron-a11y-keys id="a11y" target="[[target]]" keys="enter" on-keys-pressed="move"></iron-a11y-keys>
+            </paper-menu>
+        </paper-menu-button>
+
+        <paper-toast id="noItems" class="red" duration="2000" text="No items selected."></paper-toast>
+        <paper-toast id="done" class="green" duration="1000" text="Done. Updating"></paper-toast>
+	</template>
+
+	<script>
+		(function() {
+			'use strict';
+
+			Polymer({
+				is: 'button-actions',
+				properties: {
+                    selectedItems: {
+    					type: Array
+    				},
+                    clearVal: {
+                        type: Boolean,
+                        notify: true,
+                    },
+                    folders: {
+                        type: Array
+                    },
+                    titlevalue: {
+                        type: String
+                    },
+                    target: {
+                        type: Object,
+                        value: function() {
+                            return this.$.newFolderInput;
+                        }
+                    },
+					url: {
+						type: String
+					},
+					moveURL: {
+						computed: 'computeURL(url)'
+					},
+					removeURL: {
+						computed: 'computeRemoveURL(url)'
+					}
+				},
+				computeURL: function(url) {
+					return this.url + 'move'
+				},
+				computeRemoveURL: function(url) {
+					return this.url + 'remove'
+				},
+                attached: function() {
+                    if (this.titlevalue != 'all' && this.titlevalue != 'search') {
+                        this.$.moveButton.style.display = 'none';
+                        this.$.removeButton.style.display = 'inline-block';
+                    }
+                    // This is a hack. There is a bug in Polymer that makes the dropdown menus appear initially at the center of the screen, then move to their proper location. This forces them to do this at page load.
+                    this.$.moveButton.open();
+                    this.$.moveButton.close();
+                    this.$.newFolder.open();
+                    this.$.newFolder.close();
+                },
+                move: function(e) {
+    				if (this.selectedItems.length > 0) {
+                        var dest = (e.target.childNodes.length == 0) ? this.$.newFolderInput.value : e.target.childNodes[1].nodeValue;
+    					this.moveData = '';
+    					this.moveData += 'dest=' + dest;
+    					for (var i = 0; i < this.selectedItems.length; i++) {
+    						this.moveData += '&' + i + '=' + this.selectedItems[i].parsedname;
+    					}
+    					this.$.moveKeys.generateRequest();
+    					this.clearVal = true;
+                        this.$.done.show();
+                        this.$.newFolder.close();
+                        this.$.moveButton.close();
+    				} else this.$.noItems.show();
+                    this.$.newFolderInput.value = '';
+    			},
+    			remove: function() {
+    				if (this.selectedItems.length > 0) {
+    					this.removeData = '';
+    					this.removeData += 'dest=' + this.titlevalue;
+    					for (var i = 0; i < this.selectedItems.length; i++) {
+    						this.removeData += '&' + i + '=' + this.selectedItems[i].parsedname;
+    					}
+    					this.$.removeKeys.generateRequest();
+    					this.clearVal = true;
+                        this.$.done.show();
+    				} else this.$.noItems.show();
+    			}
+			});
+		})();
+	</script>
+</dom-module>

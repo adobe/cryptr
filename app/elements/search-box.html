@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+
+<dom-module id="search-box">
+	<style>
+		:host {
+			paper-input {
+				--paper-input-container-disabled: {
+					opacity: 1;
+				};
+				--paper-input-container-underline-disabled: {
+					border-bottom: none;
+				}
+			}
+			--iron-data-table-row-hover: {
+				background-color: #EEE;
+			};
+		}
+		#grid {
+			font-family: 'Roboto', 'Noto', sans-serif;
+			--iron-data-table-header: {
+				font-size: .95em;
+				font-weight: 100;
+			}
+			--iron-data-table-row: {
+				/*height: 60px;*/
+				font-size: .8em;
+				font-weight: 100;
+			}
+		}
+	</style>
+	<template>
+		<paper-item>
+			<iron-icon icon="search"></iron-icon>
+			<iron-a11y-keys id="a11y" target="[[target]]" keys="esc" on-keys-pressed="clear"></iron-a11y-keys>
+			<paper-input id="searchinput" value="{{query}}" label="Search All Keys" no-label-float></paper-input>
+		</paper-item>
+	</template>
+
+	<script>
+		Polymer({
+			is: "search-box",
+			properties: {
+				query: {
+					type: String,
+					value: '',
+					notify: true,
+					observer: 'queryEntered'
+				},
+				target: {
+					type: Object,
+					value: function() {
+						return this.$.searchinput;
+					}
+				},
+			},
+			queryEntered: function() {
+				if (this.query != '') {
+					page('#!/search');
+				} else {
+					page('#!/all');
+				}
+			},
+			clear: function() {
+				this.query = '';
+			}
+		});
+	</script>
+</dom-module>
+</html>

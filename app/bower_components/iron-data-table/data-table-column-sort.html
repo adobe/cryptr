@@ -1,0 +1,78 @@
+<link rel="import" href="../iron-icon/iron-icon.html">
+<link rel="import" href="../iron-icons/iron-icons.html">
+<link rel="import" href="../paper-ripple/paper-ripple.html">
+
+<dom-module id="data-table-column-sort">
+  <template>
+    <style>
+      :host {
+        display: block;
+        margin: 4px;
+      }
+
+      #sortIcon {
+        position: relative;
+        width: 24px;
+        height: 24px;
+      }
+
+      iron-icon {
+        fill: rgba(0, 0, 0, .16);
+        cursor: pointer;
+        padding: 0px;
+        --iron-icon-width: 24px;
+        --iron-icon-height: 24px;
+        transition: all .2s;
+      }
+
+      iron-icon[active], iron-icon:hover {
+        fill: rgba(0, 0, 0, .87);
+      }
+
+      paper-ripple {
+        color: rgba(0, 0, 0, .54);
+      }
+
+      #sortIcon[direction='desc'] iron-icon[active] {
+        transform: rotate(-180deg);
+      }
+    </style>
+
+    <div id="sortIcon" on-tap="_sort" hidden="[[hidden]]" direction$="[[direction]]">
+      <iron-icon active$="[[_isActive(path, sortOrder)]]" icon="arrow-upward"></iron-icon>
+      <paper-ripple class="circle" center></paper-ripple>
+    </div>
+
+  </template>
+  <script>
+    Polymer({
+      is: 'data-table-column-sort',
+
+      properties: {
+        direction: String,
+        hidden: Boolean,
+        path: String,
+        sortOrder: {
+          type: Object,
+          observer: '_sortOrderChanged'
+        }
+      },
+
+      _isActive: function(path, sortOrder) {
+        return path === sortOrder.path;
+      },
+
+      _sortOrderChanged: function(sortOrder) {
+        if (sortOrder.path === this.path) {
+          this.direction = sortOrder.direction;
+        }
+      },
+
+      _sort: function() {
+        this.direction = this.direction === 'asc' ? 'desc' : 'asc';
+
+        this.fire('sort-direction-changed', { path: this.path, direction: this.direction });
+      }
+    });
+  </script>
+</dom-module>

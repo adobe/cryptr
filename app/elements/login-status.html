@@ -1,0 +1,67 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+
+<dom-module id="login-status">
+	<template>
+		<style>
+		#errortoast {
+			background-color: #EF5350;
+		}
+		</style>
+		<iron-ajax id="checkStatus"
+			url="{{statusURL}}"
+			handle-as="json"
+			last-response="{{response}}"
+			on-response="update"
+			on-error="error">
+		</iron-ajax>
+
+	</template>
+
+	<script>
+		(function() {
+			'use strict';
+
+			Polymer({
+				is: 'login-status',
+				properties: {
+					status: {
+						type: String,
+						notify: true,
+						observer: 'watchStatus'
+					},
+					timer: {
+						type: Number,
+						notify: true
+					},
+					url: {
+						type: String
+					},
+					statusURL: {
+						computed: 'computeURL(url)'
+					}
+				},
+				computeURL: function(url) {
+					return this.url + 'status'
+				},
+				update: function() {
+					if (this.response.status == 'success') {
+						this.status = 'watch';
+					}
+				},
+				watchStatus: function() {
+					if (this.status == 'watch') {
+						this.timer = setInterval(function() {
+							var stat = document.querySelector('#checkStatus');
+							stat.generateRequest();
+						}, 11000);
+					}
+				},
+				error: function() {
+					this.status = 'none';
+					app.keys = '';
+					clearInterval(this.timer);
+				}
+			});
+		})();
+	</script>
+</dom-module>

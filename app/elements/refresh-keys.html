@@ -1,0 +1,32 @@
+<dom-module id="refresh-keys">
+	<template>
+		<iron-ajax id="refreshKeys"
+			url="{{refresh}}"
+			handle-as="json">
+		</iron-ajax>
+        <paper-icon-button icon="refresh" on-click="refreshKeys"></paper-icon-button>
+	</template>
+
+	<script>
+		(function() {
+			'use strict';
+			Polymer({
+				is: 'refresh-keys',
+				properties: {
+					url: {
+						type: String
+					},
+					refresh: {
+						computed: 'computeURL(url)'
+					}
+				},
+				computeURL: function(url) {
+					return this.url + 'refresh'
+				},
+                refreshKeys: function() {
+                    this.$.refreshKeys.generateRequest();
+                }
+			});
+		})();
+	</script>
+</dom-module>

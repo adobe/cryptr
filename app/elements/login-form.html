@@ -1,0 +1,158 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+
+<dom-module id="login-form">
+	<template>
+		<style>
+			#errortoast {
+				background-color: #EF5350;
+			}
+			#sub1, #sub2, #initfield {
+				margin: 0;
+			}
+			paper-dialog > *:last-child {
+				margin: 0;
+				padding: 0px;
+			}
+			paper-progress {
+				width: auto;
+			}
+			paper-progress.blue {
+				--paper-progress-active-color: #03A9F4;
+			}
+		</style>
+
+		<iron-ajax id="authenticateReq"
+			url="{{auth}}"
+			handle-as="json"
+			content-type="application/x-www-form-urlencoded"
+			body="{{data}}"
+			method="POST"
+			last-response="{{loginResponse}}"
+			on-response="success"
+			timeout="9000"
+			on-error="showError">
+		</iron-ajax>
+
+		<paper-dialog id="modal" class="white noselect" modal no-cancel-on-esc-key no-cancel-on-outside-click>
+			<h1>Login</h1>
+			<div id="initfield" style="display: none">
+				<paper-input value="{{url}}" label="Server URL (HTTPS)"></paper-input>
+			</div>
+			<paper-input id="sub1" value="{{username}}" label="LDAP Username"></paper-input>
+			<paper-input id="sub2" value="{{password}}" label="Password" type="password"></paper-input>
+			<div class="buttons">
+				<iron-a11y-keys id="a11y" target="[[target]]" keys="enter" on-keys-pressed="login"></iron-a11y-keys>
+				<iron-a11y-keys id="a11y" target="[[alttarget]]" keys="enter" on-keys-pressed="login"></iron-a11y-keys>
+				<paper-button on-tap="login" autofocus disabled="{{disabled}}">Login</paper-button>
+			</div>
+			<paper-progress class="blue" indeterminate disabled="{{!disabled}}"></paper-progress>
+		</paper-dialog>
+
+		<paper-toast id="errortoast" class="fit-bottom" duration="6000" text""></paper-toast>
+	</template>
+
+	<script>
+		(function() {
+			'use strict';
+			Polymer({
+				is: 'login-form',
+				properties: {
+					status: {
+						type: String,
+						value: '',
+						notify: true,
+						observer: 'watchStatus'
+					},
+					data: {
+						computed: 'computeData(username, password)'
+					},
+					target: {
+						type: Object,
+						value: function() {
+							return this.$.sub1;
+						}
+					},
+					alttarget: {
+						type: Object,
+						value: function() {
+							return this.$.sub2;
+						}
+					},
+					username: {
+						type: String,
+						value: '',
+						notify: true
+					},
+					password: {
+						type: String,
+						value: ''
+					},
+					disabled: {
+						type: Boolean,
+						value: false
+					},
+					url: {
+						type: String,
+						notify: true,
+						observer: 'observeInit'
+					},
+					auth: {
+						computed: 'computeURL(url)'
+					}
+				},
+				attached: function() {
+					this.status = 'none';
+				},
+				computeData: function(u, p) {
+					return 'username=' + u + '&password=' + Base64.encode(p);
+				},
+				computeURL: function(url) {
+					return this.url + 'auth'
+				},
+				login: function() {
+					if (this.url.toLowerCase().startsWith('https')) {
+						this.disabled = true;
+						this.$.authenticateReq.generateRequest();
+					} else {
+						this.$.errortoast.text = 'A trusted HTTPS based URL is required.';
+						this.$.initfield.style.display = 'inline-block';
+						this.$.errortoast.show();
+					}
+				},
+				success: function() {
+					if (this.loginResponse.status == "success") {
+						this.status = 'watch';
+						this.password = '';
+						this.disabled = false;
+						this.$.modal.close();
+					} else if (this.loginResponse.status == "error") {
+						this.$.errortoast.text = this.loginResponse.message;
+						this.$.errortoast.show();
+						this.disabled = false;
+					} else if (this.loginResponse.message) {
+						this.$.errortoast.text = this.loginResponse.message;
+						this.$.errortoast.show();
+						this.disabled = false;
+					}
+				},
+				showError: function(e) {
+					this.disabled = false;
+					if (!e.detail.error.message) this.$.errortoast.text = 'Error: Connection timed out.';
+					else if (e.detail.error.message.includes('503')) this.$.errortoast.text = 'Error: Cannot contact server. Please try again later.';
+					else if (e.detail.error.message.includes('401')) this.$.errortoast.text = 'Error: Unauthorized Request.';
+					else this.$.errortoast.text = 'Error: Please try again later.';
+					this.$.errortoast.show();
+				},
+				watchStatus: function() {
+					if (this.status == 'none') {
+						this.$.modal.open();
+					}
+				},
+				observeInit: function() {
+					if (this.url == '') this.$.initfield.style.display = 'inline-block';
+					ipcRenderer.send('update-url', this.url);
+				}
+			});
+		})();
+	</script>
+</dom-module>

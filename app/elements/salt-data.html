@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+
+<dom-module id="salt-data">
+	<style>
+		:host {
+			paper-input {
+				--paper-input-container-disabled: {
+					opacity: 1;
+				}
+				--paper-input-container-input: {
+					font-size: .8em;
+					font-weight: 400;
+				}
+				--paper-input-container-underline-disabled: {
+					border-bottom: none;
+				}
+			}
+			--iron-data-table-row-hover: {
+				background-color: #EEE;
+			}
+		}
+		#grid {
+			font-family: 'Roboto', 'Noto', sans-serif;
+			--iron-data-table-header: {
+				font-size: .95em;
+				font-weight: 100;
+			}
+			--iron-data-table-row: {
+				/*height: 60px;*/
+				font-size: .8em;
+				font-weight: 400;
+				cursor: default;
+			}
+		}
+		paper-toast {
+			right: 10px;
+			left: auto;
+		}
+		paper-item {
+			padding: 0px;
+		}
+		paper-input {
+			padding-bottom: 16px;
+		}
+	</style>
+	<template>
+		<button-actions id="actions" selected-items="{{selectedItems}}" clear-val="{{clearVal}}" folders="{{response.folders}}" titlevalue="{{titlevalue}}" url="{{url}}"></button-actions>
+		<iron-data-table id="grid" items="[[data]]" selection-enabled multi-selection selected-items="{{selectedItems}}">
+			<data-table-column name="Name" sort-by="name" flex="1">
+				<template>[[item.name]]</template>
+			</data-table-column>
+			<data-table-column name="Username" sort-by="username" flex="1">
+				<template>
+					<paper-item>
+						<paper-input value="[[item.username]]" disabled></paper-input>
+					</paper-item>
+					<!-- <paper-icon-button icon="content-copy"  on-click="clicked"></paper-icon-button> -->
+				</template>
+			</data-table-column>
+			<data-table-column name="Password" sort-by="password" >
+				<template>
+					<paper-item>
+						<paper-input value="[[item.password]]" type="password" disabled></paper-input>
+						<paper-icon-button icon="content-copy"  on-click="clicked"></paper-icon-button>
+					</paper-item>
+				</template>
+			</data-table-column>
+			<data-table-column name="Note" sort-by="note" flex="3">
+				<template>[[item.note]]</template>
+			</data-table-column>
+		</iron-data-table>
+
+		<paper-toast id="copied" duration="2000" text="Copied"></paper-toast>
+	</template>
+
+	<script>
+		Polymer({
+			is: "salt-data",
+			properties: {
+				response: {
+					type: Object,
+					observer: 'setType'
+				},
+				selectedItems: {
+					type: Array
+				},
+				titlevalue: {
+					type: String,
+					value: '',
+					observer: 'setType'
+				},
+				data: {
+					type: Array
+				},
+				query: {
+					type: String,
+					value: '',
+					observer: 'searchFilter'
+				},
+				clearVal: {
+					type: Boolean,
+					value: false,
+					observer: 'clearGrid'
+				},
+				url: {
+					type: String
+				}
+			},
+			clicked: function(e){
+				clipboard.writeText(e.path[2].children[0].value);
+				this.$.copied.text = 'Copied';
+				this.$.copied.show();
+			},
+			clearGrid: function() {
+				if (this.clearVal) {
+					this.$.grid.clearSelection();
+					this.clearVal = false;
+				}
+			},
+			setType: function() {
+				if (this.response) {
+					if (this.titlevalue != '') {
+						if (this.titlevalue == 'all') this.data = this.response.results;
+						else this.folderFilter();
+					}
+				}
+			},
+			searchFilter: function() {
+				if (this.response) {
+					if (this.query != '') {
+						var temp = [];
+						for (var i = 0; i < this.response.results.length; i++) {
+							if (this.response.results[i].name.toLowerCase().includes(this.query.toLowerCase()) || this.response.results[i].username.toLowerCase().includes(this.query.toLowerCase()) || this.response.results[i].note.toLowerCase().includes(this.query.toLowerCase())) {
+								temp.push(this.response.results[i]);
+							}
+						}
+					} else {
+						this.data = this.response.results;
+					}
+					this.data = temp;
+				}
+			},
+			folderFilter: function() {
+				var temp = [];
+				for (var i = 0; i < this.response.results.length; i++){
+					var index = this.response.folderdata[this.titlevalue].indexOf(this.response.results[i].parsedname);
+	                if (index != -1) temp.push(this.response.results[i]);
+				}
+				this.data = temp;
+			}
+		});
+	</script>
+</dom-module>
+</html>
