@@ -110,7 +110,9 @@
 					return this.url + 'auth'
 				},
 				login: function() {
+					this.url = this.url.trim();
 					if (this.url.toLowerCase().startsWith('https')) {
+						if (!(this.url.endsWith('/'))) this.url += '/';
 						this.disabled = true;
 						this.$.authenticateReq.generateRequest();
 					} else {
