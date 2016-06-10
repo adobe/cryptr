@@ -1,7 +1,7 @@
 {
   "name": "cryptr",
   "author": "Jacob Crowther",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "A password-manager GUI built for SaltStack's GPG Renderer",
   "main": "app/main.js",
   "repository": {
@@ -10,7 +10,7 @@
   "license": "MIT",
   "scripts": {
     "start": "electron app/main.js",
-    "build": "electron-zip-packager ./ Cryptr --platform=all --arch=all --version=0.36.7 --app-version=1.0.6 prune --asar --icon=app/images/cryptr --overwrite --out=dist --ignore=dist --ignore=README.md"
+    "build": "electron-zip-packager ./ Cryptr --platform=all --arch=all --version=0.36.7 --app-version=1.0.7 prune --asar --icon=app/images/cryptr --overwrite --out=dist --ignore=dist --ignore=README.md"
   },
   "dependencies": {
     "electron-packager": "^5.2.1",

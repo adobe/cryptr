@@ -35,7 +35,7 @@
 
 		<paper-dialog id="modal" class="white noselect" modal no-cancel-on-esc-key no-cancel-on-outside-click>
 			<h1>Login</h1>
-			<div id="initfield" style="display: none">
+			<div id="initfield">
 				<paper-input value="{{url}}" label="Server URL (HTTPS)"></paper-input>
 			</div>
 			<paper-input id="sub1" value="{{username}}" label="LDAP Username"></paper-input>
@@ -117,7 +117,6 @@
 						this.$.authenticateReq.generateRequest();
 					} else {
 						this.$.errortoast.text = 'A trusted HTTPS based URL is required.';
-						this.$.initfield.style.display = 'inline-block';
 						this.$.errortoast.show();
 					}
 				},
@@ -151,7 +150,6 @@
 					}
 				},
 				observeInit: function() {
-					if (this.url == '') this.$.initfield.style.display = 'inline-block';
 					ipcRenderer.send('update-url', this.url);
 				}
 			});
