@@ -22,7 +22,7 @@
             paper-button {
                 padding: 0px;
             }
-            .foldertext {
+            .buttontext {
                 font-size: 14px;
             }
             paper-toast {
@@ -62,7 +62,7 @@
         <paper-menu-button id="moveButton" vertical-offset="35" horizontal-offset="70" style="display: inline-block;">
             <paper-button class="dropdown-trigger">
                 <iron-icon icon="add" style="padding-right: 3px; padding-bottom: 3px;"></iron-icon>
-                <span class="foldertext">Add to Folder</span>
+                <span class="buttontext">Add to Folder</span>
             </paper-button>
             <paper-menu class="dropdown-content">
                 <template is="dom-repeat" items="[[folders]]">
@@ -73,19 +73,21 @@
 
         <paper-button id="removeButton" style="display: none;" on-tap="remove">
             <iron-icon icon="delete" style="padding: 0px 3px 3px 15px;"></iron-icon>
-            <span class="foldertext">Remove from folder</span>
+            <span class="buttontext">Remove from folder</span>
         </paper-button>
 
         <paper-menu-button id="newFolder" vertical-offset="35" horizontal-offset="52" style="display: inline-block;">
             <paper-button class="dropdown-trigger">
                 <iron-icon icon="create-new-folder" style="padding-right: 3px; padding-bottom: 3px;"></iron-icon>
-                <span class="foldertext">Create Folder from items</span>
+                <span class="buttontext">Create Folder from items</span>
             </paper-button>
             <paper-menu class="dropdown-content" style="padding: 0px">
                 <paper-input id="newFolderInput" label="Folder Name" style="padding: 0px 10px;" always-float-label></paper-input>
                 <iron-a11y-keys id="a11y" target="[[target]]" keys="enter" on-keys-pressed="move"></iron-a11y-keys>
             </paper-menu>
         </paper-menu-button>
+
+		<paper-checkbox class="buttontext" style="margin-left: 20px" checked="{{prevPassword}}">SHOW PREVIOUS PASSWORD</paper-checkbox>
 
         <paper-toast id="noItems" class="red" duration="2000" text="No items selected."></paper-toast>
         <paper-toast id="done" class="green" duration="1000" text="Done. Updating"></paper-toast>
@@ -125,6 +127,12 @@
 					},
 					removeURL: {
 						computed: 'computeRemoveURL(url)'
+					},
+					prevPassword: {
+						type: Boolean,
+						value: false,
+						notify: true,
+						observer: 'watchPrevPassword'
 					}
 				},
 				computeURL: function(url) {
@@ -171,7 +179,10 @@
     					this.clearVal = true;
                         this.$.done.show();
     				} else this.$.noItems.show();
-    			}
+    			},
+				watchPrevPassword: function() {
+					ipcRenderer.send('update-prevpass', this.prevPassword);
+				}
 			});
 		})();
 	</script>

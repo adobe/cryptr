@@ -18,11 +18,13 @@ function createWindow() {
 	try {
 		settings = JSON.parse(fs.readFileSync(initPath, 'utf8'));
 		if (settings.init === undefined || settings.init === null) settings.init = '';
+		if (settings.prevpass === undefined || settings.prevpass === null) settings.prevpass = false;
 	}
 	catch(e) {
 		settings.width = 1052;
 		settings.height = 612;
 		settings.init = '';
+		settings.prevpass = false;
 	}
 
 	// Create the browser window.
@@ -95,7 +97,11 @@ app.on('activate', function () {
 
 ipcMain.on('initialized', function(event, arg) {
 	event.sender.send('url', settings.init);
+	event.sender.send('prevpass', settings.prevpass);
 });
 ipcMain.on('update-url', function(event, arg) {
 	settings.init = arg;
+});
+ipcMain.on('update-prevpass', function(event, arg) {
+	settings.prevpass = arg;
 });

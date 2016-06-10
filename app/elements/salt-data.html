@@ -45,7 +45,7 @@
 		}
 	</style>
 	<template>
-		<button-actions id="actions" selected-items="{{selectedItems}}" clear-val="{{clearVal}}" folders="{{response.folders}}" titlevalue="{{titlevalue}}" url="{{url}}"></button-actions>
+		<button-actions id="actions" selected-items="{{selectedItems}}" prev-password="{{prevPassword}}" clear-val="{{clearVal}}" folders="{{response.folders}}" titlevalue="{{titlevalue}}" url="{{url}}"></button-actions>
 		<iron-data-table class="noselect" id="grid" items="[[data]]" selection-enabled multi-selection selected-items="{{selectedItems}}">
 			<data-table-column name="Name" sort-by="name" flex="1">
 				<template>[[item.name]]</template>
@@ -53,7 +53,7 @@
 			<data-table-column name="Username" sort-by="username" flex="1">
 				<template>
 					<paper-item>
-						<paper-input class="noselect" value="[[item.username]]" disabled></paper-input>
+						<paper-input value="[[item.username]]" disabled></paper-input>
 						<paper-icon-button icon="content-copy" on-click="copyUsername"></paper-icon-button>
 					</paper-item>
 				</template>
@@ -61,7 +61,15 @@
 			<data-table-column name="Password" sort-by="password" >
 				<template>
 					<paper-item style="cursor: pointer" on-mousedown="showPassword" on-mouseout="hidePassword" on-mouseup="hidePassword">
-						<paper-input class="noselect" value="[[item.password]]" type="password" disabled></paper-input>
+						<paper-input value="[[item.password]]" type="password" disabled></paper-input>
+						<paper-icon-button icon="content-copy" on-click="copyPassword"></paper-icon-button>
+					</paper-item>
+				</template>
+			</data-table-column>
+			<data-table-column name="Previous Password" hidden="[[!prevPassword]]">
+				<template>
+					<paper-item style="cursor: pointer" on-mousedown="showPassword" on-mouseout="hidePassword" on-mouseup="hidePassword">
+						<paper-input value="[[item.password_previous]]" type="password" disabled></paper-input>
 						<paper-icon-button icon="content-copy" on-click="copyPassword"></paper-icon-button>
 					</paper-item>
 				</template>
@@ -105,6 +113,9 @@
 				},
 				url: {
 					type: String
+				},
+				prevPassword: {
+					notify: true
 				}
 			},
 			copyPassword: function(e){

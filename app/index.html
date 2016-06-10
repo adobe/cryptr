@@ -82,16 +82,16 @@
 						</section>
 
 						<section data-route="all">
-							<salt-data titlevalue="all" response="{{response}}" url="{{url}}"></salt-data>
+							<salt-data titlevalue="all" response="{{response}}" url="{{url}}" prev-password="{{prevPassword}}"></salt-data>
 						</section>
 
 						<section data-route="search">
-							<salt-data response="{{response}}" query="{{query}}" url="{{url}}"></salt-data>
+							<salt-data response="{{response}}" query="{{query}}" url="{{url}}" prev-password="{{prevPassword}}"></salt-data>
 						</section>
 
 						<template is="dom-repeat" items="{{response.folders}}">
 							<section data-route$="folder{{index}}">
-								<salt-data titlevalue="{{item}}" response="{{response}}" url="{{url}}"></salt-data>
+								<salt-data titlevalue="{{item}}" response="{{response}}" url="{{url}}" prev-password="{{prevPassword}}"></salt-data>
 							</section>
 						</template>
 
@@ -112,6 +112,7 @@
 		const ipcRenderer = require('electron').ipcRenderer;
 		app.url = 'start';
 		ipcRenderer.on('url', function(event, arg) { app.url = arg; });
+		ipcRenderer.on('prevpass', function(event, arg) { app.prevPassword = arg; });
 		ipcRenderer.send('initialized', 'ping');
 	</script>
 </body>
