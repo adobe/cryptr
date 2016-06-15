@@ -48,6 +48,7 @@
 			body="{{moveData}}"
 			method="POST"
 			handle-as="json"
+			on-response="updateKeys"
 			last-response="{{moveKeysResponse}}">
 		</iron-ajax>
 
@@ -56,6 +57,17 @@
 			body="{{removeData}}"
 			method="POST"
 			handle-as="json"
+			on-response="updateKeys"
+			last-response="{{removeKeysResponse}}">
+		</iron-ajax>
+
+		<iron-ajax id="deleteFolder"
+			url="{{deleteURL}}"
+			body="{{deleteData}}"
+			method="POST"
+			handle-as="json"
+			content-type="application/json"
+			on-response="updateKeys"
 			last-response="{{removeKeysResponse}}">
 		</iron-ajax>
 
@@ -76,6 +88,7 @@
             <span class="buttontext">Remove from folder</span>
         </paper-button>
 
+
         <paper-menu-button id="newFolder" vertical-offset="35" horizontal-offset="52" style="display: inline-block;">
             <paper-button class="dropdown-trigger">
                 <iron-icon icon="create-new-folder" style="padding-right: 3px; padding-bottom: 3px;"></iron-icon>
@@ -86,6 +99,11 @@
                 <iron-a11y-keys id="a11y" target="[[target]]" keys="enter" on-keys-pressed="move"></iron-a11y-keys>
             </paper-menu>
         </paper-menu-button>
+
+		<paper-button id="removeFolderButton" style="display: none;" on-tap="delete">
+			<iron-icon icon="highlight-off" style="padding: 0px 3px 3px 15px;"></iron-icon>
+			<span class="buttontext">Delete folder</span>
+		</paper-button>
 
 		<paper-checkbox class="buttontext" style="margin-left: 20px" checked="{{prevPassword}}">SHOW PREVIOUS PASSWORD</paper-checkbox>
 
@@ -128,6 +146,9 @@
 					removeURL: {
 						computed: 'computeRemoveURL(url)'
 					},
+					deleteURL: {
+						computed: 'computeDeleteURL(url)'
+					},
 					prevPassword: {
 						type: Boolean,
 						value: false,
@@ -135,15 +156,22 @@
 						observer: 'watchPrevPassword'
 					}
 				},
+				updateKeys: function() {
+					document.getElementById('requestKeys').generateRequest();
+				},
 				computeURL: function(url) {
 					return this.url + 'move'
 				},
 				computeRemoveURL: function(url) {
 					return this.url + 'remove'
 				},
+				computeDeleteURL: function(url) {
+					return this.url + 'deletefolder'
+				},
                 attached: function() {
-                    if (this.titlevalue != 'all' && this.titlevalue != 'search') {
+                    if (this.titlevalue != 'all' && this.titlevalue != '') {
                         this.$.moveButton.style.display = 'none';
+                        this.$.removeFolderButton.style.display = 'inline-block';
                         this.$.removeButton.style.display = 'inline-block';
                     }
                     // This is a hack. There is a bug in Polymer that makes the dropdown menus appear initially at the center of the screen, then move to their proper location. This forces them to do this at page load.
@@ -179,6 +207,13 @@
     					this.clearVal = true;
                         this.$.done.show();
     				} else this.$.noItems.show();
+    			},
+    			delete: function() {
+					this.deleteData = '';
+					this.deleteData += '{"folder": "' + this.titlevalue + '"}';
+					this.$.deleteFolder.generateRequest();
+					this.clearVal = true;
+                    this.$.done.show();
     			},
 				watchPrevPassword: function() {
 					ipcRenderer.send('update-prevpass', this.prevPassword);

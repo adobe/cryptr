@@ -166,8 +166,13 @@
 			folderFilter: function() {
 				var temp = [];
 				for (var i = 0; i < this.response.results.length; i++){
-					var index = this.response.folderdata[this.titlevalue].indexOf(this.response.results[i].parsedname);
-	                if (index != -1) temp.push(this.response.results[i]);
+					if (this.response.folderdata[this.titlevalue]) {
+						var index = this.response.folderdata[this.titlevalue].indexOf(this.response.results[i].parsedname);
+						if (index != -1) temp.push(this.response.results[i]);
+					} else {
+						page('#!/all');
+						break;
+					}
 				}
 				this.data = temp;
 			}
