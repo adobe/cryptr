@@ -35,7 +35,7 @@ function createWindow() {
 	mainWindow.loadURL('file://' + __dirname + '/index.html');
 
 	// Open the DevTools.
-	mainWindow.webContents.openDevTools();
+	// mainWindow.webContents.openDevTools();
 
 	if (process.platform == 'darwin') {
 		// Menu items for MacOS. Specifically, this enables Copy/Paste while disallowing opening DevTools.
