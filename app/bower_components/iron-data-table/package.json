@@ -1,6 +1,6 @@
 {
   "name": "iron-data-table",
-  "version": "1.0.0",
+  "version": "0.1.4",
   "description": "![](iron-data-table.png)",
   "main": "index.html",
   "directories": {
@@ -21,7 +21,9 @@
   },
   "homepage": "https://github.com/Saulis/iron-data-table#readme",
   "dependencies": {
-    "bower": "^1.7.7",
+    "bower": "^1.7.7"
+  },
+  "devDependencies": {
     "web-component-tester": "^4.2.0"
   }
 }

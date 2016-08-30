@@ -124,7 +124,27 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       </demo-snippet>
 
       <h3>
-        Tab layout is effected by the writing direction of the surrounding area.
+        The <code>fit-container</code> attribute causes scrollable tabs to
+        stretch to fit their container if the tabs don't need to scroll.
+      </h3>
+      <demo-snippet>
+        <template>
+          <paper-tabs selected="0" scrollable fit-container>
+            <paper-tab>NUMBER ONE ITEM</paper-tab>
+            <paper-tab>ITEM TWO</paper-tab>
+            <paper-tab>THE THIRD ITEM</paper-tab>
+          </paper-tabs>
+          <br>
+          <paper-tabs selected="0" scrollable fit-container style="width: 50%;">
+            <paper-tab>NUMBER ONE ITEM</paper-tab>
+            <paper-tab>ITEM TWO</paper-tab>
+            <paper-tab>THE THIRD ITEM</paper-tab>
+          </paper-tabs>
+        </template>
+      </demo-snippet>
+
+      <h3>
+        Tab layout is affected by the writing direction of the surrounding area.
       </h3>
       <demo-snippet>
         <template>
@@ -170,7 +190,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       <h3>
         Use the <code>link</code> attribute when a <code>paper-tab</code>
-        contains a link. The link will fill the entire tab.
+        contains a link. The link will fill the entire tab. <code>paper-tabs</code>
+        implements its own tabindexing and keyboard focus patterns so an anchor
+        placed inside should set <code>tabindex="-1"</code>.
       </h3>
       <demo-snippet>
         <template>
@@ -185,9 +207,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           </style>
 
           <paper-tabs selected="0">
-            <paper-tab link><a href="#item1">ITEM ONE</a></paper-tab>
-            <paper-tab link><a href="#item2">ITEM TWO</a></paper-tab>
-            <paper-tab link><a href="#item3">ITEM THREE</a></paper-tab>
+            <paper-tab link>
+              <a href="#item1" tabindex="-1">ITEM ONE</a>
+            </paper-tab>
+            <paper-tab link>
+              <a href="#item2" tabindex="-1">ITEM TWO</a>
+            </paper-tab>
+            <paper-tab link>
+              <a href="#item3" tabindex="-1">ITEM THREE</a>
+            </paper-tab>
           </paper-tabs>
         </template>
       </demo-snippet>
@@ -215,6 +243,46 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               <paper-tab>ITEM TWO</paper-tab>
             </paper-tabs>
           </paper-toolbar>
+        </template>
+      </demo-snippet>
+
+      <h3>
+        Use <code>autoselect</code> to enable automatic tab selection.
+      </h3>
+      <demo-snippet>
+        <template>
+          <paper-tabs selected="0" autoselect>
+            <paper-tab>ITEM ONE</paper-tab>
+            <paper-tab>ITEM TWO</paper-tab>
+            <paper-tab>ITEM THREE</paper-tab>
+          </paper-tabs>
+        </template>
+      </demo-snippet>
+
+      <h3>
+        Use <code>autoselect-delay</code> to adjust the delay between the last
+        keyup event and when the tab is automatically selected (when
+        <code>autoselect</code> is true).
+      </h3>
+      <demo-snippet>
+        <template>
+          <h4>
+            <code>autoselect-delay="0"</code>
+          </h4>
+          <paper-tabs selected="0" no-slide autoselect autoselect-delay="0">
+            <paper-tab>ITEM ONE</paper-tab>
+            <paper-tab>ITEM TWO</paper-tab>
+            <paper-tab>ITEM THREE</paper-tab>
+          </paper-tabs>
+
+          <h4>
+            <code>autoselect-delay="1000"</code>
+          </h4>
+          <paper-tabs selected="0" autoselect autoselect-delay="1000">
+            <paper-tab>ITEM ONE</paper-tab>
+            <paper-tab>ITEM TWO</paper-tab>
+            <paper-tab>ITEM THREE</paper-tab>
+          </paper-tabs>
         </template>
       </demo-snippet>
 

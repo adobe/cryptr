@@ -95,6 +95,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         test('right arrow advances the selection', function (done) {
           var g = fixture('WithSelection');
+          MockInteractions.focus(g);
 
           // Needs to be async since the underlying iron-selector uses observeNodes.
           Polymer.Base.async(function() {
@@ -113,6 +114,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         test('left arrow reverses the selection', function (done) {
           var g = fixture('WithSelection');
+          MockInteractions.focus(g);
 
           // Needs to be async since the underlying iron-selector uses observeNodes.
           Polymer.Base.async(function() {
@@ -131,6 +133,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         test('selection should skip disabled items', function (done) {
           var g = fixture('WithDisabled');
+          MockInteractions.focus(g);
 
           // Needs to be async since the underlying iron-selector uses observeNodes.
           Polymer.Base.async(function() {
@@ -149,6 +152,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         test('clicking should change the selection', function (done) {
           var g = fixture('WithSelection');
+          MockInteractions.focus(g);
 
           // Needs to be async since the underlying iron-selector uses observeNodes.
           Polymer.Base.async(function() {
@@ -167,6 +171,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         test('clicking the selected item should not deselect', function (done) {
           var g = fixture('WithSelection');
+          MockInteractions.focus(g);
 
           // Needs to be async since the underlying iron-selector uses observeNodes.
           Polymer.Base.async(function() {
@@ -208,6 +213,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         test('arrow keys cause iron-activate events', function(done) {
           var g = fixture('WithSelection');
+          MockInteractions.focus(g);
 
           // Needs to be async since the underlying iron-selector uses observeNodes.
           Polymer.Base.async(function() {

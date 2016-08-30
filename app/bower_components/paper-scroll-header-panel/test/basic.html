@@ -44,24 +44,24 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       setup(function() {
         scrollHeaderPanel = fixture('trivialProgress');
-
         toolbar = Polymer.dom(scrollHeaderPanel).querySelector('paper-toolbar');
         content = Polymer.dom(scrollHeaderPanel).querySelector('.content');
       });
 
       test('check default', function() {
-        assert.equal(scrollHeaderPanel.header, toolbar);
-        assert.equal(scrollHeaderPanel.content, content);
-        assert.equal(scrollHeaderPanel.condenses, false);
-        assert.equal(scrollHeaderPanel.noReveal, false);
-        assert.equal(scrollHeaderPanel.fixed, false);
-        assert.typeOf(scrollHeaderPanel.scroller, 'object');
-        assert.equal(scrollHeaderPanel.keepCondensedHeader, false);
-        assert.equal(scrollHeaderPanel.keepCondensedHeader, false);
-
-        scrollHeaderPanel.measureHeaderHeight();
-        assert.equal(scrollHeaderPanel.headerHeight, toolbar.offsetHeight);
-        assert.equal(scrollHeaderPanel.condensedHeaderHeight, Math.round(toolbar.offsetHeight * 1/3));
+        flush(function() {
+          assert.equal(scrollHeaderPanel.header, toolbar);
+          assert.equal(scrollHeaderPanel.content, content);
+          assert.equal(scrollHeaderPanel.condenses, false);
+          assert.equal(scrollHeaderPanel.noReveal, false);
+          assert.equal(scrollHeaderPanel.fixed, false);
+          assert.typeOf(scrollHeaderPanel.scroller, 'object');
+          assert.equal(scrollHeaderPanel.keepCondensedHeader, false);
+          assert.equal(scrollHeaderPanel.keepCondensedHeader, false);
+          scrollHeaderPanel.measureHeaderHeight();
+          assert.equal(scrollHeaderPanel.headerHeight, toolbar.offsetHeight);
+          assert.equal(scrollHeaderPanel.condensedHeaderHeight, Math.round(toolbar.offsetHeight * 1/3));
+        });
       });
 
       test('condensation', function(done) {

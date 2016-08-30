@@ -22,6 +22,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   <link rel="import" href="simple-element.html">
   <link rel="import" href="element-with-nested-form-element.html">
   <link rel="import" href="element-with-nested-input.html">
+  <link rel="import" href="validatable-element-with-nested-elements.html">
 
 </head>
 <body>
@@ -128,12 +129,43 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </template>
   </test-fixture>
 
+  <test-fixture id="FormValidateNonRequiredCustomElements">
+    <template>
+      <form is="iron-form" action="/responds_with_json" method="post">
+        <paper-input label="numbers" pattern="^[0-9]$" ></paper-input>
+      </form>
+    </template>
+  </test-fixture>
+
+  <test-fixture id="FormValidateNonRequiredElements">
+    <template>
+      <form is="iron-form" action="/responds_with_json" method="post">
+        <input type="text" name="letters" pattern="^[a-z]$" >
+      </form>
+    </template>
+  </test-fixture>
+
+  <test-fixture id="FormValidateNestedElements">
+    <template>
+      <form is="iron-form">
+        <validatable-element-with-nested-elements>
+          <simple-element required></simple-element>
+          <input required>
+        </validatable-element-with-nested-elements>
+      </form>
+    </template>
+  </test-fixture>
+
   <test-fixture id="FormForResetting">
     <template>
       <form is="iron-form">
         <simple-element name="zig" value="zag"></simple-element>
         <paper-input name="zig" value="zug"></paper-input>
+        <paper-input name="blank" value=""></paper-input>
         <paper-textarea name="zig" value="zog"></paper-textarea>
+        <paper-textarea name="undef"></paper-textarea>
+        <paper-textarea name="blank" value=""></paper-textarea>
+        <input name="blank" value="">
         <input name="foo" value="bar">
         <input type="checkbox" name="foo" value="bar1" checked>
         <input type="checkbox" name="foo" value="bar2">
@@ -249,26 +281,73 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       assert.equal(Object.keys(json).length, 1);
     });
 
-  test('native elements are validated if they have a name', function() {
-    var f = fixture('FormWithRequiredElements');
-    assert.equal(f.elements.length, 1);
+    test('native elements are validated if they have a name', function() {
+      var f = fixture('FormWithRequiredElements');
+      assert.equal(f.elements.length, 1);
 
-    var input = f.elements[0];
-    input.name = 'zag';
+      var input = f.elements[0];
+      input.name = 'zag';
 
-    assert.isFalse(f.validate());
-    assert.isFalse(input.validity.valid);
+      assert.isFalse(f.validate());
+      assert.isFalse(input.validity.valid);
 
-    input.value = 'robin';
+      input.value = 'robin';
 
-    assert.isTrue(f.validate());
-    assert.isTrue(input.validity.valid);
+      assert.isTrue(f.validate());
+      assert.isTrue(input.validity.valid);
 
-    // The elements have names, so they're serialized.
-    var json = f.serialize();
-    assert.equal(Object.keys(json).length, 1);
+      // The elements have names, so they're serialized.
+      var json = f.serialize();
+      assert.equal(Object.keys(json).length, 1);
+    });
+
+    test('non-required custom elements are validated', function() {
+      var
+        f = fixture('FormValidateNonRequiredCustomElements'),
+        elements = f.getEffectiveChildren(),
+        input = elements && elements[0]
+      ;
+
+      assert.equal(elements.length, 1);
+
+      assert.isTrue(f.validate());
+      assert.isTrue(input.validate());
+
+      input.value = "abcdefg";
+
+      assert.isFalse(f.validate());
+      assert.isFalse(input.validate());
+    });
+
+    test('non-required native elements are validated', function() {
+      var f = fixture('FormValidateNonRequiredElements');
+      assert.equal(f.elements.length, 1);
+
+      var input = f.elements[0];
+
+      assert.isTrue(f.validate());
+      assert.isTrue(input.validity.valid);
+
+      input.value = "012345";
+
+      assert.isFalse(f.validate());
+      assert.isFalse(input.validity.valid);
+    });
+
+    test('nested elements are not validated', function() {
+      var f = fixture('FormValidateNestedElements');
+
+      // <validatable-element-with-nested-elements> returns true.
+      assert.isTrue(f.validate());
+
+      // The form also contains an invalid custom and native element, but those
+      // shouldn't affect the form's validity.
+      assert.equal(f._customElements.length, 2);
+      assert.equal(f.elements.length, 1);
+      assert.isFalse(f.$$('simple-element').validate());
+      assert.isFalse(f.$$('input').checkValidity());
+    });
   });
-});
 
   suite('serializing', function() {
     var f;
@@ -372,47 +451,68 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       // Initial values.
       var customElement = form.querySelector('simple-element');
       var input = form.querySelector('input[name="foo"]');
+      var inputBlank = form.querySelector('input[name="blank"]');
       var checkbox1 = form.querySelectorAll('input[type="checkbox"]')[0];
       var checkbox2 = form.querySelectorAll('input[type="checkbox"]')[1];
-      var paperInput = form.querySelector('paper-input');
-      var paperTextarea = form.querySelector('paper-textarea');
+      var paperInput = form.querySelector('paper-input[name="zig"]');
+      var paperInputBlank = form.querySelector('paper-input[name="blank"]');
+      var paperTextarea = form.querySelector('paper-textarea[name="zig"]');
+      var paperTextareaBlank = form.querySelector('paper-textarea[name="blank"]');
 
       assert.equal(customElement.value, 'zag');
       assert.equal(input.value, 'bar');
+      assert.equal(inputBlank.value, '');
       assert.isTrue(checkbox1.checked);
       assert.isFalse(checkbox2.checked);
       assert.equal(paperInput.value, 'zug');
       assert.equal(paperInput.inputElement.value, 'zug');
+      assert.equal(paperInputBlank.value, '');
+      assert.equal(paperInputBlank.inputElement.value, '');
       assert.equal(paperTextarea.value, 'zog');
       assert.equal(paperTextarea.inputElement.textarea.value, 'zog');
+      assert.equal(paperTextareaBlank.value, '');
+      assert.equal(paperTextareaBlank.inputElement.textarea.value, '');
 
       // Change the values.
       customElement.value = 'not zag';
       input.value = 'not bar';
+      inputBlank.value = 'not blank';
       checkbox1.checked = false;
       checkbox2.checked = true;
       paperInput.value = 'not zug';
+      paperInputBlank.value = 'not blank';
       paperTextarea.value = 'not zog';
+      paperTextareaBlank.value = 'not blank';
 
       assert.equal(customElement.value, 'not zag');
       assert.equal(input.value, 'not bar');
+      assert.equal(inputBlank.value, 'not blank');
       assert.isFalse(checkbox1.checked);
       assert.isTrue(checkbox2.checked);
       assert.equal(paperInput.value, 'not zug');
       assert.equal(paperInput.inputElement.value, 'not zug');
+      assert.equal(paperInputBlank.value, 'not blank');
+      assert.equal(paperInputBlank.inputElement.value, 'not blank');
       assert.equal(paperTextarea.value, 'not zog');
       assert.equal(paperTextarea.inputElement.textarea.value, 'not zog');
+      assert.equal(paperTextareaBlank.value, 'not blank');
+      assert.equal(paperTextareaBlank.inputElement.textarea.value, 'not blank');
 
       form.addEventListener('iron-form-reset', function(event) {
         // Restored initial values.
         assert.equal(customElement.value, 'zag');
         assert.equal(input.value, 'bar');
+        assert.equal(inputBlank.value, '');
         assert.isTrue(checkbox1.checked);
         assert.isFalse(checkbox2.checked);
         assert.equal(paperInput.value, 'zug');
         assert.equal(paperInput.inputElement.value, 'zug');
+        assert.equal(paperInputBlank.value, '');
+        assert.equal(paperInputBlank.inputElement.value, '');
         assert.equal(paperTextarea.value, 'zog');
         assert.equal(paperTextarea.inputElement.textarea.value, 'zog');
+        assert.equal(paperTextareaBlank.value, '');
+        assert.equal(paperTextareaBlank.inputElement.textarea.value, '');
         done();
       });
 
@@ -425,30 +525,60 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       // Initial values.
       var customElement = form.querySelector('simple-element');
       var input = form.querySelector('input[name="foo"]');
+      var inputBlank = form.querySelector('input[name="blank"]');
       var checkbox1 = form.querySelectorAll('input[type="checkbox"]')[0];
       var checkbox2 = form.querySelectorAll('input[type="checkbox"]')[1];
-      var paperInput = form.querySelector('paper-input');
-      var paperTextarea = form.querySelector('paper-textarea');
+      var paperInput = form.querySelector('paper-input[name="zig"]');
+      var paperInputBlank = form.querySelector('paper-input[name="blank"]');
+      var paperTextarea = form.querySelector('paper-textarea[name="zig"]');
+      var paperTextareaBlank = form.querySelector('paper-textarea[name="blank"]');
 
       assert.equal(customElement.value, 'zag');
       assert.equal(input.value, 'bar');
+      assert.equal(inputBlank.value, '');
       assert.isTrue(checkbox1.checked);
       assert.isFalse(checkbox2.checked);
       assert.equal(paperInput.value, 'zug');
       assert.equal(paperInput.inputElement.value, 'zug');
+      assert.equal(paperInputBlank.value, '');
+      assert.equal(paperInputBlank.inputElement.value, '');
       assert.equal(paperTextarea.value, 'zog');
       assert.equal(paperTextarea.inputElement.textarea.value, 'zog');
+      assert.equal(paperTextareaBlank.value, '');
+      assert.equal(paperTextareaBlank.inputElement.textarea.value, '');
 
       form.addEventListener('iron-form-reset', function(event) {
         // Restored initial values.
         assert.equal(customElement.value, 'zag');
         assert.equal(input.value, 'bar');
+        assert.equal(inputBlank.value, '');
         assert.isTrue(checkbox1.checked);
         assert.isFalse(checkbox2.checked);
         assert.equal(paperInput.value, 'zug');
         assert.equal(paperInput.inputElement.value, 'zug');
+        assert.equal(paperInputBlank.value, '');
+        assert.equal(paperInputBlank.inputElement.value, '');
         assert.equal(paperTextarea.value, 'zog');
         assert.equal(paperTextarea.inputElement.textarea.value, 'zog');
+        assert.equal(paperTextareaBlank.value, '');
+        assert.equal(paperTextareaBlank.inputElement.textarea.value, '');
+        done();
+      });
+
+      form.reset();
+    });
+
+    test('form restores null-value paper-textarea if initially undefined', function(done) {
+      var form = fixture('FormForResetting');
+      var paperTextarea = form.querySelector('paper-textarea[name="undef"]');
+
+      form.addEventListener('iron-form-reset', function(event) {
+        // Setting the native textarea's value to undefined causes it to
+        // display literal "undefined", and paper-textarea.value is indirectly
+        // bound to the textarea's value, so iron-form resets any undefined
+        // initial values to null in order to avoid this problem.
+        assert.equal(paperTextarea.value, null);
+        assert.equal(paperTextarea.inputElement.textarea.value, '');
         done();
       });
 

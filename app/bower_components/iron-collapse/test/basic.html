@@ -1,5 +1,6 @@
 <!doctype html>
 <!--
+@license
 Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
 This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
 The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
@@ -35,6 +36,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       </template>
     </test-fixture>
 
+    <test-fixture id="test-empty">
+    <template>
+        <iron-collapse id="collapse" opened>
+        </iron-collapse>
+      </template>
+    </test-fixture>
+
     <script>
 
       suite('basic', function() {
@@ -60,7 +68,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         });
 
         test('default opened height', function() {
-          assert.equal(collapse.style.height, 'auto');
+          assert.equal(collapse.style.maxHeight, '');
         });
 
         test('set opened to false triggers animation', function(done) {
@@ -80,7 +88,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           // trying to animate the size update
           collapse.updateSize('0px', true);
           // Animation immediately disabled.
-          assert.equal(collapse.style.height, '0px');
+          assert.equal(collapse.style.maxHeight, '0px');
         });
 
         test('set opened to false, then to true', function(done) {
@@ -88,21 +96,21 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           collapse.addEventListener('transitionend', function() {
             if (collapse.opened) {
               // Check finalSize after animation is done.
-              assert.equal(collapse.style.height, 'auto');
+              assert.equal(collapse.style.height, '');
               done();
             } else {
               // Check if size is still 0px.
-              assert.equal(collapse.style.height, '0px');
+              assert.equal(collapse.style.maxHeight, '0px');
               // Trigger 2nd toggle.
               collapse.opened = true;
               // Size should be immediately set.
-              assert.equal(collapse.style.height, collapseHeight);
+              assert.equal(collapse.style.maxHeight, collapseHeight);
             }
           });
           // Trigger 1st toggle.
           collapse.opened = false;
           // Size should be immediately set.
-          assert.equal(collapse.style.height, '0px');
+          assert.equal(collapse.style.maxHeight, '0px');
         });
 
         test('opened changes trigger iron-resize', function() {
@@ -129,13 +137,41 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         test('toggle horizontal updates size', function() {
           collapse.horizontal = false;
           assert.equal(collapse.style.width, '');
-          assert.equal(collapse.style.height, 'auto');
-          assert.equal(collapse.style.transitionProperty, 'height');
+          assert.equal(collapse.style.maxHeight, '');
+          assert.equal(collapse.style.transitionProperty, 'max-height');
 
           collapse.horizontal = true;
-          assert.equal(collapse.style.width, 'auto');
+          assert.equal(collapse.style.maxWidth, '');
           assert.equal(collapse.style.height, '');
-          assert.equal(collapse.style.transitionProperty, 'width');
+          assert.equal(collapse.style.transitionProperty, 'max-width');
+        });
+
+        test('change size with updateSize', function(done) {
+          collapse.addEventListener('transitionend', function() {
+            // size should be kept after transition
+            assert.equal(collapse.style.maxHeight, "123px");
+            done();
+          });
+          collapse.updateSize("123px", true);
+        });
+
+      });
+
+      suite('empty', function() {
+
+        var collapse;
+
+        setup(function() {
+          collapse = fixture('test-empty');
+        });
+
+        test('empty&opened shows dynamically loaded content', function(done) {
+          flush(function () {
+            collapse.toggle();
+            collapse.toggle();
+            assert.equal(collapse.style.maxHeight, "");
+            done();
+          });
         });
 
       });

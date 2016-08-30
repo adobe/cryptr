@@ -1,6 +1,6 @@
 {
   "name": "platinum-https-redirect",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "authors": [
     "The Polymer Authors"
   ],
@@ -13,9 +13,7 @@
     "web-component",
     "web-components"
   ],
-  "main": [
-    "platinum-https-redirect.html"
-  ],
+  "main": "platinum-https-redirect.html",
   "private": true,
   "repository": {
     "type": "git",
@@ -33,13 +31,13 @@
   },
   "devDependencies": {
     "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",
-    "web-component-tester": "*"
+    "web-component-tester": "^4.0.0"
   },
-  "_release": "1.0.1",
+  "_release": "1.0.2",
   "_resolution": {
     "type": "version",
-    "tag": "v1.0.1",
-    "commit": "47c14e39ec0b57baed026aac5b6908b02864f69a"
+    "tag": "v1.0.2",
+    "commit": "3fa46649197efb242c04f9e91f111b698a5a17a9"
   },
   "_source": "git://github.com/PolymerElements/platinum-https-redirect.git",
   "_target": "^1.0.0",

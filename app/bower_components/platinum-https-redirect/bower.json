@@ -13,9 +13,7 @@
     "web-component",
     "web-components"
   ],
-  "main": [
-    "platinum-https-redirect.html"
-  ],
+  "main": "platinum-https-redirect.html",
   "private": true,
   "repository": {
     "type": "git",
@@ -33,6 +31,6 @@
   },
   "devDependencies": {
     "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",
-    "web-component-tester": "*"
+    "web-component-tester": "^4.0.0"
   }
 }

@@ -1,0 +1,176 @@
+---
+title: Lazy Loading and Remote Data
+order: 3
+layout: page
+---
+
+[[vaadin-grid.lazy-loading]]
+= Lazy Loading and Remote Data
+
+In this section, you will learn how to use functions as data sources.
+This enables you to use lazy loading and remote data, such as with REST APIs.
+
+[[vaadin-grid.lazy-loading.functions]]
+== Function Data Source
+
+In addition to assigning an array to the [propertyname]#items# property, you can alternatively assign a function.
+The [vaadinelement]#vaadin-grid# element calls this function lazily, only when it needs more data to be displayed.
+
+The function takes two parameters: a `params` object and a `callback` function.
+The `params` object provides `index` and `count` properties, expressing the starting index from which
+data should be returned, and how many items should be returned, respectively.
+
+The `callback` parameter is a callback function which you must call with an array of the requested items as a parameter.
+
+[source,javascript]
+----
+var employees = [
+  {
+    user: {
+      name: { first: 'amber', last: 'crawford' },
+      email: 'amber.crawford@example.com'
+    }
+  },
+  {
+    user: {
+      name: { first: 'zoe', last: 'caldwell' },
+      email: 'zoe.caldwell@example.com'
+    }
+  },
+  {
+    user: {
+      name: { first: 'jessie', last: 'brooks' },
+      email: 'jessie.brooks@example.com'
+    }
+  }
+  ...
+];
+
+grid.size = employees.length;
+grid.items = function(params, callback) {
+  callback(employees.slice(params.index, params.index + params.count));
+};
+----
+
+When using function data sources, [propertyname]#size# always needs to be set manually.
+You can set it once, as was done in the example above, or alternatively as a second parameter given to the `callback` function.
+
+[source,javascript]
+----
+callback(employees.slice(params.index, params.index + params.count), employees.length);
+----
+
+For more details, see the API Documentation https://cdn.vaadin.com/vaadin-core-elements/latest/vaadin-grid/
+
+ifdef::web[]
+====
+See the link:https://cdn.vaadin.com/vaadin-elements/master/vaadin-grid/demo/datasources.html[live example].
+====
+endif::web[]
+
+[[vaadin-grid.lazy-loading.remote]]
+== Remote Data
+
+Using remote data does not differ much from using arrays within a function data source.
+You just need make sure you are handing an array of data over to the `callback` function.
+
+The `index` and `count` properties from the `params` argument come in handy if you are using a
+REST API that supports fetching partial result sets.
+
+[source,javascript]
+----
+grid.items = function(params, callback) {
+  var url = 'https://my.data/data?index=' + params.index + '&count=' + params.count;
+  var xhr = new XMLHttpRequest();
+  xhr.onreadystatechange = function() {
+    if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+      var response = JSON.parse(xhr.responseText);
+      callback(response.employees);
+    }
+  };
+
+  xhr.open('GET', url, true);
+  xhr.send();
+};
+----
+
+
+[[vaadin-grid.lazy-loading.size]]
+== Defining the Data Set Size
+In most cases when using remote data, you cannot know the size of the data set in advance.
+In the following are a few examples how you could set the [propertyname]#size# in different scenarios.
+
+* There is a separate API for fetching the size.
++
+[source,javascript]
+----
+// Define a function that you call manually every time
+// you believe the size might've changed.
+function setSize() {
+  var url = 'https://my.data/size';
+  var xhr = new XMLHttpRequest();
+    xhr.onreadystatechange = function() {
+      if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+        grid.size = JSON.parse(xhr.responseText).totalSize);
+      }
+    };
+    xhr.open('GET', url, true);
+    xhr.send();
+  };
+}
+----
+
+* The size is delivered with the data payload.
++
+[source,javascript]
+----
+grid.items = function(params, callback) {
+  var url = 'https://my.data/data?index=' + params.index + '&count=' + params.count;
+  var xhr = new XMLHttpRequest();
+  xhr.onreadystatechange = function() {
+    if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+      var response = JSON.parse(xhr.responseText);
+      callback(response.employees);
+
+      // Assign size from the data payload.
+      grid.size = response.totalSize;
+    }
+  };
+
+  xhr.open('GET', url, true);
+  xhr.send();
+};
+----
+
+* There is no API for getting the total size at all.
++
+[source,javascript]
+----
+// Set an initial size.
+grid.size = 10;
+
+grid.items = function(params, callback) {
+  var url = 'https://my.data/data?index=' + params.index + '&count=' + params.count;
+  var xhr = new XMLHttpRequest();
+  xhr.onreadystatechange = function() {
+    if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+      var response = JSON.parse(xhr.responseText);
+      callback(response.employees);
+
+      // Increase the size dynamically, resulting in "infinite" scrolling.
+      if (params.index + params.count == grid.size) {
+        grid.size += 10;
+      }
+    }
+  };
+
+  xhr.open('GET', url, true);
+  xhr.send();
+};
+----
+
+ifdef::web[]
+====
+See the link:https://cdn.vaadin.com/vaadin-elements/master/vaadin-grid/demo/datasources.html[live example].
+====
+endif::web[]

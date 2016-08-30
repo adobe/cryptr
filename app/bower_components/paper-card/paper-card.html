@@ -30,7 +30,7 @@ Example:
 
 Example - top card image:
 
-    <paper-card heading="Card Title" image="/path/to/image.png">
+    <paper-card heading="Card Title" image="/path/to/image.png" alt="image">
       ...
     </paper-card>
 
@@ -88,6 +88,7 @@ Custom property | Description | Default
       }
 
       .header iron-image {
+        display: block;
         width: 100%;
         --iron-image-width: 100%;
         pointer-events: none;
@@ -128,7 +129,13 @@ Custom property | Description | Default
     </style>
 
     <div class="header">
-      <iron-image hidden$="[[!image]]" src="[[image]]" preload$="[[preloadImage]]" fade$="[[fadeImage]]"></iron-image>
+      <iron-image
+          hidden$="[[!image]]"
+          src="[[image]]"
+          alt="[[alt]]"
+          placeholder="[[placeholderImage]]"
+          preload="[[preloadImage]]"
+          fade="[[fadeImage]]"></iron-image>
       <div hidden$="[[!heading]]" class$="[[_computeHeadingClass(image)]]">[[heading]]</div>
     </div>
 
@@ -158,6 +165,13 @@ Custom property | Description | Default
         },
 
         /**
+         * The text alternative of the card's title image.
+         */
+        alt: {
+          type: String
+        },
+
+        /**
          * When `true`, any change to the image url property will cause the
          * `placeholder` image to be shown until the image is fully rendered.
          */
@@ -173,6 +187,15 @@ Custom property | Description | Default
         fadeImage: {
           type: Boolean,
           value: false
+        },
+
+        /**
+         * This image will be used as a background/placeholder until the src image has
+         * loaded. Use of a data-URI for placeholder is encouraged for instant rendering.
+         */
+        placeholderImage: {
+          type: String,
+          value: null
         },
 
         /**

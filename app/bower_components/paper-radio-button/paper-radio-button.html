@@ -11,6 +11,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../paper-behaviors/paper-checked-element-behavior.html">
 <link rel="import" href="../paper-styles/default-theme.html">
+<link rel="import" href="../iron-flex-layout/iron-flex-layout.html">
 
 <!--
 Material design: [Radio button](https://www.google.com/design/spec/components/selection-controls.html#selection-controls-radio-button)
@@ -38,6 +39,7 @@ Custom property | Description | Default
 `--paper-radio-button-unchecked-ink-color` | Selected/focus ripple color when the input is not checked | `--primary-text-color`
 `--paper-radio-button-checked-color` | Radio button color when the input is checked | `--primary-color`
 `--paper-radio-button-checked-ink-color` | Selected/focus ripple color when the input is checked | `--primary-color`
+`--paper-radio-button-size` | Size of the radio button | `16px`
 `--paper-radio-button-label-color` | Label color | `--primary-text-color`
 `--paper-radio-button-label-spacing` | Spacing between the label and the button | `10px`
 
@@ -55,9 +57,11 @@ In order to apply the `Roboto` font to this element, make sure you've imported `
     <style>
       :host {
         display: inline-block;
+        line-height: 0;
         white-space: nowrap;
         cursor: pointer;
         @apply(--paper-font-common-base);
+        --calculated-paper-radio-button-size: var(--paper-radio-button-size, 16px);
       }
 
       :host(:focus) {
@@ -65,62 +69,55 @@ In order to apply the `Roboto` font to this element, make sure you've imported `
       }
 
       #radioContainer {
-        display: inline-block;
+        @apply(--layout-inline);
+        @apply(--layout-center-center);
         position: relative;
-        width: 16px;
-        height: 16px;
+        width: var(--calculated-paper-radio-button-size);
+        height: var(--calculated-paper-radio-button-size);
         vertical-align: middle;
       }
 
       #ink {
         position: absolute;
-        top: -16px;
-        left: -16px;
-        width: 48px;
-        height: 48px;
+        top: 50%;
+        left: 50%;
+        right: auto;
+        width: calc(3 * var(--calculated-paper-radio-button-size));
+        height: calc(3 * var(--calculated-paper-radio-button-size));
         color: var(--paper-radio-button-unchecked-ink-color, --primary-text-color);
         opacity: 0.6;
         pointer-events: none;
-      }
-
-      :host-context([dir="rtl"]) #ink {
-        right: -15px;
-        left: auto;
+        -webkit-transform: translate(-50%, -50%);
+        transform: translate(-50%, -50%);
       }
 
       #ink[checked] {
         color: var(--paper-radio-button-checked-ink-color, --primary-color);
       }
 
-      #offRadio {
+      #offRadio, #onRadio {
         position: absolute;
-        box-sizing: content-box;
-        top: 0px;
-        left: 0px;
-        right: 0px;
-        width: 12px;
-        height: 12px;
+        box-sizing: border-box;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
         border-radius: 50%;
-        border: solid 2px;
+      }
+
+      #offRadio {
+        border: 2px solid var(--paper-radio-button-unchecked-color, --primary-text-color);
         background-color: var(--paper-radio-button-unchecked-background-color, transparent);
-        border-color: var(--paper-radio-button-unchecked-color, --primary-text-color);
         transition: border-color 0.28s;
       }
 
       #onRadio {
-        position: absolute;
-        box-sizing: content-box;
-        top: 4px;
-        left: 4px;
-        right: 4px;
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
         background-color: var(--paper-radio-button-checked-color, --primary-color);
         -webkit-transform: scale(0);
         transform: scale(0);
         transition: -webkit-transform ease 0.28s;
         transition: transform ease 0.28s;
+        will-change: transform;
       }
 
       :host([checked]) #offRadio {
@@ -128,11 +125,12 @@ In order to apply the `Roboto` font to this element, make sure you've imported `
       }
 
       :host([checked]) #onRadio {
-        -webkit-transform: scale(1);
-        transform: scale(1);
+        -webkit-transform: scale(0.5);
+        transform: scale(0.5);
       }
 
       #radioLabel {
+        line-height: normal;
         position: relative;
         display: inline-block;
         vertical-align: middle;
@@ -142,7 +140,7 @@ In order to apply the `Roboto` font to this element, make sure you've imported `
       }
 
       :host-context([dir="rtl"]) #radioLabel {
-        margin-left: 0px;
+        margin-left: 0;
         margin-right: var(--paper-radio-button-label-spacing, 10px);
       }
 

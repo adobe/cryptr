@@ -7,7 +7,7 @@
     "list",
     "virtual-list"
   ],
-  "version": "1.2.7",
+  "version": "1.3.7",
   "homepage": "https://github.com/PolymerElements/iron-list",
   "authors": [
     "The Polymer Authors"
@@ -26,7 +26,7 @@
     "iron-scroll-target-behavior": "PolymerElements/iron-scroll-target-behavior#^1.0.0"
   },
   "devDependencies": {
-    "app-layout": "PolymerLabs/app-layout#master",
+    "app-layout": "polymerelements/app-layout#^0.10.0",
     "iron-flex-layout": "polymerelements/iron-flex-layout#^1.0.0",
     "iron-component-page": "polymerelements/iron-component-page#^1.0.0",
     "iron-ajax": "polymerelements/iron-ajax#^1.0.0",
@@ -34,7 +34,6 @@
     "iron-icons": "polymerelements/iron-icons#^1.0.0",
     "iron-scroll-threshold": "polymerelements/iron-scroll-threshold#^1.0.0",
     "iron-image": "polymerelements/iron-image#^1.0.0",
-    "paper-menu": "polymerelements/paper-menu#^1.0.0",
     "paper-item": "polymerelements/paper-item#^1.0.0",
     "paper-icon-button": "polymerelements/paper-icon-button#^1.0.0",
     "paper-button": "polymerelements/paper-button#^1.0.0",

@@ -57,7 +57,7 @@ between different views.
 ```
 
 To use links in tabs, add `link` attribute to `paper-tab` and put an `<a>`
-element in `paper-tab`.
+element in `paper-tab` with a `tabindex` of -1.
 
 Example:
 
@@ -71,13 +71,13 @@ Example:
 
 &lt;paper-tabs selected="0">
   &lt;paper-tab link>
-    &lt;a href="#link1" class="link">TAB ONE&lt;/a>
+    &lt;a href="#link1" class="link" tabindex="-1">TAB ONE&lt;/a>
   &lt;/paper-tab>
   &lt;paper-tab link>
-    &lt;a href="#link2" class="link">TAB TWO&lt;/a>
+    &lt;a href="#link2" class="link" tabindex="-1">TAB TWO&lt;/a>
   &lt;/paper-tab>
   &lt;paper-tab link>
-    &lt;a href="#link3" class="link">TAB THREE&lt;/a>
+    &lt;a href="#link3" class="link" tabindex="-1">TAB THREE&lt;/a>
   &lt;/paper-tab>
 &lt;/paper-tabs>
 </code></pre>
@@ -89,6 +89,7 @@ The following custom properties and mixins are available for styling:
 | Custom property | Description | Default |
 | --- | --- | --- |
 | `--paper-tabs-selection-bar-color` | Color for the selection bar | `--paper-yellow-a100` |
+| `--paper-tabs-selection-bar` | Mixin applied to the selection bar | `{}` |
 | `--paper-tabs` | Mixin applied to the tabs | `{}` |
 
 

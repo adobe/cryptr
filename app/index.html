@@ -31,6 +31,13 @@
 						<iron-icon icon="dashboard"></iron-icon>
 						<span>Dashboard</span>
 					</a>
+					<template is="dom-if" if="{{query}}">
+						<a data-route="search" href="{{baseUrl}}search" class="noselect">
+							<iron-icon icon="search"></iron-icon>
+							<span>Search</span>
+						</a>
+					</template>
+
 					<span id="drawerMenuText" class="noselect">Folders</span>
 					<a data-route="all" href="{{baseUrl}}all" class="noselect">
 						<iron-icon icon="folder-open"></iron-icon>
@@ -72,8 +79,8 @@
 				</paper-toolbar>
 
 				<!-- Main Content -->
-				<div class="content">
-					<iron-pages attr-for-selected="data-route" selected="{{route}}">
+				<div class="content" style="height: 100%">
+					<iron-pages attr-for-selected="data-route" selected="{{pageroute}}" style="height: 100%">
 						<section data-route="home">
 							<paper-material elevation="1">
 								<h2 class="page-title">Dashboard</h2>
@@ -81,19 +88,19 @@
 							</paper-material>
 						</section>
 
-						<section data-route="all">
-							<salt-data titlevalue="all" response="{{response}}" url="{{url}}" prev-password="{{prevPassword}}"></salt-data>
+						<section data-route="all" style="height: 100%">
+							<salt-data route="{{route}}" response="{{response}}" query="{{query}}" url="{{url}}" prev-password="{{prevPassword}}"></salt-data>
 						</section>
 
-						<section data-route="search">
+						<!-- <section data-route="search" style="height: 100%">
 							<salt-data response="{{response}}" query="{{query}}" url="{{url}}" prev-password="{{prevPassword}}"></salt-data>
 						</section>
 
 						<template is="dom-repeat" items="{{response.folders}}">
-							<section data-route$="folder{{index}}">
+							<section data-route$="folder{{index}}" style="height: 100%">
 								<salt-data titlevalue="{{item}}" response="{{response}}" url="{{url}}" prev-password="{{prevPassword}}"></salt-data>
 							</section>
-						</template>
+						</template> -->
 
 					</iron-pages>
 				</div>

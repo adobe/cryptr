@@ -1,7 +1,8 @@
+<!DOCTYPE html>
 <html>
 
 <head>
-  <script type="text/javascript" src="../../webcomponentsjs/webcomponents-lite.js"></script>
+  <script type="text/javascript" src="../../webcomponentsjs/webcomponents.js"></script>
   <link rel="import" href="common.html">
 </head>
 
@@ -11,9 +12,12 @@
     <nav class="vertical-section">
       <ul class="layout horizontal wrap">
         <li><a href="index.html">Data Binding</a></li>
+        <li><a href="selecting.html">Selecting Items</a></li>
+        <li><a href="templates.html">Templating</a></li>
+        <li><a href="details.html">Row Details</a></li>
         <li><a href="columns.html">Column Properties</a></li>
         <li><b>Styling</b></li>
-        <li><a href="filtering.html">Filtering, Sorting and Grouping</a></li>
+        <li><a href="filtering.html">Filtering and Sorting</a></li>
       </ul>
     </nav>
 
@@ -22,6 +26,10 @@
       <template>
         <template is="dom-bind">
           <style is="custom-style">
+            #grid1 data-table-row:not([header]) data-table-cell {
+              height: 60px;
+            }
+
             #grid1 {
               --default-primary-color: red;
               font-family: 'Roboto', 'Noto', sans-serif;
@@ -80,7 +88,7 @@
       </template>
     </demo-snippet>
 
-    <h4>Custom Classes</h4>
+    <h3>Custom Classes</h3>
     <demo-snippet>
       <template>
         <style is="custom-style">
@@ -109,17 +117,99 @@
       </template>
     </demo-snippet>
 
+    <h3>Customizing Rows and Cells with Hooks</h3>
+    <demo-snippet>
+      <template>
+        <style is="custom-style">
+          #grid4 data-table-cell.index {
+            color: red;
+          }
+
+          #grid4 data-table-row.even {
+            background-color: #eee;
+          }
+        </style>
+        <template is="dom-bind" id="t1">
+          <iron-ajax url="users.json" last-response="{{users}}" auto></iron-ajax>
+          <iron-data-table id="grid4" items="[[users.results]]">
+            <data-table-column name="#" width="20px" flex="0">
+              <template>[[index]]</template>
+            </data-table-column>
+            <data-table-column name="First Name">
+              <template>
+                <div>[[item.user.name.first]]</div>
+              </template>
+            </data-table-column>
+            <data-table-column name="Last Name">
+              <template>[[item.user.name.last]]</template>
+            </data-table-column>
+          </iron-data-table>
+          <script>
+            document.querySelector('#grid4').beforeRowBind = function(data, row) {
+              row.toggleClass('even', data.index % 2 === 0);
+            };
+            document.querySelector('#grid4').beforeCellBind = function(data, cell) {
+              cell.toggleClass('index', data.column.name === '#');
+            };
+          </script>
+        </template>
+      </template>
+    </demo-snippet>
+
+    <h3>Flex Height</h3>
+    <demo-snippet>
+      <template>
+        <style is="custom-style">
+          #flexbox {
+            height: 500px;
+            @apply(--layout-vertical)
+          }
+
+          #flexbox > iron-data-table {
+            transition: flex 200ms;
+          }
+
+          #flexbox > div {
+            background-color: #eee;
+            border: 1px solid #efefef;
+            flex: 1;
+          }
+        </style>
+        <template is="dom-bind" id="t2">
+          <label>Adjust iron-data-table Flex (1-10)</label>
+          <paper-slider min="1" max="10" step="1" immediate-value="{{flex}}" pin label="Flex"></paper-slider>
+          <div id="flexbox">
+            <div></div>
+            <iron-ajax url="users.json" last-response="{{users}}" auto></iron-ajax>
+            <iron-data-table items="[[users.results]]" style$="flex: [[flex]]">
+              <data-table-column name="#" width="20px" flex="0">
+                <template>
+                  <div class="index">[[index]]</div>
+                </template>
+              </data-table-column>
+              <data-table-column name="First Name">
+                <template>
+                  <div>[[item.user.name.first]]</div>
+                </template>
+              </data-table-column>
+              <data-table-column name="Last Name">
+                <template>[[item.user.name.last]]</template>
+              </data-table-column>
+            </iron-data-table>
+            <div></div>
+          </div>
+        </template>
+      </template>
+    </demo-snippet>
+
     <h3>Variable Row Height</h3>
     <demo-snippet>
       <template>
         <template is="dom-bind">
-          <style is="custom-style">
-            #grid3 {
-              --iron-data-table-cell-height: auto;
-            }
-          </style>
-
           <style>
+            #grid3 data-table-cell:not([header]) {
+              height: auto;
+            }
             #grid3 .hawaii {
               display: flex;
               align-items: center;
@@ -131,16 +221,10 @@
               align-items: center;
               height: 80px;
             }
-
-            #grid3 div[selected] {
-              display: flex;
-              align-items: center;
-              height: 100px;
-            }
           </style>
 
           <iron-ajax url="users.json" last-response="{{users}}" auto></iron-ajax>
-          <iron-data-table id="grid3" items="[[users.results]]" selection-enabled>
+          <iron-data-table id="grid3" items="[[users.results]]">
             <data-table-column name="First Name">
               <template>[[item.user.name.first]]</template>
             </data-table-column>
@@ -149,7 +233,7 @@
             </data-table-column>
             <data-table-column name="State">
               <template>
-                <div class$="[[item.user.location.state]]" selected$="[[selected]]">[[item.user.location.state]]</div>
+                <div class$="[[item.user.location.state]]">[[item.user.location.state]]</div>
               </template>
             </data-table-column>
           </iron-data-table>

@@ -27,74 +27,73 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   <link rel="import" href="dummy-data.html">
 
   <dom-module id="x-app">
-    <style>
-
-      :host {
-        display: block;
-        font-family: sans-serif;
-        @apply(--layout-horizontal);
-      }
-
-      iron-list {
-        @apply(--layout-flex);
-        height: 100%;
-      }
-
-      .item {
-        display: block;
-        padding: 8px;
-        border-bottom: 1px solid gray;
-        @apply(--layout-horizontal);
-      }
-
-      .item img {
-        height: 40px;
-        width: 40px;
-      }
-
-      .picture {
-        @apply(--layout-vertical);
-      }
-
-      #about {
-        color: lightgray;
-        font-style: italic;
-        font-size: 0.8em;
-      }
-
-      #last {
-        font-weight: bold;
-        font-size: 1.2em;
-      }
-
-      .padded {
-        @apply(--layout-flex);
-      }
-
-      .padded > * {
-        padding: 8px;
-      }
-
-      #index {
-        text-align: center;
-        padding-top: 8px;
-      }
-      #options {
-        background: white;
-        border-radius: 10px;
-        border: 1px solid gray;
-        position: absolute;
-        top: 5px;
-        right: 5px;
-        z-index: 10;
-        padding: 5px;
-      }
-      #friends {
-        height: 20px;
-      }
-
-    </style>
     <template>
+      <style>
+        :host {
+          display: block;
+          font-family: sans-serif;
+          @apply(--layout-horizontal);
+        }
+
+        iron-list {
+          @apply(--layout-flex);
+          height: 100%;
+        }
+
+        .item {
+          display: block;
+          padding: 8px;
+          border-bottom: 1px solid gray;
+          @apply(--layout-horizontal);
+        }
+
+        .item img {
+          height: 40px;
+          width: 40px;
+        }
+
+        .picture {
+          @apply(--layout-vertical);
+        }
+
+        #about {
+          color: lightgray;
+          font-style: italic;
+          font-size: 0.8em;
+        }
+
+        #last {
+          font-weight: bold;
+          font-size: 1.2em;
+        }
+
+        .padded {
+          @apply(--layout-flex);
+        }
+
+        .padded > * {
+          padding: 8px;
+        }
+
+        #index {
+          text-align: center;
+          padding-top: 8px;
+        }
+        #options {
+          background: white;
+          border-radius: 10px;
+          border: 1px solid gray;
+          position: absolute;
+          top: 5px;
+          right: 5px;
+          z-index: 10;
+          padding: 5px;
+        }
+        #friends {
+          height: 20px;
+        }
+      </style>
+
       <div id="options">
         <input value="{{separator::input}}" style="width:20px;">
         <label><input type="checkbox" checked="{{showing::change}}">Show friends</label>

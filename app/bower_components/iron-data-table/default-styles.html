@@ -1,24 +1,17 @@
 <style is="custom-style">
-  iron-data-table {
-    font: 400 100%/1.5 Roboto, sans-serif;
-    font-size: 13px;
-    font-weight: 400;
-    line-height: 1.1;
-    color: rgba(0, 0, 0, 0.87);
+  :root {
+    --iron-data-table: {
+      font: 400 100%/1.5 Roboto, sans-serif;
+      font-size: 13px;
+      font-weight: 400;
+      line-height: 1.1;
+      color: rgba(0, 0, 0, 0.87);
+    };
 
     --iron-data-table-header: {
       background-color: #fafafa;
       color: rgba(0, 0, 0, 0.54);
       font-size: 12px;
-      font-weight: 600;
-      height: 56px;
-    };
-
-    --iron-data-table-row-group: {
-      background-color: #eee;
-      border-bottom: 1px solid #e3e3e3;
-      border-top: 1px solid #e3e3e3;
-      font-size: 16px;
       font-weight: 600;
       height: 56px;
     };
@@ -49,7 +42,7 @@
       -webkit-transform: scaleX(0.0);
       transform: scaleX(0.0);
       z-index: 1;
-    }
+    };
 
     --iron-data-table-row-focused: {
       background-color: #eee;
@@ -58,6 +51,6 @@
     --iron-data-table-row-focused-after: {
       -webkit-transform: scaleX(1.0);
       transform: scaleX(1.0);
-    }
+    };
   }
 </style>

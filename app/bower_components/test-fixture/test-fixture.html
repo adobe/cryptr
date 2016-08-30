@@ -155,7 +155,9 @@ large quantity of ever-growing set-up and tear-down boilerplate.
 
     get fixtureTemplates () {
       if (!this._fixtureTemplates) {
-        this._fixtureTemplates = this.querySelectorAll('template');
+        // Copy fixtures to a true Array for Safari 7. This prevents their
+        // `content` property from being improperly garbage collected.
+        this._fixtureTemplates = Array.prototype.slice.apply(this.querySelectorAll('template'));
       }
 
       return this._fixtureTemplates;

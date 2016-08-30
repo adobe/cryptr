@@ -12,9 +12,9 @@ thing! https://github.com/PolymerLabs/tedium/issues
 
 -->
 
-[![Build Status](https://travis-ci.org/PolymerElements/paper-card.svg?branch=master)](https://travis-ci.org/PolymerElements/paper-card)
+[![Build status](https://travis-ci.org/PolymerElements/paper-card.svg?branch=master)](https://travis-ci.org/PolymerElements/paper-card)
 
-_[Demo and API Docs](https://elements.polymer-project.org/elements/paper-card)_
+_[Demo and API docs](https://elements.polymer-project.org/elements/paper-card)_
 
 
 ##&lt;paper-card&gt;
@@ -37,7 +37,7 @@ Example:
 Example - top card image:
 
 ```html
-<paper-card heading="Card Title" image="/path/to/image.png">
+<paper-card heading="Card Title" image="/path/to/image.png" alt="image">
   ...
 </paper-card>
 ```

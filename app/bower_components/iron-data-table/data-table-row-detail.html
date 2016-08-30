@@ -1,0 +1,48 @@
+<dom-module id="data-table-row-detail">
+  <template>
+    <style>
+      :host {
+        padding: 0 24px 0 24px;
+        display: flex;
+        align-items: center;
+      }
+    </style>
+    <content></content>
+  </template>
+  <script>
+    Polymer({
+      is: 'data-table-row-detail',
+
+      behaviors: [
+        saulis.DataTableTemplatizerBehavior
+      ],
+
+      properties: {
+        beforeBind: Object
+      },
+
+      observers: ['_beforeBind(beforeBind, item.*, index, selected, expanded)'],
+
+      attached: function() {
+        if (!Polymer.Settings.useNativeShadow) {
+          // details is supposed to be placed outside the local dom of iron-data-table.
+          Polymer.StyleTransformer.dom(this, 'iron-data-table', this._scopeCssViaAttr, true);
+          if (this.domHost) {
+            Polymer.StyleTransformer.dom(this, this.domHost.tagName.toLowerCase(), this._scopeCssViaAttr, false);
+          }
+        }
+      },
+
+      _beforeBind: function(beforeBind, item, index, selected, expanded) {
+        var data = {
+          index: index,
+          item: item.base,
+          expanded: expanded,
+          selected: selected
+        };
+
+        beforeBind(data, this);
+      }
+    });
+  </script>
+</dom-module>

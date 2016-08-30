@@ -54,7 +54,7 @@ between different views.
 
 
 To use links in tabs, add `link` attribute to `paper-tab` and put an `<a>`
-element in `paper-tab`.
+element in `paper-tab` with a `tabindex` of -1.
 
 Example:
 
@@ -68,13 +68,13 @@ Example:
 
 &lt;paper-tabs selected="0">
   &lt;paper-tab link>
-    &lt;a href="#link1" class="link">TAB ONE&lt;/a>
+    &lt;a href="#link1" class="link" tabindex="-1">TAB ONE&lt;/a>
   &lt;/paper-tab>
   &lt;paper-tab link>
-    &lt;a href="#link2" class="link">TAB TWO&lt;/a>
+    &lt;a href="#link2" class="link" tabindex="-1">TAB TWO&lt;/a>
   &lt;/paper-tab>
   &lt;paper-tab link>
-    &lt;a href="#link3" class="link">TAB THREE&lt;/a>
+    &lt;a href="#link3" class="link" tabindex="-1">TAB THREE&lt;/a>
   &lt;/paper-tab>
 &lt;/paper-tabs>
 </code></pre>
@@ -86,7 +86,7 @@ The following custom properties and mixins are available for styling:
 Custom property | Description | Default
 ----------------|-------------|----------
 `--paper-tabs-selection-bar-color` | Color for the selection bar | `--paper-yellow-a100`
-`--paper-tabs-selection-bar` | Mixin applied to the selection bar | {}
+`--paper-tabs-selection-bar` | Mixin applied to the selection bar | `{}`
 `--paper-tabs` | Mixin applied to the tabs | `{}`
 
 @hero hero.svg
@@ -104,9 +104,9 @@ Custom property | Description | Default
         font-size: 14px;
         font-weight: 500;
         overflow: hidden;
-          -moz-user-select: none;
-          -ms-user-select: none;
-          -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        -webkit-user-select: none;
         user-select: none;
 
         /* NOTE: Both values are needed, since some phones require the value to be `transparent`. */
@@ -140,8 +140,20 @@ Custom property | Description | Default
         white-space: nowrap;
       }
 
-      #tabsContent.horizontal {
+      #tabsContent:not(.scrollable),
+      #tabsContent.scrollable.fit-container {
         @apply(--layout-horizontal);
+      }
+
+      #tabsContent.scrollable.fit-container {
+        min-width: 100%;
+      }
+
+      #tabsContent.scrollable.fit-container > ::content > * {
+        /* IE - prevent tabs from compressing when they should scroll. */
+        -ms-flex: 1 0 auto;
+        -webkit-flex: 1 0 auto;
+        flex: 1 0 auto;
       }
 
       .hidden {
@@ -200,7 +212,7 @@ Custom property | Description | Default
     <paper-icon-button icon="paper-tabs:chevron-left" class$="[[_computeScrollButtonClass(_leftHidden, scrollable, hideScrollButtons)]]" on-up="_onScrollButtonUp" on-down="_onLeftScrollButtonDown" tabindex="-1"></paper-icon-button>
 
     <div id="tabsContainer" on-track="_scroll" on-down="_down">
-      <div id="tabsContent" class$="[[_computeTabsContentClass(scrollable)]]">
+      <div id="tabsContent" class$="[[_computeTabsContentClass(scrollable, fitContainer)]]">
         <div id="selectionBar" class$="[[_computeSelectionBarClass(noBar, alignBottom)]]"
             on-transitionend="_onBarTransitionEnd"></div>
         <content select="*"></content>
@@ -257,6 +269,15 @@ Custom property | Description | Default
         },
 
         /**
+         * If true, tabs expand to fit their container. This currently only applies when
+         * scrollable is true.
+         */
+        fitContainer: {
+          type: Boolean,
+          value: false
+        },
+
+        /**
          * If true, dragging on the tabs to scroll is disabled.
          */
         disableDrag: {
@@ -283,6 +304,25 @@ Custom property | Description | Default
         selectable: {
           type: String,
           value: 'paper-tab'
+        },
+
+        /**
+         * If true, tabs are automatically selected when focused using the
+         * keyboard.
+         */
+        autoselect: {
+          type: Boolean,
+          value: false
+        },
+
+        /**
+         * The delay (in milliseconds) between when the user stops interacting
+         * with the tabs through the keyboard and when the focused item is
+         * automatically selected (if `autoselect` is true).
+         */
+        autoselectDelay: {
+          type: Number,
+          value: 0
         },
 
         _step: {
@@ -321,12 +361,24 @@ Custom property | Description | Default
         'iron-deselect': '_onIronDeselect'
       },
 
+      keyBindings: {
+        'left:keyup right:keyup': '_onArrowKeyup'
+      },
+
       created: function() {
         this._holdJob = null;
+        this._pendingActivationItem = undefined;
+        this._pendingActivationTimeout = undefined;
+        this._bindDelayedActivationHandler = this._delayedActivationHandler.bind(this);
+        this.addEventListener('blur', this._onBlurCapture.bind(this), true);
       },
 
       ready: function() {
         this.setScrollDirection('y', this.$.tabsContainer);
+      },
+
+      detached: function() {
+        this._cancelPendingActivation();
       },
 
       _noinkChanged: function(noink) {
@@ -354,8 +406,8 @@ Custom property | Description | Default
         return '';
       },
 
-      _computeTabsContentClass: function(scrollable) {
-        return scrollable ? 'scrollable' : 'horizontal';
+      _computeTabsContentClass: function(scrollable, fitContainer) {
+        return scrollable ? 'scrollable' + (fitContainer ? ' fit-container' : '') : ' fit-container';
       },
 
       _computeSelectionBarClass: function(noBar, alignBottom) {
@@ -386,8 +438,65 @@ Custom property | Description | Default
       _onIronDeselect: function(event) {
         this.debounce('tab-changed', function() {
           this._tabChanged(null, this._previousTab);
+          this._previousTab = null;
         // See polymer/polymer#1305
         }, 1);
+      },
+
+      _activateHandler: function() {
+        // Cancel item activations scheduled by keyboard events when any other
+        // action causes an item to be activated (e.g. clicks).
+        this._cancelPendingActivation();
+
+        Polymer.IronMenuBehaviorImpl._activateHandler.apply(this, arguments);
+      },
+
+      /**
+       * Activates an item after a delay (in milliseconds).
+       */
+      _scheduleActivation: function(item, delay) {
+        this._pendingActivationItem = item;
+        this._pendingActivationTimeout = this.async(
+            this._bindDelayedActivationHandler, delay);
+      },
+
+      /**
+       * Activates the last item given to `_scheduleActivation`.
+       */
+      _delayedActivationHandler: function() {
+        var item = this._pendingActivationItem;
+        this._pendingActivationItem = undefined;
+        this._pendingActivationTimeout = undefined;
+        item.fire(this.activateEvent, null, {
+          bubbles: true,
+          cancelable: true
+        });
+      },
+
+      /**
+       * Cancels a previously scheduled item activation made with
+       * `_scheduleActivation`.
+       */
+      _cancelPendingActivation: function() {
+        if (this._pendingActivationTimeout !== undefined) {
+          this.cancelAsync(this._pendingActivationTimeout);
+          this._pendingActivationItem = undefined;
+          this._pendingActivationTimeout = undefined;
+        }
+      },
+
+      _onArrowKeyup: function(event) {
+        if (this.autoselect) {
+          this._scheduleActivation(this.focusedItem, this.autoselectDelay);
+        }
+      },
+
+      _onBlurCapture: function(event) {
+        // Cancel a scheduled item activation (if any) when that item is
+        // blurred.
+        if (event.target === this._pendingActivationItem) {
+          this._cancelPendingActivation();
+        }
       },
 
       get _tabContainerScrollSize () {
@@ -397,7 +506,6 @@ Custom property | Description | Default
             this.$.tabsContainer.offsetWidth
         );
       },
-
 
       _scroll: function(e, detail) {
         if (!this.scrollable) {
@@ -453,6 +561,9 @@ Custom property | Description | Default
 
       _tabChanged: function(tab, old) {
         if (!tab) {
+          // Remove the bar without animation.
+          this.$.selectionBar.classList.remove('expand');
+          this.$.selectionBar.classList.remove('contract');
           this._positionBar(0, 0);
           return;
         }
@@ -468,7 +579,9 @@ Custom property | Description | Default
         };
 
         if (this.noSlide || old == null) {
-          // position bar directly without animation
+          // Position the bar without animation.
+          this.$.selectionBar.classList.remove('expand');
+          this.$.selectionBar.classList.remove('contract');
           this._positionBar(this._pos.width, this._pos.left);
           return;
         }
@@ -523,7 +636,7 @@ Custom property | Description | Default
         this._width = width;
         this._left = left;
         this.transform(
-            'translate3d(' + left + '%, 0, 0) scaleX(' + (width / 100) + ')',
+            'translateX(' + left + '%) scaleX(' + (width / 100) + ')',
             this.$.selectionBar);
       },
 

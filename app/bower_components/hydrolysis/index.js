@@ -7,23 +7,23 @@
  * Code distributed by Google as part of the polymer project is also
  * subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
  */
- /*jslint node: true */
-'use strict';
 
+'use strict';
+require("babel-polyfill");
 /**
  * Static analysis for Polymer.
  * @namespace hydrolysis
  */
-module.exports = {
-  Analyzer:          require('./lib/analyzer'),
-  docs:              require('./lib/ast-utils/docs'),
-  FSResolver:        require('./lib/loader/fs-resolver'),
-  jsdoc:             require('./lib/ast-utils/jsdoc'),
-  Loader:            require('./lib/loader/file-loader'),
-  NoopResolver:      require('./lib/loader/noop-resolver'),
-  RedirectResolver:  require('./lib/loader/redirect-resolver'),
-  XHRResolver:       require('./lib/loader/xhr-resolver'),
-  StringResolver:    require('./lib/loader/string-resolver'),
-  _jsParse:          require('./lib/ast-utils/js-parse'),
-  _importParse:      require('./lib/ast-utils/import-parse'),
-};
+exports.Analyzer = require('./lib/analyzer').Analyzer;
+exports.FSResolver = require('./lib/loader/fs-resolver').FSResolver;
+exports.Loader = require('./lib/loader/file-loader').FileLoader;
+exports.NoopResolver = require('./lib/loader/noop-resolver').NoopResolver;
+exports.RedirectResolver =
+    require('./lib/loader/redirect-resolver').RedirectResolver;
+exports.XHRResolver = require('./lib/loader/xhr-resolver').XHRResolver;
+exports.StringResolver = require('./lib/loader/string-resolver').StringResolver;
+exports._jsParse = require('./lib/ast-utils/js-parse').jsParse;
+exports._importParse = require('./lib/ast-utils/import-parse').importParse;
+
+exports.docs = require('./lib/ast-utils/docs');
+exports.jsdoc = require('./lib/ast-utils/jsdoc');

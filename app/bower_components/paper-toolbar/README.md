@@ -12,9 +12,9 @@ thing! https://github.com/PolymerLabs/tedium/issues
 
 -->
 
-[![Build Status](https://travis-ci.org/PolymerElements/paper-toolbar.svg?branch=master)](https://travis-ci.org/PolymerElements/paper-toolbar)
+[![Build status](https://travis-ci.org/PolymerElements/paper-toolbar.svg?branch=master)](https://travis-ci.org/PolymerElements/paper-toolbar)
 
-_[Demo and API Docs](https://elements.polymer-project.org/elements/paper-toolbar)_
+_[Demo and API docs](https://elements.polymer-project.org/elements/paper-toolbar)_
 
 
 ##&lt;paper-toolbar&gt;
@@ -90,7 +90,7 @@ The following custom properties and mixins are available for styling:
 | --- | --- | --- |
 | `--paper-toolbar-title` | Mixin applied to the title of the toolbar | `{}` |
 | `--paper-toolbar-background` | Toolbar background color | `--primary-color` |
-| `--paper-toolbar-color` | Toolbar foreground color | `--primary-text-color` |
+| `--paper-toolbar-color` | Toolbar foreground color | `--dark-theme-text-color` |
 | `--paper-toolbar-height` | Custom height for toolbar | `64px` |
 | `--paper-toolbar-sm-height` | Custom height for small screen toolbar | `56px` |
 | `--paper-toolbar` | Mixin applied to the toolbar | `{}` |

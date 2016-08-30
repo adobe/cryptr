@@ -17,91 +17,60 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <meta name="apple-mobile-web-app-capable" content="yes">
 
     <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
-
+    <link rel="import" href="../../iron-demo-helpers/demo-snippet.html">
+    <link rel="import" href="../../iron-demo-helpers/demo-pages-shared-styles.html">
     <link rel="import" href="../../paper-radio-button/paper-radio-button.html">
     <link rel="import" href="../paper-radio-group.html">
-    <link rel="import" href="../../paper-styles/demo-pages.html">
 
-    <style is="custom-style">
-      .horizontal-section {
-        min-width: 200px;
+    <style is="custom-style" include="demo-pages-shared-styles">
+      .vertical-section-container {
+        max-width: 500px;
       }
 
-      paper-radio-button.blue {
-        --paper-radio-button-checked-color: var(--paper-light-blue-500);
-        --paper-radio-button-checked-ink-color: var(--paper-light-blue-500);
-        --paper-radio-button-unchecked-color: var(--paper-light-blue-900);
-        --paper-radio-button-unchecked-ink-color: var(--paper-light-blue-900);
+      label {
+        align-self: center;
       }
-
-      paper-radio-button.red {
-        --paper-radio-button-checked-color: var(--paper-red-500);
-        --paper-radio-button-checked-ink-color: var(--paper-red-500);
-        --paper-radio-button-unchecked-color: var(--paper-red-900);
-        --paper-radio-button-unchecked-ink-color: var(--paper-red-900);
-      }
-
-      paper-radio-button.green {
-        --paper-radio-button-checked-color: var(--paper-green-500);
-        --paper-radio-button-checked-ink-color: var(--paper-green-500);
-        --paper-radio-button-unchecked-color: var(--paper-green-900);
-        --paper-radio-button-unchecked-ink-color: var(--paper-green-900);
-      }
-
-      paper-radio-button.orange {
-        --paper-radio-button-checked-color: var(--paper-orange-500);
-        --paper-radio-button-checked-ink-color: var(--paper-orange-500);
-        --paper-radio-button-unchecked-color: var(--paper-orange-900);
-        --paper-radio-button-unchecked-ink-color: var(--paper-orange-900);
-      }
-
-      paper-radio-button {
-        display: block;
-      }
-
     </style>
   </head>
 
   <body unresolved>
-    <div class="horizontal-section-container">
-      <div>
-        <h4>Enabled</h4>
-        <div class="horizontal-section">
-          <paper-radio-group selected="c">
-            <paper-radio-button name="o">Oxygen</paper-radio-button>
-            <paper-radio-button name="c">Carbon</paper-radio-button>
-            <paper-radio-button name="h">Hydrogen</paper-radio-button>
-            <paper-radio-button name="n">Nitrogen</paper-radio-button>
-            <paper-radio-button name="ca">Calcium</paper-radio-button>
+    <div class="vertical-section-container centered">
+      <h3>A paper-radio-group allows only one item to be selected</h3>
+      <demo-snippet class="centered-demo">
+        <template>
+          <label id="label1">Dinosaurs:</label>
+          <paper-radio-group aria-labelledby="label1">
+            <paper-radio-button name="a">allosaurus</paper-radio-button>
+            <paper-radio-button name="b">brontosaurus</paper-radio-button>
+            <paper-radio-button name="d" disabled>diplodocus</paper-radio-button>
           </paper-radio-group>
-        </div>
-      </div>
+        </template>
+      </demo-snippet>
 
-      <div>
-        <h4>Disabled</h4>
-        <div class="horizontal-section">
-          <paper-radio-group selected="c">
-            <paper-radio-button name="o">Oxygen</paper-radio-button>
-            <paper-radio-button name="c">Carbon</paper-radio-button>
-            <paper-radio-button name="h" disabled>Hydrogen</paper-radio-button>
-            <paper-radio-button name="n" disabled>Nitrogen</paper-radio-button>
-            <paper-radio-button name="ca">Calcium</paper-radio-button>
+      <h3>It can have an initial selection</h3>
+      <demo-snippet class="centered-demo">
+        <template>
+          <label id="label2">Dinosaurs:</label>
+          <paper-radio-group selected="b" aria-labelledby="label2">
+            <paper-radio-button name="a">allosaurus</paper-radio-button>
+            <paper-radio-button name="b">brontosaurus</paper-radio-button>
+            <paper-radio-button name="d" disabled>diplodocus</paper-radio-button>
           </paper-radio-group>
-        </div>
-      </div>
+        </template>
+      </demo-snippet>
 
-      <div>
-        <h4>Color</h4>
-        <div class="horizontal-section">
-          <paper-radio-group selected="c">
-            <paper-radio-button name="o" class="blue">Oxygen</paper-radio-button>
-            <paper-radio-button name="c" class="red">Carbon</paper-radio-button>
-            <paper-radio-button name="h" class="orange">Hydrogen</paper-radio-button>
-            <paper-radio-button name="n" class="green">Nitrogen</paper-radio-button>
-            <paper-radio-button name="ca" class="blue">Calcium</paper-radio-button>
+      <h3>It can optionally allow items to be deselected</h3>
+      <demo-snippet class="centered-demo">
+        <template>
+          <label id="label3">Dinosaurs:</label>
+          <paper-radio-group selected="b" allow-empty-selection aria-labelledby="label3">
+            <paper-radio-button name="a">allosaurus</paper-radio-button>
+            <paper-radio-button name="b">brontosaurus</paper-radio-button>
+            <paper-radio-button name="d" disabled>diplodocus</paper-radio-button>
           </paper-radio-group>
-        </div>
-      </div>
+        </template>
+      </demo-snippet>
+
     </div>
   </body>
 </html>

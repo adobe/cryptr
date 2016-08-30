@@ -49,6 +49,14 @@ paper-scroll-header-panel {
 `paper-scroll-header-panel` works well with `paper-toolbar` but can use any element
 that represents a header by adding a `paper-header` class to it.
 
+Note: If the class `paper-header` is used, the header must be positioned relative or absolute. e.g.
+
+```css
+.paper-header {
+  position: relative;
+}
+```
+
 ```html
 <paper-scroll-header-panel>
   <div class="paper-header">Header</div>
@@ -65,7 +73,8 @@ Custom property | Description | Default
 ----------------|-------------|----------
 --paper-scroll-header-panel-full-header | To change background for toolbar when it is at its full size | {}
 --paper-scroll-header-panel-condensed-header | To change the background for toolbar when it is condensed | {}
---paper-scroll-header-container | To override or add container styles | {}
+--paper-scroll-header-panel-container | To override or add container styles | {}
+--paper-scroll-header-panel-header-container | To override or add header styles | {}
 
 @group Paper Element
 @element paper-scroll-header-panel
@@ -83,71 +92,72 @@ Custom property | Description | Default
 -->
 
 <dom-module id="paper-scroll-header-panel">
-
-  <style>
-    :host {
-      display: block;
-      position: relative;
-      overflow: hidden;
-    }
-
-    #mainContainer {
-      position: absolute;
-      top: 0;
-      right: 0;
-      bottom: 0;
-      left: 0;
-
-      -moz-box-sizing: border-box;
-      box-sizing: border-box;
-      -webkit-overflow-scrolling: touch;
-
-      overflow-x: hidden;
-      overflow-y: auto;
-
-      @apply(--paper-scroll-header-container);
-    }
-
-    #headerContainer {
-      position: absolute;
-      top: 0;
-      right: 0;
-      left: 0;
-    }
-
-    .bg-container {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-    }
-
-    #headerBg {
-      @apply(--paper-scroll-header-panel-full-header);
-    }
-
-    #condensedHeaderBg {
-      @apply(--paper-scroll-header-panel-condensed-header);
-    }
-
-    #headerBg, #condensedHeaderBg {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-repeat: no-repeat;
-      background-size: cover;
-      background-position: center center;
-    }
-
-    #condensedHeaderBg {
-      opacity: 0;
-    }
-  </style>
   <template>
+    <style>
+      :host {
+        display: block;
+        position: relative;
+        overflow: hidden;
+      }
+
+      #mainContainer {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+
+        -moz-box-sizing: border-box;
+        box-sizing: border-box;
+        -webkit-overflow-scrolling: touch;
+
+        overflow-x: hidden;
+        overflow-y: auto;
+        @apply(--paper-scroll-header-container); /* deprecated due to incorrect/confusing naming */
+        @apply(--paper-scroll-header-panel-container);
+      }
+
+      #headerContainer {
+        position: absolute;
+        top: 0;
+        right: 0;
+        left: 0;
+        @apply(--paper-scroll-header-panel-header-container);
+      }
+
+      .bg-container {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+      }
+
+      #headerBg {
+        @apply(--paper-scroll-header-panel-full-header);
+      }
+
+      #condensedHeaderBg {
+        @apply(--paper-scroll-header-panel-condensed-header);
+      }
+
+      #headerBg, #condensedHeaderBg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-repeat: no-repeat;
+        background-size: cover;
+        background-position: center center;
+      }
+
+      #condensedHeaderBg {
+        opacity: 0;
+      }
+    </style>
+
     <div id="mainContainer">
       <content id="mainContent" select=":not(paper-toolbar):not(.paper-header)"></content>
     </div>

@@ -1411,17 +1411,22 @@ function applyExtensions() {
   });
 }
 
+var fixtureTeardownAttached = false;
+
 extendInterfaces('fixture', function(context, teardown) {
 
   // Return context.fixture if it is already a thing, for backwards
   // compatibility with `test-fixture-mocha.js`:
   return context.fixture || function fixture(fixtureId, model) {
 
-    // Automatically register a teardown callback that will restore the
-    // test-fixture:
-    teardown(function() {
-      document.getElementById(fixtureId).restore();
-    });
+    if (!fixtureTeardownAttached) {
+      // Automatically register a teardown callback that will restore the
+      // test-fixture:
+      teardown(function() {
+        fixtureTeardownAttached = true;
+        document.getElementById(fixtureId).restore();
+      });
+    }
 
     // Find the test-fixture with the provided ID and create it, returning
     // the results:
@@ -1473,6 +1478,10 @@ extendInterfaces('stub', function(context, teardown) {
   };
 });
 
+// replacement map stores what should be
+var replacements = {};
+var replaceTeardownAttached = false;
+
 /**
  * replace
  *
@@ -1491,46 +1500,81 @@ extendInterfaces('replace', function(context, teardown) {
   return function replace(oldTagName) {
     return {
       with: function(tagName) {
+        // Standardizes our replacements map
+        oldTagName = oldTagName.toLowerCase();
+        tagName = tagName.toLowerCase();
+
+        replacements[oldTagName] = tagName;
+
+        // If the function is already a stub, restore it to original
+        if (Polymer.Base.instanceTemplate.isSinonProxy) {
+          return;
+        }
+
         // Keep a reference to the original `Polymer.Base.instanceTemplate`
         // implementation for later:
         var originalInstanceTemplate = Polymer.Base.instanceTemplate;
 
         // Use Sinon to stub `Polymer.Base.instanceTemplate`:
         sinon.stub(Polymer.Base, 'instanceTemplate', function(template) {
-          // The DOM to replace is the result of calling the "original"
-          // `instanceTemplate` implementation:
-          var dom = originalInstanceTemplate.apply(this, arguments);
+          var origContent = template._content || template.content;
+          var templateClone = document.createElement('template');
+          var content = templateClone.content;
+          var inertDoc = content.ownerDocument;
 
-          // The nodes to replace are queried from the DOM chunk:
-          var nodes = Array.prototype.slice.call(dom.querySelectorAll(oldTagName));
+          // imports node from inertDoc which holds inert nodes.
+          templateClone.content.appendChild(inertDoc.importNode(origContent, true));
 
-          // For all of the nodes we want to place...
-          nodes.forEach(function(node) {
+          // optional arguments are not optional on IE.
+          var nodeIterator = document.createNodeIterator(content,
+              NodeFilter.SHOW_ELEMENT, null, true);
+          var node;
 
-            // Create a replacement:
-            var replacement = document.createElement(tagName);
+          // Traverses the tree. A recently-replaced node will be put next, so
+          // if a node is replaced, it will be checked if it needs to be
+          // replaced again.
+          while (node = nodeIterator.nextNode()) {
+            var currentTagName = node.tagName.toLowerCase();
 
-            // For all attributes in the original node..
-            for (var index = 0; index < node.attributes.length; ++index) {
-              // Set that attribute on the replacement:
-              replacement.setAttribute(
-                node.attributes[index].name, node.attributes[index].value);
+            if (replacements.hasOwnProperty(currentTagName)) {
+              currentTagName = replacements[currentTagName];
+
+              // find the final tag name.
+              while (replacements[currentTagName]) {
+                currentTagName = replacements[currentTagName];
+              }
+
+              // Create a replacement:
+              var replacement = document.createElement(currentTagName);
+
+              // For all attributes in the original node..
+              for (var index = 0; index < node.attributes.length; ++index) {
+                // Set that attribute on the replacement:
+                replacement.setAttribute(
+                  node.attributes[index].name, node.attributes[index].value);
+              }
+
+              // Replace the original node with the replacement node:
+              node.parentNode.replaceChild(replacement, node);
+            }
+          }
+
+          return originalInstanceTemplate.call(this, templateClone);
+        });
+
+        if (!replaceTeardownAttached) {
+          // After each test...
+          teardown(function() {
+            replaceTeardownAttached = true;
+            // Restore the stubbed version of `Polymer.Base.instanceTemplate`:
+            if (Polymer.Base.instanceTemplate.isSinonProxy) {
+              Polymer.Base.instanceTemplate.restore();
             }
 
-            // Replace the original node with the replacement node:
-            node.parentNode.replaceChild(replacement, node);
+            // Empty the replacement map
+            replacements = {};
           });
-
-          return dom;
-        });
-
-        // After each test...
-        teardown(function() {
-          // Restore the stubbed version of `Polymer.Base.instanceTemplate`:
-          if (Polymer.Base.instanceTemplate.isSinonProxy) {
-            Polymer.Base.instanceTemplate.restore();
-          }
-        });
+        }
       }
     };
   };

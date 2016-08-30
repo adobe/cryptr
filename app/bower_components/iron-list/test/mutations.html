@@ -245,6 +245,24 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           done();
         });
       });
+
+      test('should update items off the screen', function() {
+        container.listHeight = 50;
+        list.items = buildDataSet(100);
+        Polymer.dom.flush();
+        list.scrollToIndex(40);
+        Polymer.dom.flush();
+        container.listHeight = 300;
+        container.fire('iron-resize');
+        Polymer.dom.flush();
+        list._didFocus({target: list._physicalItems[list._getPhysicalIndex(40)]});
+        list.scrollToIndex(80);
+        Polymer.dom.flush();
+        list.set('items.40.index', 'correct');
+        list.scrollToIndex(40);
+        Polymer.dom.flush();
+        assert.equal(getFirstItemFromList(list).textContent, 'correct');
+      });
     });
 
     suite('mutations of primitive type items', function() {

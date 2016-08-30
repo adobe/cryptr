@@ -27,7 +27,7 @@
             }
             paper-toast {
     			right: 10px;
-    			left: auto;
+    			left: auto !important;
     		}
             paper-toast.red {
                 border: 2px solid;
@@ -84,15 +84,15 @@
         </paper-menu-button>
 
         <paper-button id="removeButton" style="display: none;" on-tap="remove">
-            <iron-icon icon="delete" style="padding: 0px 3px 3px 15px;"></iron-icon>
-            <span class="buttontext">Remove from folder</span>
+            <iron-icon icon="highlight-off" style="padding: 0px 3px 3px 15px;"></iron-icon>
+            <span class="buttontext">Remove (from folder)</span>
         </paper-button>
 
 
         <paper-menu-button id="newFolder" vertical-offset="35" horizontal-offset="52" style="display: inline-block;">
             <paper-button class="dropdown-trigger">
                 <iron-icon icon="create-new-folder" style="padding-right: 3px; padding-bottom: 3px;"></iron-icon>
-                <span class="buttontext">Create Folder from items</span>
+                <span class="buttontext">New Folder from items</span>
             </paper-button>
             <paper-menu class="dropdown-content" style="padding: 0px">
                 <paper-input id="newFolderInput" label="Folder Name" style="padding: 0px 10px;" always-float-label></paper-input>
@@ -101,14 +101,14 @@
         </paper-menu-button>
 
 		<paper-button id="removeFolderButton" style="display: none;" on-tap="delete">
-			<iron-icon icon="highlight-off" style="padding: 0px 3px 3px 15px;"></iron-icon>
+			<iron-icon icon="delete" style="padding: 0px 3px 3px 15px;"></iron-icon>
 			<span class="buttontext">Delete folder</span>
 		</paper-button>
 
-		<paper-checkbox class="buttontext" style="margin-left: 20px" checked="{{prevPassword}}">SHOW PREVIOUS PASSWORD</paper-checkbox>
+		<!-- <paper-checkbox class="buttontext" style="margin-left: 20px" checked="{{prevPassword}}">SHOW PREVIOUS PASSWORD</paper-checkbox> - DEPRECATED-->
 
         <paper-toast id="noItems" class="red" duration="2000" text="No items selected."></paper-toast>
-        <paper-toast id="done" class="green" duration="1000" text="Done. Updating"></paper-toast>
+        <paper-toast id="done" class="green" duration="3000" text="placeholder"></paper-toast>
 	</template>
 
 	<script>
@@ -129,7 +129,8 @@
                         type: Array
                     },
                     titlevalue: {
-                        type: String
+                        type: String,
+						observer: 'changeRoute'
                     },
                     target: {
                         type: Object,
@@ -168,17 +169,16 @@
 				computeDeleteURL: function(url) {
 					return this.url + 'deletefolder'
 				},
-                attached: function() {
+                changeRoute: function() {
                     if (this.titlevalue != 'all' && this.titlevalue != '') {
                         this.$.moveButton.style.display = 'none';
-                        this.$.removeFolderButton.style.display = 'inline-block';
-                        this.$.removeButton.style.display = 'inline-block';
-                    }
-                    // This is a hack. There is a bug in Polymer that makes the dropdown menus appear initially at the center of the screen, then move to their proper location. This forces them to do this at page load.
-                    this.$.moveButton.open();
-                    this.$.moveButton.close();
-                    this.$.newFolder.open();
-                    this.$.newFolder.close();
+                        this.$.removeFolderButton.style.display = 'inline-flex';
+                        this.$.removeButton.style.display = 'inline-flex';
+                    } else {
+						this.$.moveButton.style.display = 'inline-flex';
+						this.$.removeFolderButton.style.display = 'none';
+						this.$.removeButton.style.display = 'none';
+					}
                 },
                 move: function(e) {
     				if (this.selectedItems.length > 0) {
@@ -190,6 +190,7 @@
     					}
     					this.$.moveKeys.generateRequest();
     					this.clearVal = true;
+                        this.$.done.text = 'Item Added to Folder';
                         this.$.done.show();
                         this.$.newFolder.close();
                         this.$.moveButton.close();
@@ -205,6 +206,7 @@
     					}
     					this.$.removeKeys.generateRequest();
     					this.clearVal = true;
+                        this.$.done.text = 'Item Removed from Folder';
                         this.$.done.show();
     				} else this.$.noItems.show();
     			},
@@ -213,6 +215,7 @@
 					this.deleteData += '{"folder": "' + this.titlevalue + '"}';
 					this.$.deleteFolder.generateRequest();
 					this.clearVal = true;
+                    this.$.done.text = 'Folder Deleted';
                     this.$.done.show();
     			},
 				watchPrevPassword: function() {

@@ -2,8 +2,9 @@
 <link rel="import" href="../../iron-demo-helpers/demo-pages-shared-styles.html">
 <link rel="import" href="../../paper-input/paper-input.html">
 <link rel="import" href="../../paper-button/paper-button.html">
+<link rel="import" href="../../paper-slider/paper-slider.html">
 <link rel="import" href="../../paper-checkbox/paper-checkbox.html">
-<link rel="import" href="../../iron-flex-layout/classes/iron-flex-layout.html">
+<link rel="import" href="../../iron-flex-layout/iron-flex-layout-classes.html">
 <link rel="import" href="../../iron-ajax/iron-ajax.html">
 
 <link rel="import" href="../default-styles.html">
@@ -123,31 +124,26 @@
 
 <script>
   var users;
-  document.addEventListener('WebComponentsReady', function() {
 
-    var xhr = new XMLHttpRequest();
-    xhr.onreadystatechange = function() {
-      if (xhr.readyState == XMLHttpRequest.DONE) {
-        if (xhr.status == 200) {
-          var json = JSON.parse(xhr.responseText);
-          users = json.results;
+  var xhr = new XMLHttpRequest();
+  xhr.onreadystatechange = function() {
+    if (xhr.readyState == XMLHttpRequest.DONE) {
+      if (xhr.status == 200) {
+        var json = JSON.parse(xhr.responseText);
+        users = json.results;
 
-          var grids = document.querySelectorAll('iron-data-table');
-
-          for (var i = 0; i < grids.length; i++) {
-            grids[i].items = users;
-          }
-
-          var templates = document.querySelectorAll('#t');
-
-          for (var i = 0; i < templates.length; i++) {
-            templates[i].users = users;
-          }
-        }
       }
-    };
+    }
+  };
 
-    xhr.open("GET", 'users.json', true);
-    xhr.send();
+  xhr.open("GET", 'users.json', true);
+  xhr.send();
+
+  document.addEventListener('WebComponentsReady', function() {
+    var templates = document.querySelectorAll('#t');
+
+    for (var i = 0; i < templates.length; i++) {
+      templates[i].users = users;
+    }
   });
 </script>

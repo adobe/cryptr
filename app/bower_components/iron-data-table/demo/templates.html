@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <script type="text/javascript" src="../../webcomponentsjs/webcomponents.js"></script>
+  <link rel="import" href="common.html">
+</head>
+
+<body unresolved>
+  <span id="forkongithub"><a href="https://github.com/Saulis/iron-data-table/">Fork me on GitHub</a></span>
+  <div class="vertical-section-container centered">
+    <nav class="vertical-section">
+      <ul class="layout horizontal wrap">
+        <li><a href="index.html">Data Binding</a></li>
+        <li><a href="selecting.html">Selecting Items</a></li>
+        <li><b>Templating</b></li>
+        <li><a href="details.html">Row Details</a></li>
+        <li><a href="columns.html">Column Properties</a></li>
+        <li><a href="styling.html">Styling</a></li>
+        <li><a href="filtering.html">Filtering and Sorting</a></li>
+      </ul>
+    </nav>
+
+    <h3>Template Support</h3>
+    <demo-snippet>
+      <template>
+        <template is="dom-bind">
+          <iron-ajax url="users.json" last-response="{{users}}" auto></iron-ajax>
+          <iron-data-table selection-enabled items="[[users.results]]">
+            <data-table-column name="#" width="20px" flex="0">
+              <template>[[index]]</template>
+            </data-table-column>
+            <data-table-column name="Selected" width="40px" flex="0">
+              <template>
+                <div hidden="[[!selected]]">Yes</div>
+              </template>
+            </data-table-column>
+            <data-table-column name="Picture" width="50px" flex="0">
+              <template>
+                <img src="[[item.user.picture.thumbnail]]" />
+              </template>
+            </data-table-column>
+            <data-table-column name="First Name">
+              <template>[[item.user.name.first]]</template>
+            </data-table-column>
+            <data-table-column name="Last Name">
+              <template>[[item.user.name.last]]</template>
+            </data-table-column>
+          </iron-data-table>
+        </template>
+      </template>
+    </demo-snippet>
+
+    <h3>Header Templates</h3>
+    <demo-snippet>
+      <template>
+        <template is="dom-bind">
+          <style is="custom-style">
+            #grid2 marquee {
+              width: 800px;
+              font-size: 48px;
+            }
+
+            #grid2 {
+              --iron-data-table-header-cell: {
+                overflow: visible;
+              }
+            }
+          </style>
+          <iron-ajax url="users.json" last-response="{{users}}" auto></iron-ajax>
+          <iron-data-table id="grid2" items="[[users.results]]">
+            <data-table-column>
+              <template is="header">
+                <marquee>Breaking News: Your Browser Supports &lt;marquee&gt;. Nice!</marquee>
+              </template>
+              <template><marquee direction="right">[[item.user.name.first]]</marquee></template>
+            </data-table-column>
+          </iron-data-table>
+        </template>
+      </template>
+    </demo-snippet>
+
+    <h3>Two-Way Binding Support</h3>
+    <demo-snippet>
+      <template>
+        <template is="dom-bind">
+          <style is="custom-style">
+            paper-input {
+              --paper-input-container: {
+                margin-bottom: 20px;
+              };
+              --paper-input-container-label: {
+                font-size: inherit;
+              }
+            }
+          </style>
+          <paper-input label="Foo" value="{{foo}}"></paper-input>
+          <iron-ajax url="users.json" last-response="{{users}}" auto></iron-ajax>
+          <iron-data-table selection-enabled items="[[users.results]]">
+            <data-table-column name="First Name">
+              <template>
+                <paper-input value="{{item.user.name.first}}"></paper-input>
+              </template>
+            </data-table-column>
+            <data-table-column name="First Name Also">
+              <template>[[item.user.name.first]]</template>
+            </data-table-column>
+            <data-table-column name="Foo">
+              <template>
+                <paper-input value="{{foo}}"></paper-input>
+              </template>
+            </data-table-column>
+          </iron-data-table>
+        </template>
+      </template>
+    </demo-snippet>
+  </div>
+</body>
+
+</html>

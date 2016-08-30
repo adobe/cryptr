@@ -1,6 +1,6 @@
 {
   "name": "test-fixture",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "A simple element to fixture DOM for tests",
   "main": "test-fixture.html",
   "repository": {

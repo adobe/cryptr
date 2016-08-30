@@ -13,38 +13,37 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../iron-list.html">
 
 <dom-module id="x-list">
-
-  <style>
-    :host {
-      @apply(--layout-fit);
-      @apply(--layout-vertical);
-
-      display: block;
-    }
-
-    .item {
-      color: white;
-    }
-
-    .item:nth-child(odd) {
-      background-color: green;
-    }
-
-    .item:nth-child(even) {
-      background-color: red;
-    }
-
-    iron-list {
-      overflow: hidden;
-    }
-  </style>
-
   <template>
+    <style>
+      :host {
+        @apply(--layout-fit);
+        @apply(--layout-vertical);
+
+        display: block;
+      }
+
+      .item {
+        color: white;
+      }
+
+      .item:nth-child(odd) {
+        background-color: green;
+      }
+
+      .item:nth-child(even) {
+        background-color: red;
+      }
+
+      iron-list {
+        overflow: hidden;
+      }
+    </style>
+
     <iron-list style$="[[_computedListHeight(listHeight)]]" items="[[data]]" as="item" id="list">
       <template>
-        <div class="item">
-          <div style$="[[_computedItemHeight(item)]]" tabindex$="[[tabIndex]]" hidden$="[[primitive]]">[[item.index]]</div>
-          <div style$="[[_computedItemHeight(item)]]" tabindex$="[[tabIndex]]" hidden$="[[!primitive]]">[[item]]</div>
+        <div class="item" tabindex$="[[_computedTabIndex(tabIndex, useTabIndex)]]">
+          <div style$="[[_computedItemHeight(item)]]" tabindex="0" hidden$="[[primitive]]">[[item.index]]</div>
+          <div style$="[[_computedItemHeight(item)]]" tabindex="0" hidden$="[[!primitive]]">[[item]]</div>
         </div>
       </template>
     </iron-list>
@@ -78,6 +77,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       primitive: {
         value: false,
         type: Boolean
+      },
+
+      useTabIndex: {
+        value: true,
+        type: Boolean
       }
     },
 
@@ -97,6 +101,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
     _computedListHeight: function(listHeight) {
       return 'height: ' + (listHeight) + 'px;';
+    },
+
+    _computedTabIndex: function(tabIndex, useTabIndex) {
+      return useTabIndex ? tabIndex : undefined;
     }
   });
 </script>

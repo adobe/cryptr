@@ -2,7 +2,27 @@
   <template>
     <style>
       :host {
-        display: block;
+        height: 48px;
+        flex-basis: 48px;
+        flex-grow: 0;
+        flex-shrink: 0;
+        padding: 0 8px 0 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-right: 1px solid #e3e3e3;
+      }
+
+      :host([header]) {
+        height: 56px;
+      }
+
+      :host([hidden]) {
+        display: none;
+      }
+
+      :host(:focus) {
+        outline: none;
       }
 
       #container {
@@ -18,12 +38,12 @@
         transition: background-color 140ms, border-color 140ms;
       }
 
-      :host[checked] #container {
+      :host([checked]) #container {
         border-color: var(--default-primary-color);
         background-color: var(--default-primary-color);
       }
 
-      :host[checked] .checkmark {
+      :host([checked]) .checkmark {
         border-bottom: 2px solid white;
         border-right: 2px solid white;
         width: 36%;
@@ -52,7 +72,7 @@
         }
       }
 
-      :host[indeterminate] .checkmark {
+      :host([indeterminate]) .checkmark {
         border-bottom: 2px solid var(--primary-text-color);
         width: 60%;
         height: 45%;

@@ -10,14 +10,12 @@
   "license": "MIT",
   "scripts": {
     "start": "electron app/main.js",
-    "build": "electron-zip-packager ./ Cryptr --platform=all --arch=all --version=0.36.7 --app-version=1.0.7 prune --asar --icon=app/images/cryptr --overwrite --out=dist --ignore=dist --ignore=README.md"
+    "build": "electron-zip-packager ./ Cryptr --platform=all --arch=all --app-version=1.0.7 prune --asar --icon=app/images/cryptr --overwrite --out=dist --ignore=dist --ignore=README.md"
   },
-  "dependencies": {
-    "electron-packager": "^5.2.1",
-    "electron-prebuilt": "0.36.7",
-    "electron-zip-packager": "^1.0.4"
-  },
-  "engines": {
-    "electron": "0.36.7"
+  "devDependencies": {
+    "devtron": "^1.3.0",
+    "electron-packager": "^7.7.0",
+    "electron-prebuilt": "^1.3.4",
+    "electron-zip-packager": "^3.0.0"
   }
 }

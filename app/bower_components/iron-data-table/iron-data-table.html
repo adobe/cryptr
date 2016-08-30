@@ -18,11 +18,16 @@ limitations under the License.
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../iron-list/iron-list.html">
 <link rel="import" href="../iron-resizable-behavior/iron-resizable-behavior.html">
+<link rel="import" href="../paper-spinner/paper-spinner-lite.html">
 
 <link rel="import" href="data-table-column.html">
 <link rel="import" href="data-table-column-sort.html">
 <link rel="import" href="data-table-cell.html">
+<link rel="import" href="data-table-row.html">
 <link rel="import" href="data-table-checkbox.html">
+<link rel="import" href="data-table-row-detail.html">
+
+<script src="array-datasource.js"></script>
 
 <!--
 `iron-data-table` displays a table or a grid of data.
@@ -43,7 +48,8 @@ Column templates should bind to template models of the following structure:
 {
   index: 0,        // index in the item array
   selected: false, // true if the current item is selected
-  item: {}         // user data corresponding to items[index]
+  item: {},        // user data corresponding to items[index],
+  expanded: false  // true if row details have been expanded for the current item
 }
 ```
 For example, given the following `data` array:
@@ -88,12 +94,9 @@ There are several custom properties and mixins you can use to style the componen
 
 Custom property | Description
 ----------------|-------------
-`--iron-data-table-cell-height` | Property that determines the height of the cells
+`--iron-data-table` | Mixin applied to the main element
 `--iron-data-table-header` | Mixin applied to the header element
-`--iron-data-table-header-cell` | Mixin applied to the header cells
-`--iron-data-table-row-group` | Mixin applied to the row group element
 `--iron-data-table-row` | Mixin applied to the row item element
-`--iron-data-table-row-cell` | Mixin applied to the row cells.
 `--iron-data-table-row-hover` | Mixin applied to the row item element when hovered on
 `--iron-data-table-row-selected` | Mixin applied to the selected row item elements
 `--iron-data-table-row-after` | Mixin applied to :after pseudoelement of the row item element
@@ -102,8 +105,6 @@ Custom property | Description
 
 To get started, you can import `default-styles.html` which provides material design
 inspired styles to your `iron-data-table`.
-
-@demo demo/index.html
 -->
 
 <dom-module id="iron-data-table">
@@ -111,27 +112,29 @@ inspired styles to your `iron-data-table`.
     <style is="custom-style">
       :host {
         display: block;
-        height: auto;
         position: relative;
         overflow-x: auto;
         overflow-y: hidden;
         -webkit-overflow-scrolling: touch;
+        /* Default height just to help users get started in making stuff visible.  */
+        height: 400px;
+        @apply(--iron-data-table);
       }
 
       #container {
-        height: inherit;
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
         display: flex;
         flex-direction: column;
       }
 
       #header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        flex-grow: 0;
-        flex-shrink: 0;
         box-shadow: 0 1px 0 rgba(0, 0, 0, 0.1);
         transition: box-shadow 200ms;
+        -webkit-transition: box-shadow 200ms;
+        z-index: 1;
         @apply(--iron-data-table-header);
       }
 
@@ -139,126 +142,94 @@ inspired styles to your `iron-data-table`.
         box-shadow: 0 1px 0 rgba(0, 0, 0, 0.06), 0 2px 0 rgba(0, 0, 0, 0.075), 0 3px 0 rgba(0, 0, 0, 0.05), 0 4px 0 rgba(0, 0, 0, 0.015);
       }
 
-      #header > data-table-cell,
-      .item > data-table-cell:not([hidden]) {
-        flex: 1 0 100px;
-        padding: 0 24px 0 24px;
-        height: var(--iron-data-table-cell-height, 48px);
-        display: flex;
-        align-items: center;
-        overflow: hidden;
-      }
-
-      #header > data-table-cell,
-      #header .checkbox {
-        height: 56px !important;
-      }
-
-      #header > data-table-cell {
-        @apply(--iron-data-table-header-cell);
-      }
-
-      .item > data-table-cell {
-        @apply(--iron-data-table-row-cell);
-      }
-
-      .group {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 0 24px 0 24px;
-        @apply(--iron-data-table-row-group);
-      }
-
-      .checkbox {
-        height: var(--iron-data-table-cell-height, 48px);
-        flex-basis: var(--iron-data-table-cell-height, 48px);
-        flex-grow: 0;
-        flex-shrink: 0;
-        padding: 0 8px 0 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-right: 1px solid #e3e3e3;
-      }
-
       #list {
-        overflow-x: hidden;
-        overflow-y: auto;
-        flex-basis: 100%;
-        flex-shrink: 1;
-        flex-grow: 0;
+        overflow-x: hidden !important;
+        overflow-y: auto !important;
+        flex: 1;
+        transition: opacity 200ms;
+        -webkit-transition: opacity 200ms;
       }
 
-      .item {
-        cursor: pointer;
-        display: flex;
-        justify-content: space-between;
-        opacity: 1;
-        @apply(--iron-data-table-row);
+      :host([loading]) #list {
+        opacity: 0.25;
       }
 
-      .item:focus {
-        outline: none;
-
-        @apply(--iron-data-table-row-focused);
+      :host(:not([loading])) paper-spinner-lite {
+        display: none;
       }
 
-      .item:focus:after {
-        @apply(--iron-data-table-row-focused-after);
+      :host([loading]) paper-spinner-lite {
+        position: absolute;
+        top: 45%;
+        left: 50%;
+        --paper-spinner-color: var(--default-primary-color);
       }
-
-      .item:hover {
-        @apply(--iron-data-table-row-hover);
-      }
-
-      .item[selected] {
-        @apply(--iron-data-table-row-selected);
-      }
-
-      .item[even] {
-        @apply(--iron-data-table-row-even);
-      }
-
-      .item:not([even]) {
-        @apply(--iron-data-table-row-odd);
-      }
-
-      .item:after {
-        @apply(--iron-data-table-row-after);
-      }
-
     </style>
     <div id="container">
       <div id="header">
-        <div class="checkbox" hidden$="[[!multiSelection]]" on-tap="_toggleSelectAll">
-          <data-table-checkbox checked="[[_isSelectAllChecked(selectedItems.length, _filteredItems)]]" indeterminate="[[_isSelectAllIndeterminate(selectedItems.length, _filteredItems)]]"></data-table-checkbox>
-        </div>
-        <template is="dom-repeat" items="[[columns]]" as="column">
-          <data-table-cell column="[[column]]" template="[[column.headerTemplate]]" bind="[[_bind(column)]]">
-            <data-table-column-sort sort-order="[[sortOrder]]" path="[[column.sortBy]]" on-sort-direction-changed="_sortDirectionChanged" hidden="[[!column.sortBy]]"></data-table-column-sort>
-          </data-table-cell>
-        </template>
+        <data-table-row header>
+          <data-table-checkbox header hidden$="[[!multiSelection]]" on-tap="_toggleSelectAll" checked="[[_isSelectAllChecked(selectedItems.length, selectedItems.inverted, size)]]" indeterminate="[[_isSelectAllIndeterminate(selectedItems.length, size)]]"></data-table-checkbox>
+          <template is="dom-repeat" items="[[columns]]" as="column">
+            <data-table-cell header
+                             align-right="[[column.alignRight]]"
+                             before-bind="[[beforeCellBind]]"
+                             column="[[column]]"
+                             flex="[[column.flex]]"
+                             hidden="[[column.hidden]]"
+                             order="[[column.order]]"
+                             table="[[_this]]"
+                             template="[[column.headerTemplate]]"
+                             width="[[column.width]]">
+              <data-table-column-sort sort-order="[[sortOrder]]" path="[[column.sortBy]]" on-sort-direction-changed="_sortDirectionChanged" hidden$="[[!column.sortBy]]"></data-table-column-sort>
+            </data-table-cell>
+          </template>
+        </data-table-row>
       </div>
 
-      <iron-list id="list" as="item" items="[[_sortedItems]]" on-scroll="_onVerticalScroll" selection-enabled="[[selectionEnabled]]" multi-selection="[[multiSelection]]" selected-item="{{selectedItem}}" selected-items="{{selectedItems}}">
+      <iron-list id="list" as="item" items="[[_cachedItems]]" on-scroll="_onVerticalScroll">
         <template>
-          <div>
-            <div class="group" hidden$="[[!_getGrouping(index, _groupings)]]" on-mousedown="_stopPropagation" on-touchstart="_stopPropagation">
-              <div>[[_getGrouping(index, _groupings)]]</div>
-            </div>
-            <div class="item" tabindex$="[[tabIndex]]" selected$="[[selected]]" even$="[[!_isEven(index)]]">
-              <div class="checkbox" hidden$="[[!multiSelection]]">
-                <data-table-checkbox checked="[[selected]]"></data-table-checkbox>
-              </div>
+          <div class="item">
+            <data-table-row before-bind="[[beforeRowBind]]"
+                            even$="[[!_isEven(index)]]"
+                            expanded="[[_isExpanded(item, _expandedItems, _expandedItems.*)]]"
+                            index="[[index]]"
+                            item="[[item]]"
+                            tabindex="-1"
+                            selected="[[_isSelected(item, selectedItems, selectedItems.*)]]">
+              <data-table-checkbox hidden$="[[!multiSelection]]" tabindex="0" checked="[[_isSelected(item, selectedItems, selectedItems.*)]]" on-tap="_onCheckBoxTap"></data-table-checkbox>
               <template is="dom-repeat" items="[[columns]]" as="column" index-as="colIndex">
-                <data-table-cell column="[[column]]" template="[[column.template]]" bind="[[_bind(item, index, selected)]]"></data-table-cell>
+                <data-table-cell template="[[column.template]]"
+                                 table="[[_this]]"
+                                 align-right="[[column.alignRight]]"
+                                 column="[[column]]"
+                                 expanded="[[_isExpanded(item, _expandedItems, _expandedItems.*)]]"
+                                 flex="[[column.flex]]"
+                                 hidden="[[column.hidden]]"
+                                 index="[[index]]"
+                                 item="[[item]]"
+                                 on-click="_onCellClick"
+                                 order="[[column.order]]"
+                                 selected="[[_isSelected(item, selectedItems, selectedItems.*)]]"
+                                 width="[[column.width]]"
+                                 before-bind="[[beforeCellBind]]"></data-table-cell>
               </template>
-            </div>
+              <template is="dom-if" if="[[_isExpanded(item, _expandedItems)]]" on-dom-change="_updateSizeForItem">
+                <data-table-row-detail index="[[index]]"
+                                       item="[[item]]"
+                                       expanded="[[_isExpanded(item, _expandedItems, _expandedItems.*)]]"
+                                       selected="[[_isSelected(item, selectedItems, selectedItems.*)]]"
+                                       before-bind="[[beforeDetailsBind]]"
+                                       table="[[_this]]"
+                                       template="[[rowDetail]]"></data-table-row-detail>
+              </template>
+            </data-table-row>
           </div>
         </template>
       </iron-list>
     </div>
+    <paper-spinner-lite active></paper-spinner-lite>
+    <content select="data-table-column"></content>
+    <content select="template[is=row-detail]"></content>
   </template>
 
   <script>
@@ -272,10 +243,48 @@ inspired styles to your `iron-data-table`.
       listeners: {
         'column-filter-changed': '_onColumnFilterChanged',
         'iron-resize': '_resizeCellContainers',
+        'item-changed': '_itemChanged',
         'scroll': '_onHorizontalScroll'
       },
 
       properties: {
+
+        /**
+         * A function that is called before data is bound to a row or header cell.
+         * Can be used to customize the cell element depending on the data.
+         * #### Example:
+         * ```js
+         * function(data, cell) {
+         *   cell.toggleClass('custom', data.useCustomClass);
+         * }
+         * ```
+         */
+        beforeCellBind: Object,
+
+        /**
+         * A function that is called before data is bound to a row details element.
+         * Can be used to customize the element depending on the data.
+         * #### Example:
+         * ```js
+         * function(data, details) {
+         *   details.toggleClass('custom', data.useCustomClass);
+         * }
+         * ```
+         */
+        beforeDetailsBind: Object,
+
+        /**
+         * A function that is called before data is bound to a row.
+         * Can be used to customize the row element depending on the data.
+         * #### Example:
+         * ```js
+         * function(data, row) {
+         *   row.toggleClass('custom', data.useCustomClass);
+         * }
+         * ```
+         */
+        beforeRowBind: Object,
+
         /**
          * An array containing the items which will be stamped to the column template
          * instances.
@@ -285,16 +294,11 @@ inspired styles to your `iron-data-table`.
         },
 
         /**
-         * Path to an item property that is used to group the items.
+         * If `true`, tapping a row will expand the item details, if available.
          */
-        groupBy: {
-          type: String,
-          value: ''
-        },
-
-        _groupings: {
-          type: Object,
-          computed: '_getGroupings(_sortedItems, groupBy)'
+        detailsEnabled: {
+          type: Boolean,
+          value: false
         },
 
         /**
@@ -308,11 +312,6 @@ inspired styles to your `iron-data-table`.
           }
         },
 
-        _filteredItems: {
-          type: Array,
-          computed: '_filter(items.*, filter.*)'
-        },
-
         /**
          * When `true`, multiple items may be selected at once (in this case,
          * `selected` is an array of currently selected items).  When `false`,
@@ -321,6 +320,14 @@ inspired styles to your `iron-data-table`.
         multiSelection: {
           type: Boolean,
           value: false
+        },
+
+        /**
+         * Number of items fetched at a time from the datasource.
+         */
+        pageSize: {
+          type: Number,
+          value: 50
         },
 
         /**
@@ -337,31 +344,45 @@ inspired styles to your `iron-data-table`.
          */
         selectedItem: {
           type: Object,
+          readOnly: true,
           notify: true
         },
 
         /**
          * When `multiSelection` is true, this is an array that contains the selected items.
+         * If `selectedItems.inverted` is `true`, the array contains deselected items instead.
+         * `selectedItems.filters` contains an array of filters that were active when the selection changed.
          */
         selectedItems: {
           type: Object,
-          notify: true
-        },
-
-        /**
-         * An object with a path/sortorder ('asc' or 'desc') that is used to sort the items
-         */
-        sortOrder: {
-          type: Object,
           notify: true,
+          readOnly: true,
           value: function() {
-            return {};
+            var items = [];
+            items.filters = [];
+
+            return items;
           }
         },
 
-        _sortedItems: {
+        /**
+         * Size of the data set.
+         */
+        size: {
+          type: Number,
+          notify: true,
+          value: 0
+        },
+
+        /**
+         * An array with a path/sortorder ('asc' or 'desc') pairs that are used to sort the items.
+         */
+        sortOrder: {
           type: Array,
-          computed: '_sort(_filteredItems, sortOrder, groupBy)'
+          notify: true,
+          value: function() {
+            return [];
+          }
         },
 
         /**
@@ -371,38 +392,113 @@ inspired styles to your `iron-data-table`.
         columns: {
           type: Array,
           notify: true,
-          observer: '_columnsChanged',
           value: function() {
-            return Polymer.dom(this).querySelectorAll('data-table-column');
+            return [];
+          },
+          observer: '_columnsChanged'
+        },
+
+        /**
+         * Function that provides items lazily. Receives parameters `opts`, `callback`, `err`
+         *
+         * `opts.page` Requested page index
+         *
+         * `opts.pageSize` Current page size
+         *
+         * `opts.filter` Current filter parameters
+         *
+         * `opts.sortOrder` Current sorting parameters
+         */
+        dataSource: {
+          type: Object,
+          notify: true
+        },
+
+        _pagesLoading: {
+          type: Array,
+          value: function() {
+            return [];
+          },
+        },
+
+        /**
+         * `true` if the table is currently loading data from the data source.
+         */
+        loading: {
+          type: Boolean,
+          notify: true,
+          reflectToAttribute: true,
+          value: false
+        },
+
+        _cachedItems: {
+          type: Array,
+          value: function() {
+            return [];
+          }
+        },
+
+        _cachedPages: {
+          type: Array,
+          value: function() {
+            return [];
+          }
+        },
+
+        _currentPage: {
+          type: Number,
+          value: 0
+        },
+
+        _expandedItems: {
+          type: Array,
+          value: function() {
+            return [];
+          }
+        },
+
+        _this: {
+          type: Object,
+          value: function() {
+            return this;
           }
         }
       },
 
-      ready: function() {
-        this._patchIronListCreatePool();
-      },
+      observers: ['_itemsChanged(items.*)',
+        '_sizeChanged(size)',
+        '_currentPageChanged(dataSource, _currentPage)',
+        '_resetData(dataSource, filter.*, sortOrder.*)'
+      ],
 
-      _patchIronListCreatePool: function() {
-        // Since 1.2.0, iron-list changed timings on how the first three rows are
-        // rendered initially: https://github.com/PolymerElements/iron-list/commit/c0e27e52ee93dcd93d33590b569bd17c5c504005#diff-b97995700c5da5fa638d0324b5f3f861L765
-        // Apparently, this causes the Polymer.dom.flush() to be called in such order,
-        // that templatize for the data-table-cells doesn't work properly for the initial render.
+      created: function() {
+        this._observer = Polymer.dom(this).observeNodes(function(info) {
+          var hasColumns = function(node) {
+            return (node.nodeType === Node.ELEMENT_NODE && node.tagName.toUpperCase() === 'DATA-TABLE-COLUMN');
+          };
 
-        // As a fix, calling Polymer.dom.flush() after the initial rows have been created seems to help.
-        // So far, haven't been able to produce an isolated jsbin to report about this to iron-list.
+          var hasDetails = function(node) {
+            return (node.nodeType === Node.ELEMENT_NODE &&
+              node.tagName.toUpperCase() === 'TEMPLATE' && node.hasAttribute('is') &&
+              node.getAttribute('is') === 'row-detail');
+          };
 
-        var createPool = this.$.list._createPool.bind(this.$.list);
-        var initialCreateCalled = false;
-        this.$.list._createPool = function(size) {
-          var items = createPool(size);
-
-          // Polymer.dom.flush() needs to be called on the initial creation ONLY.
-          if (!initialCreateCalled) {
-            initialCreateCalled = true;
-            Polymer.dom.flush();
+          if (info.addedNodes.filter(hasColumns).length > 0 ||
+            info.removedNodes.filter(hasColumns).length > 0) {
+            this.set('columns', this.getContentChildren('[select=data-table-column]'));
+            this.notifyResize();
           }
-          return items;
-        };
+
+          if (info.addedNodes.filter(hasDetails).length > 0) {
+            this.set('rowDetail', this.getContentChildren('[select="template[is=row-detail]"]')[0]);
+
+            // assuming parent element is always a Polymer element.
+            // set dataHost to the same context the template was declared in
+            var parent = Polymer.dom(this.rowDetail).parentNode;
+            this.rowDetail._rootDataHost = parent.dataHost ? (parent.dataHost._rootDataHost || parent.dataHost) : parent;
+          }
+
+        }.bind(this));
       },
 
       _stopPropagation: function(e) {
@@ -416,40 +512,28 @@ inspired styles to your `iron-data-table`.
        * @param {(Object|number)} item The item object or its index
        */
       selectItem: function(item) {
-        this.$.list.selectItem(item);
-      },
-
-      /*
-       * Selects all the items in the list.
-       */
-      selectAll: function() {
-        // TODO: https://github.com/PolymerElements/iron-list/issues/124
-        this.$.list.items.forEach(function(item) {
-          this.$.list.selectItem(item);
-        }.bind(this));
-      },
-
-      /**
-       * Clears the current selection state.
-       */
-      clearSelection: function() {
-        this.$.list.clearSelection();
-      },
-
-      _toggleSelectAll: function() {
-        if (this.$.list.items.length === this.$.list.selectedItems.length) {
-          this.clearSelection();
+        if (typeof item === 'number' && item >= 0 && this.items && this.items.length > item) {
+          this._selectItem(this.items[item]);
         } else {
-          this.selectAll();
+          this._selectItem(item);
         }
       },
 
-      _isSelectAllChecked: function(selectedItemsLength, filteredItems) {
-        return selectedItemsLength > 0 && selectedItemsLength === filteredItems.length;
-      },
+      _selectItem: function(item) {
+        this._setSelectedItem(item);
 
-      _isSelectAllIndeterminate: function(selectedItemsLength, filteredItems) {
-        return selectedItemsLength > 0 && selectedItemsLength !== filteredItems.length;
+        if (this.multiSelection) {
+          if (this.selectedItems.inverted) {
+            var index;
+            if ((index = this.selectedItems.indexOf(item)) > -1) {
+              this.splice('selectedItems', index, 1);
+            }
+          } else {
+            this.push('selectedItems', item);
+          }
+        } else {
+          this.splice('selectedItems', 0, this.selectedItems.length, item);
+        }
       },
 
       /**
@@ -459,120 +543,147 @@ inspired styles to your `iron-data-table`.
        * @param {(Object|number)} item The item object or its index
        */
       deselectItem: function(item) {
-        this.$.list.deselectItem(item);
+        if (typeof item === 'number' && item >= 0 && this.items && this.items.length > item) {
+          this._deselectItem(this.items[item]);
+        } else {
+          this._deselectItem(item);
+        }
       },
 
-      _bind: function(item, index, selected) {
-        if (index !== undefined && selected !== undefined) {
-          return {
-            item: item,
-            index: index,
-            selected: selected
-          };
+      _deselectItem: function(item) {
+        this._setSelectedItem(null);
+
+        var index = this.selectedItems.indexOf(item);
+
+        if (this.selectedItems.inverted) {
+          if (index === -1) {
+            this.push('selectedItems', item);
+          }
         } else {
-          return {
-            column: item
-          };
+          if (index > -1) {
+            this.splice('selectedItems', index, 1);
+          }
         }
+      },
+
+      _isSelected: function(item, selectedItems) {
+        var selected = selectedItems.indexOf(item) > -1;
+
+        return selectedItems.inverted ? !selected : selected;
+      },
+
+      /*
+       * Selects all the items in the list.
+       */
+      selectAll: function() {
+        var selectedItems = [];
+        selectedItems.inverted = true;
+        // use a copy of filter so that we can safely send separate changed
+        // notifications for both filter and selectedItems.filter
+        selectedItems.filters = this.filter.slice(0) || [];
+
+        this._setSelectedItems(selectedItems);
+      },
+
+      /**
+       * Clears the current selection state.
+       */
+      clearSelection: function() {
+        var selectedItems = [];
+        selectedItems.inverted = false;
+        // use a copy of filter so that we can safely send separate changed
+        // notifications for both filter and selectedItems.filter
+        selectedItems.filters = this.filter.slice(0) || [];
+
+        this._setSelectedItems(selectedItems);
+
+        if (this.selectedItem !== undefined) {
+          this._setSelectedItem(null);
+        }
+      },
+
+      _toggleSelectAll: function() {
+        if (this._isSelectAllChecked(this.selectedItems.length, this.selectedItems.inverted, this.size)) {
+          this.clearSelection();
+        } else {
+          this.selectAll();
+        }
+      },
+
+      _isSelectAllChecked: function(selectedItemsLength, inverted, size) {
+        return size > 0 && selectedItemsLength === (inverted ? 0 : size);
+      },
+
+      _isSelectAllIndeterminate: function(length, size) {
+        return size > 0 && length > 0 && length < size;
       },
 
       _isEven: function(index) {
         return index % 2 === 0;
       },
 
+      _resetData: function(dataSource, filter, sortOrder) {
+        // Resetting scroll position and selection for consistency here. They are
+        // both reset implicitly when a new _cachedItems is set to iron-list, but
+        // that doesn't happen when size of the dataset changes only by a few items.
+        this.clearSelection();
 
-      _getGrouping: function(index, _groupings) {
-        for (var prop in _groupings) {
-          if (_groupings[prop] === index) {
-            return prop;
-          }
-        }
-      },
-
-      _getGroupings: function(items, groupBy) {
-        var groups = {};
-
-        if (this.groupBy) {
-          for (var i = 0; i < items.length; i++) {
-            var group = this.get(this.groupBy, items[i]);
-            if (groups[group] === undefined) {
-              groups[group] = i;
-            }
-          }
-        }
-
-        return groups;
-      },
-
-      _filter: function(items, filter) {
-        // small optimization here to prevent filtering done twice when pushing
-        // on both items.splices and items.length paths.
-        if (items.path === 'items.length') {
-          return;
-        }
-
-        return Array.prototype.filter.call(items.base, function(item, index) {
-          for (var i = 0; i < filter.base.length; i++) {
-            var value = this.get(filter.base[i].path, item);
-
-            if (value.toLowerCase().indexOf(filter.base[i].filter.toLowerCase()) === -1) {
-              return false;
-            }
-          }
-
-          return true;
-        }.bind(this));
-      },
-
-      _sort: function(items, sortOrder, groupBy) {
-        // TODO: need to fire some notifications, because sorting happens in place.
-        this.notifyPath('_sortedItems', undefined);
-
-        return Array.prototype.sort.call(items, function(a, b) {
-          var groupOrder = groupBy ? this._compare(this.get(groupBy, a), this.get(groupBy, b)) : 0;
-
-          if (groupOrder === 0 && sortOrder && sortOrder.path) {
-            if (sortOrder.direction === 'asc') {
-              return this._compare(this.get(sortOrder.path, a), this.get(sortOrder.path, b));
-            } else {
-              return this._compare(this.get(sortOrder.path, b), this.get(sortOrder.path, a));
-            }
-          } else {
-            return groupOrder;
-          }
-        }.bind(this));
+        this.clearCache();
+        this.$.list.scrollToIndex(0);
       },
 
       _sortDirectionChanged: function(e) {
-        this.set('sortOrder', e.detail);
+        for (var i = 0; i < this.sortOrder.length; i++) {
+          if (this.sortOrder[i].path === e.detail.path) {
+            if (e.detail.direction) {
+              this.set('sortOrder.' + i + '.direction', e.detail.direction);
+            } else {
+              this.splice('sortOrder', i, 1);
+            }
+            return;
+          }
+        }
+
+        this.push('sortOrder', {
+          path: e.detail.path,
+          direction: e.detail.direction
+        });
       },
 
-      _compare: function(a, b) {
-        if (a < b) {
-          return -1;
+      _columnsChanged: function(columns, oldColumns) {
+        if (oldColumns) {
+          oldColumns.forEach(function(column) {
+            this.unlisten(column, 'filter-value-changed');
+          }.bind(this));
         }
-        if (a > b) {
-          return 1;
-        }
-        return 0;
-      },
 
-      _columnsChanged: function(columns) {
-        columns.forEach(function(column) {
-          this.listen(column, 'filter-value-changed', '_onColumnFilterChanged');
-        }.bind(this));
+        if (columns) {
+          columns.forEach(function(column) {
+            column.table = this;
+            this.listen(column, 'filter-value-changed', '_onColumnFilterChanged');
+          }.bind(this));
+        }
       },
 
       _onColumnFilterChanged: function(e) {
         for (var i = 0; i < this.filter.length; i++) {
-          if (this.filter[i].path === e.target.filterBy) {
+          if (this.filter[i].path === e.detail.filterBy) {
             this.set('filter.' + i + '.filter', e.detail.value);
+
+            // selectedItems.filter is actually already set at this point when
+            // clearSelection is called after filter is set.
+            this.set('selectedItems.filters.' + i + '.filter', e.detail.value);
             return;
           }
         }
 
         this.push('filter', {
-          path: e.target.filterBy,
+          path: e.detail.filterBy,
+          filter: e.detail.value
+        });
+
+        this.push('selectedItems.filters', {
+          path: e.detail.filterBy,
           filter: e.detail.value
         });
       },
@@ -583,6 +694,9 @@ inspired styles to your `iron-data-table`.
 
         this.async(function() {
           this.$.container.style.width = Math.min(this.scrollWidth, this.clientWidth + this.scrollLeft) + 'px';
+
+          // add scrollbar width as padding
+          this.$.header.style.paddingRight = this.$.list.offsetWidth - this.$.list.clientWidth + 'px';
         }.bind(this));
       },
 
@@ -598,7 +712,301 @@ inspired styles to your `iron-data-table`.
 
       _onVerticalScroll: function(e) {
         // Toggle shadow when at the top
-        this.toggleClass("scrolled", this.$.list.scrollTop !== 0, this.$.header);
+        this.toggleClass("scrolled", this.$.list.scrollTop >= 1, this.$.header);
+
+        this._currentPage = Math.max(0, Math.floor(this.$.list.scrollTop / this.$.list._physicalAverage / this.pageSize));
+      },
+
+      /**
+       * Lazy loading
+       */
+      _itemsChanged: function(items) {
+        if ((items.path === 'items' || items.path === 'items.splices') && Array.isArray(items.base)) {
+          this.size = items.base.length;
+          this.dataSource = new ArrayDataSource(items.base);
+        } else if (items.path.indexOf('items.#') === 0 && Array.isArray(items.base)) {
+          var index = items.path.split('.')[1].substring(1);
+          var item = this.items[index];
+
+          var cachedIndex = this._cachedItems.indexOf(item);
+
+          if (cachedIndex >= 0) {
+            this.set(items.path.replace('items.', '_cachedItems.').replace('#' + index, cachedIndex), items.value);
+          }
+        }
+      },
+
+      _itemChanged: function(e) {
+        if (this.items) {
+          var index = this.items.indexOf(e.detail.item);
+          if (index >= 0) {
+            this.set('items.' + index + '.' + e.detail.path, e.detail.value);
+          }
+        }
+      },
+
+      _currentPageChanged: function(dataSource, page) {
+        if (!this._isPageCached(page)) {
+          this.loading = true;
+        }
+
+        this.debounce('loading', function() {
+          this._loadPage(dataSource, page);
+
+          if (page + 1 < (this.size / this.pageSize)) {
+            this._loadPage(dataSource, page + 1);
+          }
+
+          if (page > 0) {
+            this._loadPage(dataSource, page - 1);
+          }
+        }.bind(this), 100);
+      },
+
+      _isPageLoading: function(page) {
+        return this._pagesLoading.indexOf(page) > -1;
+      },
+
+      _addLoadingPage: function(page) {
+        if (!this._isPageLoading(page)) {
+          this.push('_pagesLoading', page);
+        }
+
+        this.loading = this._pagesLoading.length > 0;
+      },
+
+      _removeLoadingPage: function(page) {
+        var index = this._pagesLoading.indexOf(page);
+        if (index !== -1) {
+          this.splice('_pagesLoading', index, 1);
+        }
+
+        this.loading = this._pagesLoading.length > 0;
+      },
+
+      _isPageCached: function(page) {
+        return this._cachedPages && this._cachedPages.indexOf(page) > -1;
+      },
+
+      _loadPage: function(dataSource, page) {
+        if (this._isPageCached(page)) {
+          this._removeLoadingPage(page);
+        } else if (!this._isPageLoading(page)) {
+          this._addLoadingPage(page);
+
+          var success = function(items, size) {
+            this.push('_cachedPages', page);
+            this.size = size || this.size;
+            var start = page * this.pageSize;
+
+            for (var i = 0; i < this.pageSize; i++) {
+              var index = start + i;
+              var item = items[i];
+
+              this.set('_cachedItems.' + index, item);
+
+              // TODO: send an issue/pr to iron-list, that makes sure the internal
+              // collection stays up-to-date when `items` change.
+              // When _collection gets out-of-sync things like selection and
+              // notifying [[item]] bindings break.
+              this.$.list._collection.store[index] = item;
+              if (item && typeof item == 'object') {
+                this.$.list._collection.omap.set(item, index);
+              } else {
+                this.$.list._collection.pmap[item] = index;
+              }
+            }
+
+            // resize required for variable row height items.
+            // debouncing for optimizing when multiple requests are running at
+            // the same time.
+            this.debounce('resizing', function() {
+              this.$.list.notifyResize();
+            }.bind(this), 100);
+
+            this._removeLoadingPage(page);
+          }.bind(this);
+
+          var err = function() {
+            this._removeLoadingPage(page);
+          }.bind(this);
+
+          dataSource({
+            page: page,
+            pageSize: this.pageSize,
+            filter: this.filter,
+            sortOrder: this.sortOrder
+          }, success, err);
+        }
+      },
+
+      _sizeChanged: function(size) {
+        // Optimization: Calling `set` on _cachedItems will reset the scroll position and selections,
+        // using `push` and `pop` with large changes (more than 1000 items) is a heavy operation
+        // that jams things up.
+        if (this._cachedItems && Math.abs(this._cachedItems.length - size) < this.pageSize * 2) {
+          while (this._cachedItems.length < size) {
+            this.push('_cachedItems', {});
+          }
+
+          while (this._cachedItems.length > size) {
+            this.pop('_cachedItems');
+          }
+        } else {
+          var items = [];
+
+          while (items.length < size) {
+            items.push({});
+          }
+
+          this.set('_cachedItems', items);
+        }
+      },
+
+      /**
+       * Clears the cached pages and reloads data from datasource when needed.
+       */
+      clearCache: function() {
+        this._cachedPages = [];
+
+        // Force reload on currently visible pages.
+        this._currentPageChanged(this.dataSource, this._currentPage);
+      },
+
+      _updateSizeForItem: function(event) {
+        if (event.model.get('item')) {
+          // notifyResize() doesn't do anything on iOS if the viewport size hasn't changed
+          // so calling updateSizeForItem(item) is more reliable.
+
+          // TODO: However, since we're reusing the same items array in most cases,
+          // the _collection item map inside <iron-list> gets out of sync and
+          // that breaks things like selection and updateSizeForItem.
+          // To mitigate the issue, we'll update height of every row element.
+          // Can be optimized later if needed to update only the row that has
+          // expanded or collapsed.
+          var itemSet = [];
+          for(var i = 0; i < this.$.list._physicalItems.length; i++) {
+            itemSet.push(i);
+          }
+
+          // extracted from updateSizeFromItem(item) in <iron-list>
+          this.$.list._updateMetrics(itemSet);
+          this.$.list._positionItems();
+        }
+      },
+
+      /**
+       * Expands the row details for this item, if available.
+       */
+      expandItem: function(item) {
+        if (this.rowDetail && this._expandedItems && !this._isExpanded(item, this._expandedItems)) {
+
+          // replacing the whole array here to simplify the observers.
+          this._expandedItems.push(item);
+          this._expandedItems = this._expandedItems.slice(0);
+        }
+      },
+
+      /**
+       * Collapses the row details for this item, if expanded.
+       */
+      collapseItem: function(item) {
+        if (this.rowDetail && this._expandedItems && this._isExpanded(item, this._expandedItems)) {
+          var index = this._expandedItems.indexOf(item);
+
+          // replacing the whole array here to simplify the obsevers.
+          this._expandedItems.splice(index, 1);
+          this._expandedItems = this._expandedItems.slice(0);
+        }
+      },
+
+      _isExpanded: function(item, items) {
+        return items && items.indexOf(item) > -1;
+      },
+
+      _isFocusable: function(target) {
+        if (Polymer.Settings.useNativeShadow) {
+          // https://nemisj.com/focusable/
+          // tabIndex is not reliable in IE.
+          return target.tabIndex >= 0;
+        } else {
+          // unreliable with Shadow, document.activeElement doesn't go inside
+          // the shadow root.
+          return target.contains(Polymer.dom(document.activeElement).node) || target.tagName.toUpperCase() === 'A';
+        }
+      },
+
+      /**
+       * Fired when user clicks on a item to select it. Note that this event is
+       * not fired when user clicks on a multi-selection checkbox.
+       *
+       * @event selecting-item
+       * @param {Object} detail
+       * @param {Object} detail.item item to be selected
+       */
+
+      /**
+       * Fired when user clicks on a item to deselect it. Note that this event is
+       * not fired when user clicks on a multi-selection checkbox.
+       *
+       * @event deselecting-item
+       * @param {Object} detail
+       * @param {Object} detail.item item to be deselected
+       */
+
+      /**
+       * Fired when user clicks on a item to expand it.
+       *
+       * @event expanding-item
+       * @param {Object} detail
+       * @param {Object} detail.item item to be expanded
+       */
+
+       /**
+        * Fired when user clicks on a item to collapse it.
+        *
+        * @event collapsing-item
+        * @param {Object} detail
+        * @param {Object} detail.item item to be collapsed
+        */
+
+      // we need to listen to click instead of tap because on mobile safari, the
+      // document.activeElement has not been updated (focus has not been shifted)
+      // yet at the point when tap event is being executed.
+      _onCellClick: function(e) {
+        // Prevent item selection if row itself is not focused. This means that
+        // an element inside the row has been focused.
+        // Mobile devices don't move focus from body unless it's an input element that is focused, so this element will never get focused.
+        if (this._isFocusable(Polymer.dom(e).localTarget)) {
+          return;
+        } else {
+          var fireEvent = function(eventName, item, defaultAction) {
+            var e = this.fire(eventName, {item: item}, {cancelable: true});
+            if (!e.defaultPrevented) {
+              defaultAction.call(this, item);
+            }
+          }.bind(this);
+
+          if (this.rowDetail && this.detailsEnabled) {
+            if (this._isExpanded(e.model.item, this._expandedItems)) {
+              fireEvent('collapsing-item', e.model.item, this.collapseItem);
+            } else {
+              fireEvent('expanding-item', e.model.item, this.expandItem);
+            }
+          }
+
+          if (this.selectionEnabled) {
+            if (this._isSelected(e.model.item, this.selectedItems)) {
+              fireEvent('deselecting-item', e.model.item, this.deselectItem);
+            } else {
+              fireEvent('selecting-item', e.model.item, this.selectItem);
+            }
+          }
+        }
+      },
+
+      _onCheckBoxTap: function(e) {
+        this._isSelected(e.model.item, this.selectedItems) ? this.deselectItem(e.model.item) : this.selectItem(e.model.item);
       }
     });
   </script>

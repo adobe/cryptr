@@ -7,15 +7,17 @@ paper-radio-group.html
 Edit those files, and our readme bot will duplicate them over here!
 Edit this file, and the bot will squash your changes :)
 
+The bot does some handling of markdown. Please file a bug if it does the wrong
+thing! https://github.com/PolymerLabs/tedium/issues
+
 -->
 
-[![Build Status](https://travis-ci.org/PolymerElements/paper-radio-group.svg?branch=master)](https://travis-ci.org/PolymerElements/paper-radio-group)
+[![Build status](https://travis-ci.org/PolymerElements/paper-radio-group.svg?branch=master)](https://travis-ci.org/PolymerElements/paper-radio-group)
 
-_[Demo and API Docs](https://elements.polymer-project.org/elements/paper-radio-group)_
+_[Demo and API docs](https://elements.polymer-project.org/elements/paper-radio-group)_
 
 
 ##&lt;paper-radio-group&gt;
-
 
 Material design: [Radio button](https://www.google.com/design/spec/components/selection-controls.html#selection-controls-radio-button)
 
@@ -29,21 +31,29 @@ set.
 
 Example:
 
-    <paper-radio-group selected="small">
-      <paper-radio-button name="small">Small</paper-radio-button>
-      <paper-radio-button name="medium">Medium</paper-radio-button>
-      <paper-radio-button name="large">Large</paper-radio-button>
-    </paper-radio-group>
+```html
+<paper-radio-group selected="small">
+  <paper-radio-button name="small">Small</paper-radio-button>
+  <paper-radio-button name="medium">Medium</paper-radio-button>
+  <paper-radio-button name="large">Large</paper-radio-button>
+</paper-radio-group>
+```
 
 Radio-button-groups can be made optional, and allow zero buttons to be selected:
 
-    <paper-radio-group selected="small" allow-empty-selection>
-      <paper-radio-button name="small">Small</paper-radio-button>
-      <paper-radio-button name="medium">Medium</paper-radio-button>
-      <paper-radio-button name="large">Large</paper-radio-button>
-    </paper-radio-group>
+```html
+<paper-radio-group selected="small" allow-empty-selection>
+  <paper-radio-button name="small">Small</paper-radio-button>
+  <paper-radio-button name="medium">Medium</paper-radio-button>
+  <paper-radio-button name="large">Large</paper-radio-button>
+</paper-radio-group>
+```
 
 See <a href="paper-radio-button">paper-radio-button</a> for more
 information about `paper-radio-button`.
+
+| Custom property | Description | Default |
+| --- | --- | --- |
+| `--paper-radio-group-item-padding` | The padding of the item | `12px` |
 
 

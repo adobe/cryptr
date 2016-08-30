@@ -3,83 +3,75 @@
 
 <dom-module id="salt-data">
 	<style>
-		:host {
-			paper-input {
-				--paper-input-container-disabled: {
-					opacity: 1;
-				}
-				--paper-input-container-input: {
-					font-size: .8em;
-					font-weight: 400;
-				}
-				--paper-input-container-underline-disabled: {
-					border-bottom: none;
-				}
-			}
-			--iron-data-table-row-hover: {
-				background-color: #EEE;
-			}
-		}
-		#grid {
-			font-family: 'Roboto', 'Noto', sans-serif;
-			--iron-data-table-header: {
-				font-size: .95em;
-				font-weight: 100;
-			}
-			--iron-data-table-row: {
-				/*height: 60px;*/
-				font-size: .8em;
-				font-weight: 400;
-				cursor: default;
-			}
+		:host { }
+		#container {
+			height: calc(100% - 39px);
 		}
 		paper-toast {
 			right: 10px;
-			left: auto;
+			left: auto !important;
 		}
-		paper-item {
-			padding: 0px;
-		}
-		paper-input {
-			padding-bottom: 16px;
+		input {
+		    outline: none;
+			border: 0;
+			background-color: transparent;
 		}
 	</style>
 	<template>
 		<button-actions id="actions" selected-items="{{selectedItems}}" prev-password="{{prevPassword}}" clear-val="{{clearVal}}" folders="{{response.folders}}" titlevalue="{{titlevalue}}" url="{{url}}"></button-actions>
-		<iron-data-table class="noselect" id="grid" items="[[data]]" selection-enabled multi-selection selected-items="{{selectedItems}}">
-			<data-table-column name="Name" sort-by="name" flex="1">
-				<template>[[item.name]]</template>
-			</data-table-column>
-			<data-table-column name="Username" sort-by="username" flex="1">
-				<template>
-					<paper-item>
-						<paper-input value="[[item.username]]" disabled></paper-input>
-						<paper-icon-button icon="content-copy" on-click="copyUsername"></paper-icon-button>
-					</paper-item>
-				</template>
-			</data-table-column>
-			<data-table-column name="Password" sort-by="password" >
-				<template>
-					<paper-item style="cursor: pointer" on-mousedown="showPassword" on-mouseout="hidePassword" on-mouseup="hidePassword">
-						<paper-input value="[[item.password]]" type="password" disabled></paper-input>
-						<paper-icon-button icon="content-copy" on-click="copyPassword"></paper-icon-button>
-					</paper-item>
-				</template>
-			</data-table-column>
-			<data-table-column name="Previous Password" hidden="[[!prevPassword]]">
-				<template>
-					<paper-item style="cursor: pointer" on-mousedown="showPassword" on-mouseout="hidePassword" on-mouseup="hidePassword">
-						<paper-input value="[[item.password_previous]]" type="password" disabled></paper-input>
-						<paper-icon-button icon="content-copy" on-click="copyPassword"></paper-icon-button>
-					</paper-item>
-				</template>
-			</data-table-column>
-			<data-table-column name="Note" sort-by="note" flex="3">
-				<template>[[item.note]]</template>
-			</data-table-column>
-		</iron-data-table>
+		<div id="container">
+		  <vaadin-grid id="vaadingrid" on-sort-order-changed="sortOrder" on-selected-items-changed="getSelected" selection-mode="multi" style="width: 100%; height:100%">
+			<table>
+				<colgroup>
+					<col name="Name" sortable hidable>
+					<col name="Username" sortable hidable>
+					<col name="Password" sortable hidable width="185">
+					<col name="Previous" sortable hidable hidden width="185">
+					<col name="Note" sortable hidable>
+					<col name="Hash" sortable hidable hidden>
+				</colgroup>
+				<thead>
+					<tr>
+						<th>Name</th>
+						<th>Username</th>
+						<th>Password</th>
+						<th>Previous</th>
+						<th>Note</th>
+						<th>Hash</th>
+					</tr>
+				</thead>
+				<tbody>
+					<template is="dom-repeat" items="[[data]]">
+						<tr>
+							<td>{{item.name}}</td>
+							<td>
+								<div>
+									<input type="text" value$="[[item.username]]" disabled></input>
+									<paper-icon-button icon="content-copy" onclick="copy(this)"></paper-icon-button>
+								</div>
+							</td>
+							<td>
+								<div onmousedown="showPassword(this)" onmouseout="hidePassword(this)" onmouseup="hidePassword(this)">
+									<input type="password" value$="[[item.password]]" disabled></input>
+									<paper-icon-button icon="content-copy" onclick="copy(this)"></paper-icon-button>
+								</div>
+							</td>
+							<td>
+								<div onmousedown="showPassword(this)" onmouseout="hidePassword(this)" onmouseup="hidePassword(this)">
+									<input type="password" value$="[[item.password_previous]]" disabled></input>
+									<paper-icon-button icon="content-copy" onclick="copy(this)"></paper-icon-button>
+								</div>
+							</td>
+							<td>{{item.note}}</td>
+							<td>{{item.hash}}</td>
+						</tr>
+					</template>
+				</tbody>
+			</table>
+		</vaadin-grid>
 
-		<paper-toast id="copied" duration="2000" text="Copied"></paper-toast>
+	  </div>
+		<paper-toast id="copied" duration="1500" text="Copied"></paper-toast>
 	</template>
 
 	<script>
@@ -92,6 +84,9 @@
 				},
 				selectedItems: {
 					type: Array
+				},
+				route: {
+					observer: 'changeRoute'
 				},
 				titlevalue: {
 					type: String,
@@ -118,26 +113,28 @@
 					notify: true
 				}
 			},
-			copyPassword: function(e){
-				clipboard.writeText(e.path[2].children[0].value.replace(/(?:\r\n|\r|\n)/g, ''));
-				this.$.copied.text = 'Copied';
-				this.$.copied.show();
-			},
-			copyUsername: function(e){
-				clipboard.writeText(e.path[2].children[0].value.replace(/(?:\r\n|\r|\n)/g, ''));
-				this.$.copied.text = 'Copied';
-				this.$.copied.show();
-			},
-			showPassword: function(e){
-				e.target.children[0].type = 'input';
-			},
-			hidePassword: function(e){
-				e.target.children[0].type = 'password';
+			getSelected: function() {
+				var all = this.$.vaadingrid.selection.selected();
+				var temp = [];
+				for (var i = 0; i < all.length; i++) {
+					temp.push(this.data[all[i]]);
+				}
+				this.selectedItems = temp;
 			},
 			clearGrid: function() {
 				if (this.clearVal) {
-					this.$.grid.clearSelection();
+					this.$.vaadingrid.selection.clear();
 					this.clearVal = false;
+				}
+			},
+			changeRoute: function() {
+				if (this.route.startsWith('folder')) {
+					var index = this.route.replace('folder', '');
+					this.titlevalue = this.response.folders[index];
+				} else {
+					this.titlevalue = 'all';
+					if (this.route == 'search') this.searchFilter();
+					else if (this.query) this.data = this.response.results;
 				}
 			},
 			setType: function() {
@@ -150,17 +147,14 @@
 			},
 			searchFilter: function() {
 				if (this.response) {
-					if (this.query != '') {
-						var temp = [];
-						for (var i = 0; i < this.response.results.length; i++) {
-							if (this.response.results[i].name.toLowerCase().includes(this.query.toLowerCase()) || this.response.results[i].username.toLowerCase().includes(this.query.toLowerCase()) || this.response.results[i].note.toLowerCase().includes(this.query.toLowerCase())) {
-								temp.push(this.response.results[i]);
-							}
+					var filterText = this.query.toLowerCase();
+					this.data = this.response.results.filter(function(val) {
+						if (filterText) {
+							return (val.name.toLowerCase()).indexOf(filterText) > -1 || (val.username.toLowerCase()).indexOf(filterText) > -1 || (val.note.toLowerCase()).indexOf(filterText) > -1
+						} else {
+							return true;
 						}
-					} else {
-						this.data = this.response.results;
-					}
-					this.data = temp;
+					});
 				}
 			},
 			folderFilter: function() {
@@ -176,7 +170,28 @@
 				}
 				this.data = temp;
 			}
+			// sortOrder: function() {
+			// 	var index = this.$.vaadingrid.sortOrder[0].column;
+			// 	var lookup = ['name', 'username', 'password', 'password_previous', 'note'];
+			// 	var lesser = this.$.vaadingrid.sortOrder[0].direction == 'asc' ? -1 : 1;
+			// 	this.data.sort(function(a, b) {
+			// 		console.log(a[lookup[index]]);
+			// 		return (a[lookup[index]] < b[lookup[index]]) ? lesser : -lesser;
+			// 	});
+			// 	console.log(this.data);
+			// }
 		});
+		function showPassword(e) {
+			e.children[0].type = 'text';
+		}
+		function hidePassword(e) {
+			e.children[0].type = 'password';
+		}
+		function copy(e){
+			clipboard.writeText(e.parentNode.children[0].value.replace(/(?:\r\n|\r|\n)/g, ''));
+			document.getElementById('copied').text = 'Copied';
+			document.getElementById('copied').show();
+		}
 	</script>
 </dom-module>
 </html>

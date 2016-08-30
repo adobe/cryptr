@@ -1,5 +1,6 @@
 <!doctype html>
 <!--
+@license
 Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
 This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
 The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
@@ -221,6 +222,31 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           }).then(function() {
             expect(server.requests.length).to.be.equal(1);
           });
+        });
+
+        test('requestUrl remains empty despite valid queryString', function() {
+          ajax = fixture('BlankUrl');
+          expect(ajax.url).to.be.equal(undefined);
+          expect(ajax.queryString).to.be.equal('');
+          expect(ajax.requestUrl).to.be.equal('');
+
+          ajax.params = {'a':'b', 'c':'d'};
+
+          expect(ajax.queryString).to.be.equal('a=b&c=d');
+          expect(ajax.requestUrl).to.be.equal('?a=b&c=d');
+        });
+
+        test('generateRequest works with empty URL and valid queryString', function() {
+          ajax = fixture('BlankUrl');
+          expect(ajax.url).to.be.equal(undefined);
+
+          ajax.generateRequest();
+          expect(server.requests[0].url).to.be.eql('');
+
+          ajax.params = {'a':'b', 'c':'d'};
+
+          ajax.generateRequest();
+          expect(server.requests[1].url).to.be.eql('?a=b&c=d');
         });
       });
 
@@ -652,8 +678,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           ajax.handleAs = 'json';
           var eventFired = false;
           ajax.addEventListener('error', function(event) {
-            expect(event.detail.request).to.be.okay;
-            expect(event.detail.error).to.be.okay;
+            expect(event.detail.request).to.be.ok;
+            expect(event.detail.error).to.be.ok;
             eventFired = true;
           });
           var request = ajax.generateRequest();
@@ -666,6 +692,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           }).then(function() {
             expect(eventFired).to.be.eq(true);
             expect(ajax.lastError).to.not.be.eq(null);
+            expect(ajax.lastError.status).to.be.eq(502);
+            expect(ajax.lastError.statusText).to.be.eq("Bad Gateway");
+            expect(ajax.lastError.response).to.be.ok;
           });
 
           server.respond();
@@ -678,8 +707,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           server.restore();
           var eventFired = false;
           ajax.addEventListener('error', function(event) {
-            expect(event.detail.request).to.be.okay;
-            expect(event.detail.error).to.be.okay;
+            expect(event.detail.request).to.be.ok;
+            expect(event.detail.error).to.be.ok;
             eventFired = true;
           });
           var request = ajax.generateRequest();
@@ -827,12 +856,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           var total = 0;
           function incrementTotal(){
             total++;
-            if (total === 2){
+            if (total === 4){
               done();
             }
           }
           window.addEventListener('request', incrementTotal);
+          window.addEventListener('iron-ajax-request', incrementTotal);
           window.addEventListener('response', incrementTotal);
+          window.addEventListener('iron-ajax-response', incrementTotal);
           var ajax = fixture('Bubbles')[0];
           ajax.generateRequest();
           server.respond();
@@ -843,12 +874,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           var total = 0;
           function incrementTotal(){
             total++;
-            if (total === 2){
+            if (total === 4){
               done();
             }
           }
           window.addEventListener('request', incrementTotal);
+          window.addEventListener('iron-ajax-request', incrementTotal);
           window.addEventListener('error', incrementTotal);
+          window.addEventListener('iron-ajax-error', incrementTotal);
           var ajax = fixture('Bubbles')[1];
           ajax.generateRequest();
           server.respond();

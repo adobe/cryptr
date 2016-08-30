@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <script type="text/javascript" src="../../webcomponentsjs/webcomponents.js"></script>
+  <link rel="import" href="common.html">
+</head>
+
+<body unresolved>
+  <span id="forkongithub"><a href="https://github.com/Saulis/iron-data-table/">Fork me on GitHub</a></span>
+  <div class="vertical-section-container centered">
+    <nav class="vertical-section">
+      <ul class="layout horizontal wrap">
+        <li><a href="index.html">Data Binding</a></li>
+        <li><a href="selecting.html">Selecting Items</a></li>
+        <li><a href="templates.html">Templating</a></li>
+        <li><b>Row Details</b></li>
+        <li><a href="columns.html">Column Properties</a></li>
+        <li><a href="styling.html">Styling</a></li>
+        <li><a href="filtering.html">Filtering and Sorting</a></li>
+      </ul>
+    </nav>
+
+    <h3>Row Details</h3>
+    <demo-snippet>
+      <template>
+        <template is="dom-bind">
+          <style>
+            #grid1 data-table-row-detail {
+              height: 100px;
+            }
+
+            #grid1 .detail {
+              width: 100%;
+              display: flex;
+              justify-content: space-around;
+              align-items: center;
+              border: 2px solid #aaa;
+            }
+          </style>
+          <iron-ajax url="users.json" last-response="{{users}}" auto></iron-ajax>
+          <iron-data-table id="grid1" details-enabled items="[[users.results]]">
+            <template is="row-detail">
+              <div class="detail">
+                <img src="[[item.user.picture.medium]]" />
+                <p>[[item.user.username]]</p>
+                <p>[[item.user.email]]</p>
+              </div>
+            </template>
+            <data-table-column name="First Name">
+              <template>[[item.user.name.first]]</template>
+            </data-table-column>
+            <data-table-column name="Last Name">
+              <template>[[item.user.name.last]]</template>
+            </data-table-column>
+          </iron-data-table>
+        </template>
+      </template>
+    </demo-snippet>
+
+    <h3>Custom Expand Toggle</h3>
+    <demo-snippet>
+      <template>
+        <template is="dom-bind">
+          <style>
+            iron-data-table data-table-row-detail {
+              height: 100px;
+            }
+
+            iron-data-table data-table-row-detail .detail {
+              width: 100%;
+              display: flex;
+              justify-content: space-around;
+              align-items: center;
+              border: 2px solid #aaa;
+            }
+          </style>
+          <iron-ajax url="users.json" last-response="{{users}}" auto></iron-ajax>
+          <iron-data-table id="grid2" multi-selection selection-enabled items="[[users.results]]">
+            <template is="row-detail">
+              <div class="detail">
+                <img src="[[item.user.picture.medium]]" />
+                <p>[[item.user.username]]</p>
+                <p>[[item.user.email]]</p>
+              </div>
+            </template>
+            <data-table-column name="First Name">
+              <template>[[item.user.name.first]]</template>
+            </data-table-column>
+            <data-table-column name="Last Name">
+              <template>[[item.user.name.last]]</template>
+            </data-table-column>
+            <data-table-column name="" flex="1" width="50px" align-right>
+              <template>
+                <paper-checkbox checked="{{expanded}}">Details</paper-checkbox>
+              </template>
+            </data-table-column>
+          </iron-data-table>
+        </template>
+      </template>
+    </demo-snippet>
+
+    <h3>Styling Expand Indicator</h3>
+    <demo-snippet>
+      <template>
+        <template is="dom-bind">
+          <style>
+            iron-data-table data-table-row-detail {
+              height: 100px;
+            }
+
+            iron-data-table data-table-row-detail .detail {
+              width: 100%;
+              display: flex;
+              justify-content: space-around;
+              align-items: center;
+              border: 2px solid #aaa;
+            }
+          </style>
+          <iron-ajax url="users.json" last-response="{{users}}" auto></iron-ajax>
+          <iron-data-table id="grid2" details-enabled items="[[users.results]]">
+            <template is="row-detail">
+              <div class="detail">
+                <img src="[[item.user.picture.medium]]" />
+                <p>[[item.user.username]]</p>
+                <p>[[item.user.email]]</p>
+              </div>
+            </template>
+            <data-table-column name="First Name">
+              <template>[[item.user.name.first]]</template>
+            </data-table-column>
+            <data-table-column name="Last Name">
+              <template>[[item.user.name.last]]</template>
+            </data-table-column>
+            <data-table-column name="" width="20px" align-right flex="0">
+              <template>
+                <template is="dom-if" if="[[!expanded]]">
+                  <iron-icon icon="icons:expand-more"></iron-icon>
+                </template>
+                <template is="dom-if" if="[[expanded]]">
+                  <iron-icon icon="icons:expand-less"></iron-icon>
+                </template>
+              </template>
+            </data-table-column>
+          </iron-data-table>
+        </template>
+      </template>
+    </demo-snippet>
+
+    <h3>Customizing Expansion - Single Item Expanded</h3>
+    <demo-snippet>
+      <template>
+        <template is="dom-bind">
+          <style>
+            iron-data-table data-table-row-detail {
+              height: 100px;
+            }
+
+            iron-data-table data-table-row-detail .detail {
+              width: 100%;
+              display: flex;
+              justify-content: space-around;
+              align-items: center;
+              border: 2px solid #aaa;
+            }
+          </style>
+          <iron-ajax url="users.json" last-response="{{users}}" auto></iron-ajax>
+          <custom-expansion>
+            <iron-data-table items="[[users.results]]" details-enabled>
+              <template is="row-detail">
+                <div class="detail">
+                  <img src="[[item.user.picture.medium]]" />
+                  <p>[[item.user.username]]</p>
+                  <p>[[item.user.email]]</p>
+                </div>
+              </template>
+              <data-table-column name="First Name">
+                <template>[[item.user.name.first]]</template>
+              </data-table-column>
+              <data-table-column name="Last Name">
+                <template>[[item.user.name.first]]</template>
+              </data-table-column>
+              <data-table-column name="Email">
+                <template>[[item.user.email]]</template>
+              </data-table-column>
+            </iron-data-table>
+          </custom-expansion>
+        </template>
+        <script>
+          document.addEventListener('WebComponentsReady', function() {
+            Polymer({
+              is: 'custom-expansion',
+              ready: function() {
+                var table = Polymer.dom(this).querySelector('iron-data-table');
+                var expandedItem;
+                table.addEventListener('expanding-item', function(e) {
+                  if (expandedItem) {
+                    table.collapseItem(expandedItem);
+                  }
+                  expandedItem = e.detail.item;
+                });
+              }
+            });
+          });
+        </script>
+      </template>
+    </demo-snippet>
+  </div>
+</body>
+
+</html>

@@ -1,5 +1,6 @@
 <!doctype html>
 <!--
+@license
 Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
 This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
 The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
@@ -70,6 +71,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         successfulRequestOptions = {
           url: '/responds_to_get_with_json'
         };
+
+        synchronousSuccessfulRequestOptions = {
+          url: '/responds_to_get_with_json',
+          async: false,
+          timeout: 100
+        };
+
+        asynchronousSuccessfulRequestOptions = {
+          url: '/responds_to_get_with_json',
+          async: true,
+          timeout: 100
+        };
       });
 
       teardown(function () {
@@ -83,6 +96,20 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           server.respond();
 
           expect(request.response).to.be.ok;
+        });
+
+        test('timeout not set if synchronous', function () {
+          request.send(synchronousSuccessfulRequestOptions);
+
+          expect(request.xhr.async).to.be.eql(false);
+          expect(request.xhr.timeout).to.be.eql(undefined);
+        });
+
+        test('timeout set if asynchronous', function () {
+          request.send(asynchronousSuccessfulRequestOptions);
+
+          expect(request.xhr.async).to.be.eql(true);
+          expect(request.xhr.timeout).to.be.eql(100);
         });
 
         test('sets async to true by default', function () {

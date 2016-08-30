@@ -6,7 +6,7 @@ Basic building blocks for creating an application. Most of the `iron` elements w
 
 ### Elements recently released
 
-* [`iron-page-url`](https://github.com/PolymerElements/iron-page-url) - Handles data binding into and out of the URL. The foundation of routing.
+* [`iron-location`](https://github.com/PolymerElements/iron-location) - Handles data binding into and out of the URL. The foundation of routing.
 * [`iron-demo-helpers`](https://github.com/PolymerElements/iron-demo-helpers) - Utility classes to make building demo pages easier.
 * [`iron-swipeable-container`](https://github.com/PolymerElements/iron-swipeable-container) - A container that allows any of its nested children to be swiped away.
 * [`iron-label`](https://github.com/PolymerElements/iron-label) - A version of the `<label>` element that works with custom elements as well as native elements.

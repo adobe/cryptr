@@ -9,17 +9,19 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 -->
 
 <link rel="import" href="../polymer/polymer.html">
-<link rel="import" href="../paper-styles/default-theme.html">
+<link rel="import" href="../iron-a11y-keys-behavior/iron-a11y-keys-behavior.html">
+<link rel="import" href="../iron-behaviors/iron-button-state.html">
+<link rel="import" href="../iron-behaviors/iron-control-state.html">
+<link rel="import" href="../iron-form-element-behavior/iron-form-element-behavior.html">
+<link rel="import" href="../iron-icon/iron-icon.html">
+<link rel="import" href="../iron-validatable-behavior/iron-validatable-behavior.html">
 <link rel="import" href="../paper-input/paper-input.html">
 <link rel="import" href="../paper-menu-button/paper-menu-button.html">
 <link rel="import" href="../paper-ripple/paper-ripple.html">
-<link rel="import" href="../iron-a11y-keys-behavior/iron-a11y-keys-behavior.html">
-<link rel="import" href="../iron-behaviors/iron-control-state.html">
-<link rel="import" href="../iron-behaviors/iron-button-state.html">
-<link rel="import" href="../iron-icons/iron-icons.html">
-<link rel="import" href="../iron-icon/iron-icon.html">
-<link rel="import" href="../iron-form-element-behavior/iron-form-element-behavior.html">
-<link rel="import" href="../iron-validatable-behavior/iron-validatable-behavior.html">
+<link rel="import" href="../paper-styles/default-theme.html">
+
+<link rel="import" href="paper-dropdown-menu-icons.html">
+<link rel="import" href="paper-dropdown-menu-shared-styles.html">
 
 <!--
 Material design: [Dropdown menus](https://www.google.com/design/spec/components/buttons.html#buttons-dropdown-buttons)
@@ -29,25 +31,31 @@ Material design: [Dropdown menus](https://www.google.com/design/spec/components/
 item is displayed in the control. If no item is selected, the `label` is
 displayed instead.
 
-The child element with the class `dropdown-content` will be used as the dropdown
-menu. It could be a `paper-menu` or element that triggers `iron-select` when
-selecting its children.
-
 Example:
 
     <paper-dropdown-menu label="Your favourite pastry">
-      <paper-menu class="dropdown-content">
+      <paper-listbox class="dropdown-content">
         <paper-item>Croissant</paper-item>
         <paper-item>Donut</paper-item>
         <paper-item>Financier</paper-item>
         <paper-item>Madeleine</paper-item>
-      </paper-menu>
+      </paper-listbox>
     </paper-dropdown-menu>
 
 This example renders a dropdown menu with 4 options.
 
-Similarly to using `iron-select`, `iron-deselect` events will cause the
-current selection of the `paper-dropdown-menu` to be cleared.
+The child element with the class `dropdown-content` is used as the dropdown
+menu. This can be a [`paper-listbox`](paper-listbox), or any other or
+element that acts like an [`iron-selector`](iron-selector).
+
+Specifically, the menu child must fire an
+[`iron-select`](iron-selector#event-iron-select) event when one of its
+children is selected, and an [`iron-deselect`](iron-selector#event-iron-deselect)
+event when a child is deselected. The selected or deselected item must
+be passed as the event's `detail.item` property.
+
+Applications can listen for the `iron-select` and `iron-deselect` events
+to react when options are selected and deselected.
 
 ### Styling
 
@@ -74,72 +82,10 @@ respectively.
 
 <dom-module id="paper-dropdown-menu">
   <template>
-    <style>
-      :host {
-        display: inline-block;
-        position: relative;
-        text-align: left;
-        cursor: pointer;
-
-        /* NOTE(cdata): Both values are needed, since some phones require the
-         * value to be `transparent`.
-         */
-        -webkit-tap-highlight-color: rgba(0,0,0,0);
-        -webkit-tap-highlight-color: transparent;
-
-        --paper-input-container-input: {
-          overflow: hidden;
-          white-space: nowrap;
-          text-overflow: ellipsis;
-          max-width: 100%;
-          box-sizing: border-box;
-          cursor: pointer;
-        };
-
-        @apply(--paper-dropdown-menu);
-      }
-
-      :host([disabled]) {
-        @apply(--paper-dropdown-menu-disabled);
-      }
-
-      :host([noink]) paper-ripple {
-        display: none;
-      }
-
-      :host([no-label-float]) paper-ripple {
-        top: 8px;
-      }
-
-      paper-ripple {
-        top: 12px;
-        left: 0px;
-        bottom: 8px;
-        right: 0px;
-
-        @apply(--paper-dropdown-menu-ripple);
-      }
-
-      paper-menu-button {
-        display: block;
-        padding: 0;
-
-        @apply(--paper-dropdown-menu-button);
-      }
-
-      paper-input {
-        @apply(--paper-dropdown-menu-input);
-      }
-
-      iron-icon {
-        color: var(--disabled-text-color);
-
-        @apply(--paper-dropdown-menu-icon);
-      }
-    </style>
+    <style include="paper-dropdown-menu-shared-styles"></style>
 
     <!-- this div fulfills an a11y requirement for combobox, do not remove -->
-    <div role="button"></div>
+    <span role="button"></span>
     <paper-menu-button
       id="menuButton"
       vertical-align="[[verticalAlign]]"
@@ -149,7 +95,9 @@ respectively.
       no-animations="[[noAnimations]]"
       on-iron-select="_onIronSelect"
       on-iron-deselect="_onIronDeselect"
-      opened="{{opened}}">
+      opened="{{opened}}"
+      close-on-activate
+      allow-outside-scroll="[[allowOutsideScroll]]">
       <div class="dropdown-trigger">
         <paper-ripple></paper-ripple>
         <!-- paper-input has type="text" for a11y, do not remove -->
@@ -164,7 +112,7 @@ respectively.
           always-float-label="[[alwaysFloatLabel]]"
           no-label-float="[[noLabelFloat]]"
           label="[[label]]">
-          <iron-icon icon="arrow-drop-down" suffix></iron-icon>
+          <iron-icon icon="paper-dropdown-menu:arrow-drop-down" suffix></iron-icon>
         </paper-input>
       </div>
       <content id="content" select=".dropdown-content"></content>
@@ -177,18 +125,6 @@ respectively.
 
       Polymer({
         is: 'paper-dropdown-menu',
-
-        /**
-         * Fired when the dropdown opens.
-         *
-         * @event paper-dropdown-open
-         */
-
-        /**
-         * Fired when the dropdown closes.
-         *
-         * @event paper-dropdown-close
-         */
 
         behaviors: [
           Polymer.IronButtonState,
@@ -262,6 +198,17 @@ respectively.
             notify: true,
             value: false,
             observer: '_openedChanged'
+          },
+
+          /**
+           * By default, the dropdown will constrain scrolling on the page
+           * to itself when opened.
+           * Set to true in order to prevent scroll from being constrained
+           * to the dropdown when it opens.
+           */
+          allowOutsideScroll: {
+            type: Boolean,
+            value: false
           },
 
           /**
@@ -402,7 +349,7 @@ respectively.
           if (!selectedItem) {
             value = '';
           } else {
-            value = selectedItem.label || selectedItem.textContent.trim();
+            value = selectedItem.label || selectedItem.getAttribute('label') || selectedItem.textContent.trim();
           }
 
           this._setValue(value);

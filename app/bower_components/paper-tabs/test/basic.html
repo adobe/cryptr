@@ -46,6 +46,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
     <script>
 
+      function ensureDocumentHasFocus() {
+        window.top && window.top.focus();
+      }
+
       function checkSelectionBar(tabs, tab) {
         var tabRect = tab.getBoundingClientRect();
         var rect = Polymer.dom(tabs.root).querySelector('#selectionBar').getBoundingClientRect();
@@ -96,10 +100,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         test('to false as alignBottom', function() {
           assert.equal(tabs.alignBottom, false);
-        });
-
-        test('has role tablist', function() {
-          assert.equal(tabs.getAttribute('role'), 'tablist');
         });
       });
 
@@ -204,6 +204,188 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             assert.isFalse(tab.noink);
           });
         });
+      });
+
+      suite('accessibility', function() {
+        var LEFT = 37;
+        var RIGHT = 39;
+        var tabs;
+
+        setup(function () {
+          tabs = fixture('basic');
+          Polymer.dom.flush();
+        });
+
+        test('paper-tabs has role tablist', function() {
+          assert.equal(tabs.getAttribute('role'), 'tablist');
+        });
+
+        test('paper-tab has role tab', function() {
+          tabs.items.forEach(function(tab) {
+            assert.equal(tab.getAttribute('role'), 'tab');
+          });
+        });
+
+        test('without autoselect, tabs are not automatically selected',
+          function(done) {
+            ensureDocumentHasFocus();
+            Polymer.Base.async(function() {
+              tabs.select(0);
+              MockInteractions.pressAndReleaseKeyOn(tabs.selectedItem, RIGHT);
+              Polymer.Base.async(function() {
+                assert.equal(tabs.selected, 0);
+
+                MockInteractions.pressAndReleaseKeyOn(tabs.selectedItem, LEFT);
+                Polymer.Base.async(function() {
+                  assert.equal(tabs.selected, 0);
+
+                  MockInteractions.pressAndReleaseKeyOn(tabs.selectedItem, LEFT);
+                  Polymer.Base.async(function() {
+                    assert.equal(tabs.selected, 0);
+                    done();
+                  }, 100);
+                }, 100);
+              }, 100);
+            });
+          });
+
+        test('with autoselect, tabs are selected when moved to using arrow ' +
+          'keys', function(done) {
+            ensureDocumentHasFocus();
+            Polymer.Base.async(function() {
+              tabs.autoselect = true;
+              tabs.select(0);
+              MockInteractions.pressAndReleaseKeyOn(tabs.selectedItem, RIGHT);
+              Polymer.Base.async(function() {
+                assert.equal(tabs.selected, 1);
+
+                MockInteractions.pressAndReleaseKeyOn(tabs.selectedItem, RIGHT);
+                Polymer.Base.async(function() {
+                  assert.equal(tabs.selected, 2);
+
+                  MockInteractions.pressAndReleaseKeyOn(tabs.selectedItem, LEFT);
+                  Polymer.Base.async(function() {
+                    assert.equal(tabs.selected, 1);
+                    done();
+                  }, 100);
+                }, 100);
+              }, 100);
+            });
+          });
+
+        test('with autoselect, tabs are selected when moved to using arrow ' +
+          'keys (RTL)',function(done) {
+            ensureDocumentHasFocus();
+            Polymer.Base.async(function() {
+              tabs.setAttribute('dir', 'rtl');
+
+              tabs.autoselect = true;
+              tabs.select(0);
+              MockInteractions.pressAndReleaseKeyOn(tabs.selectedItem, LEFT);
+              Polymer.Base.async(function() {
+                assert.equal(tabs.selected, 1);
+
+                MockInteractions.pressAndReleaseKeyOn(tabs.selectedItem, LEFT);
+                Polymer.Base.async(function() {
+                  assert.equal(tabs.selected, 2);
+
+                  MockInteractions.pressAndReleaseKeyOn(tabs.selectedItem, RIGHT);
+                  Polymer.Base.async(function() {
+                    assert.equal(tabs.selected, 1);
+                    done();
+                  }, 100);
+                }, 100);
+              }, 100);
+            });
+          });
+
+        test('with autoselect-delay zero, tabs are selected with ' +
+          'microtask timing after the keyup', function(done) {
+            ensureDocumentHasFocus();
+            Polymer.Base.async(function() {
+              tabs.autoselect = true;
+              tabs.autoselectDelay = 0;
+              tabs.select(0);
+
+              MockInteractions.keyDownOn(tabs.selectedItem, RIGHT);
+              Polymer.Base.async(function() {
+                assert.equal(tabs.selected, 0);
+                assert.equal(tabs.items.indexOf(tabs.focusedItem), 1);
+
+                // No keyup between keydown events: the key is being held.
+                MockInteractions.keyDownOn(tabs.selectedItem, RIGHT);
+                Polymer.Base.async(function() {
+                  assert.equal(tabs.selected, 0);
+                  assert.equal(tabs.items.indexOf(tabs.focusedItem), 2);
+
+                  MockInteractions.keyUpOn(tabs.selectedItem, RIGHT);
+                  assert.equal(tabs.selected, 0);
+                  Polymer.Base.async(function() {
+                    assert.equal(tabs.selected, 2);
+                    assert.equal(tabs.items.indexOf(tabs.focusedItem), 2);
+
+                    MockInteractions.keyDownOn(tabs.selectedItem, LEFT);
+                    Polymer.Base.async(function() {
+                      assert.equal(tabs.selected, 2);
+                      assert.equal(tabs.items.indexOf(tabs.focusedItem), 1);
+
+                      MockInteractions.keyUpOn(tabs.selectedItem, LEFT);
+                      assert.equal(tabs.selected, 2);
+                      Polymer.Base.async(function() {
+                        assert.equal(tabs.selected, 1);
+                        done();
+                      });
+                    });
+                  });
+                });
+              });
+            });
+          });
+
+        test('with autoselect-delay positive, tabs are selected with ' +
+          'microtask timing after the keyup and delay', function(done) {
+            ensureDocumentHasFocus();
+            Polymer.Base.async(function() {
+              var DELAY = 100;
+
+              tabs.autoselect = true;
+              tabs.autoselectDelay = DELAY;
+              tabs.select(0);
+
+              MockInteractions.keyDownOn(tabs.selectedItem, RIGHT);
+              Polymer.Base.async(function() {
+                assert.equal(tabs.selected, 0);
+                assert.equal(tabs.items.indexOf(tabs.focusedItem), 1);
+
+                // No keyup between keydown events: the key is being held.
+                MockInteractions.keyDownOn(tabs.selectedItem, RIGHT);
+                Polymer.Base.async(function() {
+                  assert.equal(tabs.selected, 0);
+                  assert.equal(tabs.items.indexOf(tabs.focusedItem), 2);
+
+                  MockInteractions.keyUpOn(tabs.selectedItem, RIGHT);
+                  assert.equal(tabs.selected, 0);
+                  Polymer.Base.async(function() {
+                    assert.equal(tabs.selected, 2);
+                    assert.equal(tabs.items.indexOf(tabs.focusedItem), 2);
+
+                    MockInteractions.keyDownOn(tabs.selectedItem, LEFT);
+                    Polymer.Base.async(function() {
+                      assert.equal(tabs.selected, 2);
+                      assert.equal(tabs.items.indexOf(tabs.focusedItem), 1);
+
+                      MockInteractions.keyUpOn(tabs.selectedItem, LEFT);
+                      assert.equal(tabs.selected, 2);
+                      Polymer.Base.async(function() {
+                        assert.equal(tabs.selected, 1);
+                        done();
+                      }, DELAY + 100);
+                    });
+                  }, DELAY + 100);
+                });
+              });
+            });
+          });
       });
 
     </script>

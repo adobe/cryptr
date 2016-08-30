@@ -1,6 +1,6 @@
 {
   "name": "iron-elements",
-  "version": "1.0.8",
+  "version": "1.0.10",
   "description": "A set of visual and non-visual utility elements. Includes elements for working with layout, user input, selection, and scaffolding apps",
   "keywords": [
     "web-components",
@@ -40,11 +40,11 @@
     "iron-list": "PolymerElements/iron-list#^1.0.0",
     "iron-label": "PolymerElements/iron-label#^1.0.0",
     "iron-localstorage": "PolymerElements/iron-localstorage#^1.0.0",
+    "iron-location": "PolymerElements/iron-location#^0.8.0",
     "iron-media-query": "PolymerElements/iron-media-query#^1.0.0",
     "iron-menu-behavior": "PolymerElements/iron-menu-behavior#^1.0.0",
     "iron-meta": "PolymerElements/iron-meta#^1.0.0",
     "iron-overlay-behavior": "PolymerElements/iron-overlay-behavior#^1.0.0",
-    "iron-page-url": "PolymerElements/iron-page-url#~0.7.0",
     "iron-pages": "PolymerElements/iron-pages#^1.0.0",
     "iron-range-behavior": "PolymerElements/iron-range-behavior#^1.0.0",
     "iron-resizable-behavior": "PolymerElements/iron-resizable-behavior#^1.0.0",
@@ -70,11 +70,11 @@
     "tests"
   ],
   "main": "iron-elements.html",
-  "_release": "1.0.8",
+  "_release": "1.0.10",
   "_resolution": {
     "type": "version",
-    "tag": "v1.0.8",
-    "commit": "55f3d9ca27901c76fc05dea536a3618e92214041"
+    "tag": "v1.0.10",
+    "commit": "5abb33a0d179877b4e5eedb4d08298524f0b08b9"
   },
   "_source": "git://github.com/PolymerElements/iron-elements.git",
   "_target": "^1.0.0",

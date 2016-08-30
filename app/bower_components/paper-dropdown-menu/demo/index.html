@@ -21,12 +21,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
   <link rel="import" href="../../iron-demo-helpers/demo-snippet.html">
   <link rel="import" href="../../iron-demo-helpers/demo-pages-shared-styles.html">
-  <link rel="import" href="../../paper-button/paper-button.html">
   <link rel="import" href="../../paper-item/paper-item.html">
   <link rel="import" href="../../paper-listbox/paper-listbox.html">
-  <link rel="import" href="../../paper-styles/demo-pages.html">
   <link rel="import" href="../../paper-tabs/paper-tabs.html">
   <link rel="import" href="../paper-dropdown-menu.html">
+  <link rel="import" href="../paper-dropdown-menu-light.html">
 
   <style is="custom-style" include="demo-pages-shared-styles">
     paper-tabs {
@@ -39,6 +38,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
     paper-dropdown-menu {
       width: 200px;
+      margin-right: 20px;
     }
   </style>
 
@@ -56,6 +56,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <paper-item>diplodocus</paper-item>
           </paper-listbox>
         </paper-dropdown-menu>
+
+        <paper-dropdown-menu-light label="Dinosaurs (light)">
+          <paper-listbox class="dropdown-content">
+            <paper-item>allosaurus</paper-item>
+            <paper-item>brontosaurus</paper-item>
+            <paper-item>carcharodontosaurus</paper-item>
+            <paper-item>diplodocus</paper-item>
+          </paper-listbox>
+        </paper-dropdown-menu-light>
       </template>
     </demo-snippet>
 
@@ -70,6 +79,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <paper-item>diplodocus</paper-item>
           </paper-listbox>
         </paper-dropdown-menu>
+
+        <paper-dropdown-menu-light label="Dinosaurs (light)">
+          <paper-listbox class="dropdown-content" selected="1">
+            <paper-item>allosaurus</paper-item>
+            <paper-item>brontosaurus</paper-item>
+            <paper-item>carcharodontosaurus</paper-item>
+            <paper-item>diplodocus</paper-item>
+          </paper-listbox>
+        </paper-dropdown-menu-light>
       </template>
     </demo-snippet>
 
@@ -84,6 +102,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <paper-item>diplodocus</paper-item>
           </paper-listbox>
         </paper-dropdown-menu>
+
+        <paper-dropdown-menu-light label="Upwards and to the left! (light)" vertical-align="bottom" horizontal-align="left">
+          <paper-listbox class="dropdown-content">
+            <paper-item>allosaurus</paper-item>
+            <paper-item>brontosaurus</paper-item>
+            <paper-item>carcharodontosaurus</paper-item>
+            <paper-item>diplodocus</paper-item>
+          </paper-listbox>
+        </paper-dropdown-menu-light>
       </template>
     </demo-snippet>
 
@@ -99,6 +126,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <paper-item>diplodocus</paper-item>
           </paper-listbox>
         </paper-dropdown-menu>
+
+        <paper-dropdown-menu-light label="Disabled dinosaurs (light)" disabled>
+          <paper-listbox class="dropdown-content">
+            <paper-item>allosaurus</paper-item>
+            <paper-item>brontosaurus</paper-item>
+            <paper-item>carcharodontosaurus</paper-item>
+            <paper-item>diplodocus</paper-item>
+          </paper-listbox>
+        </paper-dropdown-menu-light>
       </template>
     </demo-snippet>
 
@@ -128,6 +164,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <paper-tab>emmental</paper-tab>
           </paper-tabs>
         </paper-dropdown-menu>
+
+        <paper-dropdown-menu-light label="Menu tabs!? (light)">
+          <paper-tabs class="dropdown-content">
+            <paper-tab>cheddar</paper-tab>
+            <paper-tab>stilton</paper-tab>
+            <paper-tab>emmental</paper-tab>
+          </paper-tabs>
+        </paper-dropdown-menu-light>
       </template>
     </demo-snippet>
 
@@ -142,6 +186,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <paper-item>diplodocus</paper-item>
           </paper-listbox>
         </paper-dropdown-menu>
+
+        <paper-dropdown-menu-light label="Dinosaurs (light)" noink no-animations>
+          <paper-listbox class="dropdown-content">
+            <paper-item>allosaurus</paper-item>
+            <paper-item>brontosaurus</paper-item>
+            <paper-item>carcharodontosaurus</paper-item>
+            <paper-item>diplodocus</paper-item>
+          </paper-listbox>
+        </paper-dropdown-menu-light>
       </template>
     </demo-snippet>
 
@@ -151,8 +204,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <style is="custom-style">
           paper-dropdown-menu.custom {
             --paper-input-container-label: {
-              color: white;
-              background-color: var(--paper-pink-500);
+              color: var(--paper-pink-500);
               font-style: italic;
               text-align: center;
               font-weight: bold;
@@ -168,6 +220,23 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               display: none;
             };
           }
+
+          paper-dropdown-menu-light.custom {
+            --paper-dropdown-menu-label: {
+              color: var(--paper-pink-500);
+              font-style: italic;
+              text-align: center;
+              font-weight: bold;
+            };
+            --paper-dropdown-menu-input: {
+              color: var(--paper-indigo-500);
+              font-style: normal;
+              font-family: serif;
+              text-transform: uppercase;
+              /* no underline */
+              border-bottom: none;
+            }
+          }
         </style>
         <paper-dropdown-menu class="custom" label="Custom" no-label-float>
           <paper-listbox class="dropdown-content">
@@ -177,41 +246,50 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <paper-item>diplodocus</paper-item>
           </paper-listbox>
         </paper-dropdown-menu>
+
+        <paper-dropdown-menu-light class="custom" label="Custom (light)" no-label-float>
+          <paper-listbox class="dropdown-content">
+            <paper-item>allosaurus</paper-item>
+            <paper-item>brontosaurus</paper-item>
+            <paper-item>carcharodontosaurus</paper-item>
+            <paper-item>diplodocus</paper-item>
+          </paper-listbox>
+        </paper-dropdown-menu-light>
       </template>
     </demo-snippet>
   </div>
 
   <script>
-  document.addEventListener('WebComponentsReady', function() {
-    Demo.dinosaurs = [
-      'allosaurus',
-      'brontosaurus',
-      'carcharodontosaurus',
-      'diplodocus',
-      'ekrixinatosaurus',
-      'fukuiraptor',
-      'gallimimus',
-      'hadrosaurus',
-      'iguanodon',
-      'jainosaurus',
-      'kritosaurus',
-      'liaoceratops',
-      'megalosaurus',
-      'nemegtosaurus',
-      'ornithomimus',
-      'protoceratops',
-      'quetecsaurus',
-      'rajasaurus',
-      'stegosaurus',
-      'triceratops',
-      'utahraptor',
-      'vulcanodon',
-      'wannanosaurus',
-      'xenoceratops',
-      'yandusaurus',
-      'zephyrosaurus'
-    ];
-  });
+  // document.addEventListener('WebComponentsReady', function() {
+  //   Demo.dinosaurs = [
+  //     'allosaurus',
+  //     'brontosaurus',
+  //     'carcharodontosaurus',
+  //     'diplodocus',
+  //     'ekrixinatosaurus',
+  //     'fukuiraptor',
+  //     'gallimimus',
+  //     'hadrosaurus',
+  //     'iguanodon',
+  //     'jainosaurus',
+  //     'kritosaurus',
+  //     'liaoceratops',
+  //     'megalosaurus',
+  //     'nemegtosaurus',
+  //     'ornithomimus',
+  //     'protoceratops',
+  //     'quetecsaurus',
+  //     'rajasaurus',
+  //     'stegosaurus',
+  //     'triceratops',
+  //     'utahraptor',
+  //     'vulcanodon',
+  //     'wannanosaurus',
+  //     'xenoceratops',
+  //     'yandusaurus',
+  //     'zephyrosaurus'
+  //   ];
+  // });
   </script>
 </body>
 </html>

@@ -4,7 +4,9 @@
 
 # &lt;iron-data-table&gt;
 
-[Demos and API Documentation](https://saulis.github.io/iron-data-table/)
+[Demos](https://saulis.github.io/iron-data-table/demo/) and [API Documentation](https://saulis.github.io/iron-data-table/)
+
+For *Angular 2* support, see [angular2-iron-data-table](https://github.com/Saulis/angular2-iron-data-table/blob/master/README.md)
 
 To install, run: `bower install iron-data-table`
 
@@ -28,7 +30,8 @@ Column templates should bind to template models of the following structure:
 {
   index: 0,        // index in the item array
   selected: false, // true if the current item is selected
-  item: {}         // user data corresponding to items[index]
+  item: {}         // user data corresponding to items[index],
+  expanded: false  // true if row details have been expanded for the current item
 }
 ```
 For example, given the following `data` array:
@@ -70,11 +73,12 @@ bound from the model object provided to the template scope):
 
 ## Features (1.0)
 - Virtual, 'infinite' scrolling provided by `<iron-list>`
+- Lazy Loading
 - Data filtering
 - Data sorting
+- Multi-Column sorting (thanks to @userquin)
 - Item selection
 - Multi-Selection
-- Row Grouping
 - Template support for each column
 - Two-way binding support
 - Custom styling support for templates
@@ -82,18 +86,19 @@ bound from the model object provided to the template scope):
 - Native Shadow DOM support
 - Column manipulation, resizing, hiding, reordering
 - Custom Header templates
+- Basic Angular 2 support with directives
+- Row Details (thanks to @gazal-k)
 
 ## Roadmap (1.1)
 In random order: (please let me know if something is missing or misplaced)
 - Frozen Columns
-- Row Details
 - Drag and Drop Column Resizing
 - Drag and Drop Column Reordering
 
 ## Roadmap (1.x)
 In random order: (please let me know if something is missing or misplaced)
-- Lazy Loading
 - Nested Row Grouping (Tree)
+- Row Grouping
 - Custom Footer templates
 
 # Contributing

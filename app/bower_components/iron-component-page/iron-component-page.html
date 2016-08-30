@@ -38,6 +38,10 @@ documentation page including demos (if available).
         background: var(--paper-grey-50);
       }
 
+      [hidden] {
+        display: none !important;
+      }
+
       p {
         max-width: 20em;
       }
@@ -85,8 +89,16 @@ documentation page including demos (if available).
         margin: -2px 5px 0 0;
       }
 
-      paper-toolbar a:hover, paper-toolbar a:hover iron-icon, paper-toolbar a.iron-selected, paper-toolbar a.iron-selected iron-icon {
+      paper-toolbar a.iron-selected, paper-toolbar a.iron-selected iron-icon {
         color: var(--paper-grey-800);
+      }
+
+      paper-toolbar a:hover, paper-toolbar a:hover iron-icon {
+        color: var(--paper-pink-500);
+      }
+
+      select {
+        cursor: pointer;
       }
 
       #demo iframe {
@@ -365,6 +377,8 @@ documentation page including demos (if available).
            */
           _activeDescriptor: Object,
 
+          _fragmentPrefix: String,
+
           /**
            * Toggle flag to be used when this element is being displayed in the
            * Polymer Elements catalog.
@@ -531,16 +545,39 @@ documentation page including demos (if available).
 
           var src = view.split(':')[1];
           var demoSrc = new URL(src, this.base).toString();
+          var self = this;
 
           // If you use history.pushState with iframe.src = url, you will create 2 history entries,
           // but creating a new iframe dynamically will prevent it.
-
           if (this._iframe) {
             Polymer.dom(this.$.demo).removeChild(this._iframe);
           }
-
           this._iframe = document.createElement('iframe');
           this._iframe.src = demoSrc;
+          this._iframe.allowFullscreen = true;
+
+          // Fixes iron-component-page/issues/80
+          // Scrollbar issue in desktop/mobile Safari that prevents the user
+          // from scrolling the demos. In this case, we need to force layout
+          // in the main document when the iframe content has been fully rendered.
+          this._iframe.style.height = '0%';
+          this._iframe.addEventListener('load', function() {
+            var win = self._iframe.contentWindow;
+            if (win.HTMLImports) {
+              win.HTMLImports.whenReady(function() {
+                if (win.Polymer) {
+                  win.Polymer.RenderStatus.afterNextRender(self, function() {
+                    self._iframe.style.height = '100%';
+                  });
+                } else {
+                  self._iframe.style.height = '100%';
+                }
+              });
+            } else {
+              self._iframe.style.height = '100%';
+            }
+          });
+
           Polymer.dom(this.$.demo).appendChild(this._iframe);
         },
 

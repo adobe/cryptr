@@ -65,29 +65,29 @@ property.
         on-tap="_togglePrivate">{{_privateToggleLabel}}</paper-button>
     </nav>
 
-    <section id="[[_formatAnchor(prefix,'properties')]]" class="card" hidden$="{{_noneToShow(_showPrivate,_properties)}}">
-      <header><a href="#[[_formatAnchor(prefix,'properties')]]" class="deeplink">Properties</a></header>
+    <section id$="[[_formatAnchor(prefix,'properties')]]" class="card" hidden$="{{_noneToShow(_showPrivate,_properties)}}">
+      <header><a href$="#[[_formatAnchor(prefix,'properties')]]" class="deeplink">Properties</a></header>
       <template is="dom-repeat" items="{{_properties}}" hidden$="{{!_properties.length}}">
         <iron-doc-property anchor-id="[[_formatAnchor(prefix,'property',item.name)]]" descriptor="{{item}}"></iron-doc-property>
       </template>
     </section>
 
-    <section id="[[_formatAnchor(prefix,'methods')]]" class="card"  hidden$="{{_noneToShow(_showPrivate,_methods)}}">
-      <header><a href="#[[_formatAnchor(prefix,'methods')]]" class="deeplink">Methods</a></header>
+    <section id$="[[_formatAnchor(prefix,'methods')]]" class="card"  hidden$="{{_noneToShow(_showPrivate,_methods)}}">
+      <header><a href$="#[[_formatAnchor(prefix,'methods')]]" class="deeplink">Methods</a></header>
       <template is="dom-repeat" items="{{_methods}}">
         <iron-doc-property anchor-id="[[_formatAnchor(prefix,'method',item.name)]]" descriptor="{{item}}"></iron-doc-property>
       </template>
     </section>
 
-    <section id="[[_formatAnchor(prefix,'events')]]" class="card" hidden$="{{_noneToShow(_showPrivate,_events)}}">
-      <header><a href="#[[_formatAnchor(prefix,'events')]" class="deeplink">Events</a></header>
+    <section id$="[[_formatAnchor(prefix,'events')]]" class="card" hidden$="{{_noneToShow(_showPrivate,_events)}}">
+      <header><a href$="#[[_formatAnchor(prefix,'events')]]" class="deeplink">Events</a></header>
       <template is="dom-repeat" items="{{_events}}">
         <iron-doc-property anchor-id="[[_formatAnchor(prefix,'event',item.name)]]" descriptor="{{item}}"></iron-doc-property>
       </template>
     </section>
 
-    <section id="[[_formatAnchor(prefix,'behaviors')]]" class="card" hidden$="{{_hideBehaviors(_behaviors)}}">
-      <header><a href="#[[_formatAnchor(prefix,'behaviors')]]" class="deeplink">Behaviors</a></header>
+    <section id$="[[_formatAnchor(prefix,'behaviors')]]" class="card" hidden$="{{_hideBehaviors(_behaviors)}}">
+      <header><a href$="#[[_formatAnchor(prefix,'behaviors')]]" class="deeplink">Behaviors</a></header>
       <template is="dom-repeat" items="{{_behaviors}}">
         <p on-click="_broadcastBehavior">{{item}}</p>
       </template>
@@ -147,7 +147,7 @@ property.
           // Note that this is only an error during element creation. You are free
           // to stomp over the descriptor after it is ready.
           if (jsonDescriptor && this.descriptor) {
-            console.error(
+            Polymer.Base._error(
                 this,
                 'received both a bound descriptor:', this.descriptor,
                 'and JSON descriptor:', this._jsonDescriptor,
@@ -178,7 +178,7 @@ property.
           try {
             return JSON.parse(textContent);
           } catch(error) {
-            console.error('Failure when parsing JSON:', textContent, error);
+            Polymer.Base._error('Failure when parsing JSON:', textContent, error);
             throw error;
           }
         },

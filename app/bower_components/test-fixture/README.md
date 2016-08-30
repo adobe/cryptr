@@ -7,14 +7,15 @@ test-fixture.html
 Edit those files, and our readme bot will duplicate them over here!
 Edit this file, and the bot will squash your changes :)
 
+The bot does some handling of markdown. Please file a bug if it does the wrong
+thing! https://github.com/PolymerLabs/tedium/issues
+
 -->
 
-[![Build Status](https://travis-ci.org/PolymerElements/test-fixture.svg?branch=master)](https://travis-ci.org/PolymerElements/test-fixture)
+[![Build status](https://travis-ci.org/PolymerElements/test-fixture.svg?branch=master)](https://travis-ci.org/PolymerElements/test-fixture)
 
 
 ##&lt;test-fixture&gt;
-
-
 
 The `<test-fixture>` element can simplify the exercise of consistently
 resetting a test suite's DOM. To use it, wrap the test suite's DOM as a template:

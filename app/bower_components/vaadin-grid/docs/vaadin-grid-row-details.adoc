@@ -1,0 +1,61 @@
+---
+title: Row Details
+order: 10
+layout: page
+---
+
+[[vaadin-grid.row-details]]
+= Row Details
+
+The row details feature can be used to display additional information related to a single row inside the data grid.
+The [vaadinelement]#vaadin-grid# element provides an API to assign a function that acts as a row details generator and to toggle the visibility of the row details.
+
+[[figure.vaadin-grid.row-details]]
+.A [vaadinelement]#vaadin-grid# displaying row details
+image::img/vaadin-grid-row-details.png[]
+
+[[vaadin-grid.row-details.generator]]
+== Generator Function
+
+The row details generator should be a function assigned to the [propertyname]#grid.rowDetailsGenerator# property.
+This callback function is called when the row details are displayed and it is expected to return an HTML element that is to be displayed below the row.
+As the sole parameter the function gets the index of the row.
+
+See the following example on how you can implement this function:
+[source,javascript]
+----
+grid.rowDetailsGenerator = function(rowIndex) {
+  var element = document.createElement('div');
+
+  grid.getItem(rowIndex, function(error, item) {
+    if (!error) {
+      // The getUserDetails should return HTML.
+      element.innerHTML = getUserDetails(item.user);
+    }
+  });
+
+  return element;
+};
+----
+
+[[vaadin-grid.row-details.display]]
+== Displaying the Details
+
+In order to actually display the row details, you need to call the [methodname]#setRowDetailsVisible()# method.
+This method takes two parameters: the index number of the row and a `Boolean` value to indicate whether to display or hide the row details.
+
+See the following example on how to display details for the currently selected row:
+[source,javascript]
+----
+var detailsOpenIndex = -1;
+
+// Show details for the selected row
+grid.addEventListener('selected-items-changed', function() {
+  grid.setRowDetailsVisible(detailsOpenIndex, false);
+  var selected = grid.selection.selected();
+  if (selected.length == 1) {
+    grid.setRowDetailsVisible(selected[0], true);
+    detailsOpenIndex = selected[0];
+  }
+});
+----

@@ -36,7 +36,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       .deeplink:hover {
-        color: #555;
+        color: var(--paper-pink-500);
       }
 
       #api {
@@ -45,10 +45,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       #api header {
-        @apply(--paper-font-subhead);
+        @apply(--paper-font-title);
 
         flex: 1;
-        padding-left: 16px;
       }
 
       #api a {
@@ -67,9 +66,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       #summary .markdown-html pre {
-        background-color: var(--paper-grey-50);
-        border: solid #e5e5e5;
-        border-width: 1px 0;
+        background-color: var(--paper-grey-200);
+        border-radius: 3px;
         font-size: 15px;
         overflow-x: auto;
         padding: 12px 24px;
@@ -77,14 +75,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       #summary .markdown-html table {
+        background-color: var(--paper-grey-200);
         border-collapse: collapse;
-        border-top: 1px solid #e5e5e5;
         margin: 12px 0;
         width: 100%;
       }
 
       #summary .markdown-html tr {
-        border-bottom: 1px solid #e5e5e5;
         padding: 0 18px;
       }
 
@@ -103,53 +100,79 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         padding-right: 24px;
       }
 
+      #summary .markdown-html td:first-child > code {
+        color: black;
+        font-weight: bold;
+      }
+
       #summary .markdown-html code {
         @apply(--paper-font-code1);
+        background: var(--paper-grey-200);
+        padding: 3px;
+        border-radius: 3px;
       }
 
       #summary .markdown-html p {
-        padding: 0 24px;
+        padding: 0;
       }
 
       #summary .markdown-html a {
+        background: none;
+        @apply(--paper-font-body1);
         color: var(--paper-indigo-a200);
         font-weight: 500;
         text-decoration: none;
       }
 
-      #summary .markdown-html h1,
-      #summary .markdown-html h2,
-      #summary .markdown-html h3,
-      #summary .markdown-html h4,
-      #summary .markdown-html h5 {
-        padding: 0 18px;
+      #summary .markdown-html h1 {
+        @apply(--paper-font-display1);
+      }
+
+      #summary .markdown-html h2 {
+        @apply(--paper-font-headline);
+      }
+
+      #summary .markdown-html h3 {
+        @apply(--paper-font-title);
+      }
+
+      #summary .markdown-html h4 {
+        @apply(--paper-font-subhead);
       }
 
       /* Property Sections */
 
       .card {
-        background: white;
-        border-radius: 2px;
-        border: 1px solid #e5e5e5;
         margin-bottom: 20px;
       }
 
-      .card > header {
-        border-bottom: 1px solid #e5e5e5;
+      .card a {
         font-size: 20px;
         font-weight: 400;
         line-height: 28px;
-        padding: 14px 24px;
+        line-height: 48px;
+      }
 
+      .card > header {
         @apply(--iron-doc-viewer-header);
       }
 
+      nav {
+        border-bottom: 1px solid var(--paper-grey-200);
+      }
+
       iron-doc-property {
-        border-bottom: 1px solid #e5e5e5;
+        background: var(--paper-grey-200);
+      }
+
+      iron-doc-property:first-of-type {
+        border-top-left-radius: 3px;
+        border-top-right-radius: 3px;
       }
 
       iron-doc-property:last-of-type {
-        border-bottom-width: 0;
+        border-bottom-left-radius: 3px;
+        border-bottom-right-radius: 3px;
       }
 
       /* Private Properties */
@@ -160,6 +183,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       :host(.show-private) iron-doc-property[private] {
         display: block;
+        background: var(--paper-grey-300);
       }
 
       iron-doc-property[configuration] {
@@ -167,7 +191,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       #behaviors > p {
-        border-bottom: 1px solid #e5e5e5;
         box-sizing: border-box;
         cursor: pointer;
         display: block;
@@ -176,6 +199,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       #behaviors > p:last-of-type {
         border-bottom: none;
+      }
+
+      paper-button:hover {
+        color: var(--paper-pink-500);
       }
     </style>
   </template>

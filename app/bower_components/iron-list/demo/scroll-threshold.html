@@ -11,9 +11,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <!doctype html>
 <html id="html">
 <head>
-
   <title>Load data using iron-scroll-threshold</title>
-
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=no">
   <meta name="mobile-web-app-capable" content="yes">
@@ -24,12 +22,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   <link rel="import" href="../../polymer/polymer.html">
   <link rel="import" href="../../iron-flex-layout/iron-flex-layout.html">
   <link rel="import" href="../../iron-scroll-threshold/iron-scroll-threshold.html">
+  <link rel="import" href="../../iron-image/iron-image.html">
   <link rel="import" href="../../paper-styles/color.html">
   <link rel="import" href="../../paper-styles/typography.html">
   <link rel="import" href="../../app-layout/app-toolbar/app-toolbar.html">
   <link rel="import" href="../../paper-spinner/paper-spinner.html">
   <link rel="import" href="../../iron-ajax/iron-ajax.html">
-  <link rel="import" href="../../iron-icons/iron-icons.html">
   <link rel="import" href="../iron-list.html">
 
   <style is="custom-style">
@@ -85,6 +83,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       border: 1px solid #ddd;
     }
 
+    .avatar {
+      height: 40px;
+      width: 40px;
+      border-radius: 20px;
+      box-sizing: border-box;
+      background-color: #DDD;
+    }
+
     .pad {
       padding: 0 16px;
       @apply(--layout-flex);
@@ -96,12 +102,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       font-weight: bold;
     }
 
-    .secondary {
+    address {
       font-size: 14px;
-    }
-
-    .dim {
-      color: gray;
+      margin: 10px 0;
     }
 
     .spacer {
@@ -120,29 +123,29 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   <template is="dom-bind" id="app">
 
     <iron-ajax id="ajax"
-      url="http://www.filltext.com/"
-      params='{"rows": "20", "delay": 1, "fname":"{firstName}", "lname": "{lastName}", "address": "{streetAddress}",
-       "city": "{city}", "state": "{usState|abb}", "zip": "{zip}", "business": "{business}", "index": "{index}"}'
+      url="//randomuser.me/api/"
+      params='{"results": 20}'
       handle-as="json"
       loading="{{loadingPeople}}"
       on-response="_didRespond">
     </iron-ajax>
 
     <app-toolbar>
-      <div title>Load data using iron-scroll-threshold</div>
+      <div main-title>Load data using iron-scroll-threshold</div>
     </app-toolbar>
 
     <iron-list id="list" items="[]" as="person" scroll-target="html">
       <template>
         <div>
           <div class="personItem" tabindex$="[[tabIndex]]">
+            <iron-image class="avatar" sizing="contain" src="[[person.picture.medium]]"></iron-image>
             <div class="pad">
-              <div class="primary">[[person.fname]] [[person.lname]]</div>
-              <div class="secondary">[[person.address]] [[person.city]]</div>
-              <div class="secondary">[[person.city]], [[person.state]] [[person.zip]]</div>
-              <div class="secondary dim">[[person.business]]</div>
+              <div class="primary">[[person.name.first]] [[person.name.last]]</div>
+              <address>
+                [[person.location.street]] [[person.city]] <br />
+                [[person.location.city]], [[person.location.state]] [[person.location.postcode]]
+              </address>
             </div>
-            <iron-icon icon$="[[_iconForPerson(person)]]"></iron-icon>
           </div>
         </div>
       </template>
@@ -165,16 +168,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
     (function(scope) {
 
-      scope._iconForPerson = function(person) {
-        return person.integer < 50 ? 'star-border' : 'star';
-      };
-
       scope._loadMoreData = function() {
         scope.$.ajax.generateRequest();
       };
 
       scope._didRespond = function(e) {
-        var people = e.detail.response;
+        var people = e.detail.response.results;
 
         people.forEach(function(person) {
           scope.$.list.push('items', person);

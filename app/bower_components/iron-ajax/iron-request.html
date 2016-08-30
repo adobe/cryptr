@@ -1,4 +1,5 @@
 <!--
+@license
 Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
 This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
 The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
@@ -15,7 +16,7 @@ iron-request can be used to perform XMLHttpRequests.
 
     <iron-request id="xhr"></iron-request>
     ...
-    this.$.xhr.send({url: url, params: params});
+    this.$.xhr.send({url: url, body: params});
 -->
 <script>
   'use strict';
@@ -185,7 +186,7 @@ iron-request can be used to perform XMLHttpRequests.
      *     url The url to which the request is sent.
      *     method The HTTP method to use, default is GET.
      *     async By default, all requests are sent asynchronously. To send synchronous requests,
-     *         set to true.
+     *         set to false.
      *     body The content for the request body for POST method.
      *     headers HTTP request headers.
      *     handleAs The response type. Default is 'text'.
@@ -225,17 +226,16 @@ iron-request can be used to perform XMLHttpRequests.
         this.rejectCompletes(new Error('Request aborted.'));
       }.bind(this));
 
-
       // Called after all of the above.
       xhr.addEventListener('loadend', function () {
         this._updateStatus();
+        this._setResponse(this.parseResponse());
 
         if (!this.succeeded) {
           this.rejectCompletes(new Error('The request failed with status code: ' + this.xhr.status));
           return;
         }
 
-        this._setResponse(this.parseResponse());
         this.resolveCompletes(this);
       }.bind(this));
 
@@ -265,7 +265,7 @@ iron-request can be used to perform XMLHttpRequests.
       }
       Object.keys(headers).forEach(function (requestHeader) {
         if (/[A-Z]/.test(requestHeader)) {
-          console.error('Headers must be lower case, got', requestHeader);
+          Polymer.Base._error('Headers must be lower case, got', requestHeader);
         }
         xhr.setRequestHeader(
           requestHeader,
@@ -274,6 +274,10 @@ iron-request can be used to perform XMLHttpRequests.
       }, this);
 
       if (options.async !== false) {
+        if (options.async) {
+          xhr.timeout = options.timeout;
+        }
+
         var handleAs = options.handleAs;
 
         // If a JSON prefix is present, the responseType must be 'text' or the
@@ -293,7 +297,7 @@ iron-request can be used to perform XMLHttpRequests.
       }
 
       xhr.withCredentials = !!options.withCredentials;
-      xhr.timeout = options.timeout;
+
 
       var body = this._encodeBodyObject(options.body, headers['content-type']);
 
@@ -421,6 +425,9 @@ iron-request can be used to perform XMLHttpRequests.
     _wwwFormUrlEncodePiece: function(str) {
       // Spec says to normalize newlines to \r\n and replace %20 spaces with +.
       // jQuery does this as well, so this is likely to be widely compatible.
+      if (str === null) {
+        return '';
+      }
       return encodeURIComponent(str.toString().replace(/\r?\n/g, '\r\n'))
           .replace(/%20/g, '+');
     },

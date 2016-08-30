@@ -36,7 +36,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       .deeplink:hover {
-        color: #666;
+        color: var(--paper-pink-500);
       }
 
       #signature {
@@ -46,6 +46,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         overflow: hidden;
         text-overflow: ellipsis;
         width: 260px;
+        color: black;
       }
 
       #signature .name {
@@ -57,7 +58,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         width: 100%;
       }
 
-      :host:not([function]) #signature .params {
+      :host(:not([function])) #signature .params {
         display: none;
       }
 
@@ -159,6 +160,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
       #meta {
         transition: opacity ease-in-out 150ms;
+        color: var(--paper-blue-500);
       }
       #desc {
         transition: transform ease-in-out 150ms, opacity  ease-in-out 150ms;

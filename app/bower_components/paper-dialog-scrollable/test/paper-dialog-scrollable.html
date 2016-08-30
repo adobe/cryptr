@@ -26,11 +26,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
     <style is="custom-style">
       .fixed-height {
+        width: 100%;
         height: 400px;
         @apply(--layout-vertical);
       }
-      paper-dialog-scrollable {
-        @apply(--layout-flex)
+      .fixed-height paper-dialog-scrollable {
+        @apply(--layout-flex);
       }
     </style>
 
@@ -39,7 +40,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
     <test-fixture id="basic">
       <template>
-        <section class="fixed-height vertical">
+        <section class="fixed-height">
           <div class="header">Header</div>
           <paper-dialog-scrollable>
             <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
@@ -188,14 +189,34 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           }, 10);
         });
 
-        test('paper-dialog-scrollable has the right size if paper-dialog is created opened', function(done) {
+        test('correctly sized (container = section)', function() {
+          var container = fixture('basic');
+          var scrollable = Polymer.dom(container).querySelector('paper-dialog-scrollable');
+          var cRect = container.getBoundingClientRect();
+          var sRect = scrollable.getBoundingClientRect();
+          var stRect = scrollable.scrollTarget.getBoundingClientRect();
+          assert.equal(sRect.width, cRect.width, 'scrollable width ok');
+          assert.isAbove(sRect.height, 0, 'scrollable height bigger than 0');
+          assert.isBelow(sRect.height, cRect.height, 'scrollable height contained in container height');
+          assert.equal(stRect.width, sRect.width, 'scrollTarget width ok');
+          assert.equal(stRect.height, sRect.height, 'scrollTarget height ok');
+        });
+
+        test('correctly sized (container = paper-dialog[opened])', function(done) {
           var dialog = fixture('dialog');
+          var scrollable = Polymer.dom(dialog).querySelector('paper-dialog-scrollable');
           // Wait for dialog to be opened and styles applied.
-          setTimeout(function () {
-            var scrollable = Polymer.dom(dialog).querySelector('paper-dialog-scrollable');
-            assert.notEqual(scrollable.getBoundingClientRect().height, 0);
+          dialog.addEventListener('iron-overlay-opened', function() {
+            var dRect = dialog.getBoundingClientRect();
+            var sRect = scrollable.getBoundingClientRect();
+            var stRect = scrollable.scrollTarget.getBoundingClientRect();
+            assert.equal(sRect.width, dRect.width, 'scrollable width ok');
+            assert.isAbove(sRect.height, 0, 'scrollable height bigger than 0');
+            assert.isBelow(sRect.height, dRect.height, 'scrollable height contained in dialog height');
+            assert.equal(stRect.width, sRect.width, 'scrollTarget width ok');
+            assert.equal(stRect.height, sRect.height, 'scrollTarget height ok');
             done();
-          }, 20);
+          });
         });
 
       });

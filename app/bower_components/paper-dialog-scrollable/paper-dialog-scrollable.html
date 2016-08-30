@@ -10,6 +10,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../paper-dialog-behavior/paper-dialog-behavior.html">
 <link rel="import" href="../paper-styles/default-theme.html">
 
 <!--
@@ -70,47 +71,46 @@ Custom property | Description | Default
 
 <dom-module id="paper-dialog-scrollable">
 
-  <style>
-
-    :host {
-      /* Needed for correct flex rendering on Firefox & Chrome Canary */
-      min-height: 0;
-      max-height: 100%;
-
-      @apply(--layout);
-      @apply(--layout-relative);
-    }
-
-    :host(.is-scrolled:not(:first-child))::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 1px;
-      background: var(--divider-color);
-    }
-
-    :host(.can-scroll:not(.scrolled-to-bottom):not(:last-child))::after {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 1px;
-      background: var(--divider-color);
-    }
-
-    .scrollable {
-      padding: 0 24px;
-
-      @apply(--layout-flex);
-      @apply(--layout-scroll);
-      @apply(--paper-dialog-scrollable);
-    }
-  </style>
-
   <template>
+    <style>
+
+      :host {
+        display: block;
+        @apply(--layout-relative);
+      }
+
+      :host(.is-scrolled:not(:first-child))::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: var(--divider-color);
+      }
+
+      :host(.can-scroll:not(.scrolled-to-bottom):not(:last-child))::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: var(--divider-color);
+      }
+
+      .scrollable {
+        padding: 0 24px;
+
+        @apply(--layout-scroll);
+        @apply(--paper-dialog-scrollable);
+      }
+
+      .fit {
+        @apply(--layout-fit);
+      }
+    </style>
+
     <div id="scrollable" class="scrollable">
       <content></content>
     </div>
@@ -168,9 +168,13 @@ Custom property | Description | Default
       // read parentNode on attached because if dynamically created,
       // parentNode will be null on creation.
       this.dialogElement = this.dialogElement || Polymer.dom(this).parentNode;
-      // Set itself to the overlay sizing target
-      if (this.dialogElement) {
+      // Check if parent implements paper-dialog-behavior. If not, fit scrollTarget to host.
+      if (this.dialogElement && this.dialogElement.behaviors &&
+          this.dialogElement.behaviors.indexOf(Polymer.PaperDialogBehaviorImpl) >= 0) {
         this.dialogElement.sizingTarget = this.scrollTarget;
+        this.scrollTarget.classList.remove('fit');
+      } else if (this.dialogElement) {
+        this.scrollTarget.classList.add('fit');
       }
     }
 

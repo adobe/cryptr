@@ -322,7 +322,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         });
       });
 
-
       test('splice a selected item', function(done) {
         list.items = buildDataSet(100);
 
@@ -343,6 +342,92 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
           done();
         });
+      });
+
+      test('single selection of a primitive type', function() {
+        list.primitive = true;
+        list.items = ['a', 'b', 'c', 'd'];
+        list.selectionEnabled = true;
+        Polymer.dom.flush();
+        list.selectItem(0);
+        assert.equal(list.selectedItem, 'a', 'single selection 1');
+        list.clearSelection();
+        assert.isNull(list.selectedItem);
+        list.selectItem(2);
+        list.set('items.0', 'z');
+        list.set('items.1', 'y');
+        assert.equal(list.selectedItem, 'c', 'single selection 2');
+      });
+
+      test('multi selection of a primitive types', function() {
+        list.primitive = true;
+        list.items = ['a', 'b', 'c', 'd'];
+        list.selectionEnabled = true;
+        list.multiSelection = true;
+        Polymer.dom.flush();
+        list.selectItem(0);
+        list.selectItem(1);
+        assert.deepEqual(list.selectedItems, ['a', 'b'], 'multiple selection 1');
+        list.clearSelection();
+        assert.equal(list.selectedItems.length, 0, 'multiple selection 2');
+      });
+
+      test('modify primitive item while being selected', function() {
+        list.primitive = true;
+        list.items = ['a', 'b', 'c', 'd'];
+        list.selectionEnabled = true;
+        Polymer.dom.flush();
+        list.selectItem(0);
+        list.set('items.0', 'z');
+        assert.equal(list.selectedItem, 'z', 'single selection 1');
+        list.selectItem(2);
+        assert.equal(list.selectedItem, 'c', 'single selection 2');
+        list.clearSelection();
+        assert.isNull(list.selectedItem);
+
+        // test multi selection
+        list.multiSelection = true;
+        list.selectItem(0);
+        list.selectItem(1);
+        assert.deepEqual(list.selectedItems, ['z', 'b'], 'multiple selection 1');
+        list.set('items.1', 'y');
+        assert.deepEqual(list.selectedItems, ['z', 'y'], 'multiple selection 2');
+        list.deselectItem('y');
+        assert.deepEqual(list.selectedItems, ['z'], 'multiple selection 3');
+        list.deselectItem('z');
+        assert.equal(list.selectedItems.length, 0);
+      });
+
+      test('tapping on a focusable child should not change the selection', function() {
+        list.items = buildDataSet(1);
+        list.selectionEnabled = true;
+        Polymer.dom.flush();
+        var node = document.createElement('div');
+        node.innerText = 'focusable';
+        node.tabIndex = 0;
+        Polymer.dom(getFirstItemFromList(list)).appendChild(node);
+        Polymer.dom.flush();
+        node.focus();
+        MockInteractions.tap(node);
+        assert.isNull(list.selectedItem);
+      });
+
+      test('try to select active element', function() {
+        container.useTabIndex = false;
+        list.items = buildDataSet(1);
+        list.selectionEnabled = true;
+        Polymer.dom.flush();
+
+        var item = list._physicalItems[0];
+
+        if (item.setActive) {
+          item.setActive();
+        } else {
+          item.focus();
+        }
+
+        MockInteractions.tap(item);
+        assert.isNotNull(list.selectedItem);
       });
     });
 

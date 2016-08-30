@@ -76,6 +76,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </template>
   </test-fixture>
 
+  <test-fixture id="initially-hidden">
+    <template>
+      <div style="position:relative">
+        <div id="target"></div>
+        <paper-badge for="target" label="1" hidden></paper-badge>
+      </div>
+    </template>
+  </test-fixture>
+
   <script>
     suite('basic', function() {
       test('badge is positioned correctly', function(done) {
@@ -95,6 +104,44 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           expect(divRect.height).to.be.equal(20);
 
           var contentRect = badge.getBoundingClientRect();
+          expect(contentRect.width).to.be.equal(20);
+          expect(contentRect.height).to.be.equal(20);
+
+          // The target div is 100 x 20, and the badge is centered on the
+          // top right corner.
+          expect(contentRect.left).to.be.equal(100 - 10);
+          expect(contentRect.top).to.be.equal(0 - 10);
+
+          // Also check the math, just in case.
+          expect(contentRect.left).to.be.equal(divRect.width - 10);
+          expect(contentRect.top).to.be.equal(divRect.top - 10);
+
+          done();
+        });
+      });
+
+      test('badge is positioned correctly after initially being hidden', function(done) {
+        var f = fixture('initially-hidden');
+        var badge = f.querySelector('paper-badge');
+        var actualbadge = Polymer.dom(badge.root).querySelector('.badge');
+
+        expect(badge.target.getAttribute('id')).to.be.equal('target');
+
+        // Badge is initially hidden.
+        var contentRect = badge.getBoundingClientRect();
+        expect(contentRect.width).to.be.equal(0);
+        expect(contentRect.height).to.be.equal(0);
+
+        badge.removeAttribute('hidden');
+
+        Polymer.Base.async(function() {
+          assert.equal(actualbadge.textContent.trim(), "1");
+
+          var divRect = f.querySelector('#target').getBoundingClientRect();
+          expect(divRect.width).to.be.equal(100);
+          expect(divRect.height).to.be.equal(20);
+
+          contentRect = badge.getBoundingClientRect();
           expect(contentRect.width).to.be.equal(20);
           expect(contentRect.height).to.be.equal(20);
 

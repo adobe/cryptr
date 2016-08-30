@@ -62,8 +62,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           <div>Three</div>
         </iron-pages>
         <script>
-          document.addEventListener('click', function(e) {
-            var pages = document.querySelector('iron-pages');
+          var pages = document.querySelector('iron-pages');
+          pages.addEventListener('click', function(e) {
             pages.selectNext();
           });
         </script>

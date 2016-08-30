@@ -1,6 +1,6 @@
 {
   "name": "iron-form",
-  "version": "1.0.16",
+  "version": "1.1.4",
   "description": "Makes it easier to manage forms",
   "keywords": [
     "web-components",
@@ -20,7 +20,7 @@
   "homepage": "https://github.com/PolymerElements/iron-form",
   "ignore": [],
   "dependencies": {
-    "polymer": "Polymer/polymer#^1.0.0",
+    "polymer": "Polymer/polymer#^1.1.0",
     "iron-ajax": "PolymerElements/iron-ajax#^1.0.0"
   },
   "devDependencies": {
@@ -39,11 +39,11 @@
     "web-component-tester": "^4.0.0",
     "webcomponentsjs": "^0.7.0"
   },
-  "_release": "1.0.16",
+  "_release": "1.1.4",
   "_resolution": {
     "type": "version",
-    "tag": "v1.0.16",
-    "commit": "439e0b959c30f6c018c833e9ea657fc723b6ef91"
+    "tag": "v1.1.4",
+    "commit": "8559a69ecc0481b235f91f1584103240ff76d4c4"
   },
   "_source": "git://github.com/PolymerElements/iron-form.git",
   "_target": "^1.0.0",
