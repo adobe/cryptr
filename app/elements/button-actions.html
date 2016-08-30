@@ -19,9 +19,6 @@
             paper-menu-button {
                 padding: 8px 8px 3px 8px;
             }
-            paper-button {
-                padding: 0px;
-            }
             .buttontext {
                 font-size: 14px;
             }
@@ -41,6 +38,16 @@
                 background-color: var(--paper-light-green-300);
                 color: var(--paper-green-900);
             }
+			.green-button {
+				text-transform: none;
+				color: black;
+				background-color: #5BD65F;
+		    }
+			.red-button {
+				text-transform: none;
+				color: black;
+				background-color: #F44336;
+		    }
 		</style>
 
         <iron-ajax id="moveKeys"
@@ -72,7 +79,7 @@
 		</iron-ajax>
 
         <paper-menu-button id="moveButton" vertical-offset="35" horizontal-offset="70" style="display: inline-block;">
-            <paper-button class="dropdown-trigger">
+            <paper-button class="dropdown-trigger" style="padding: 0px">
                 <iron-icon icon="add" style="padding-right: 3px; padding-bottom: 3px;"></iron-icon>
                 <span class="buttontext">Add to Folder</span>
             </paper-button>
@@ -83,14 +90,14 @@
             </paper-menu>
         </paper-menu-button>
 
-        <paper-button id="removeButton" style="display: none;" on-tap="remove">
+        <paper-button id="removeButton" style="display: none; padding: 0px" on-tap="remove">
             <iron-icon icon="highlight-off" style="padding: 0px 3px 3px 15px;"></iron-icon>
             <span class="buttontext">Remove (from folder)</span>
         </paper-button>
 
 
         <paper-menu-button id="newFolder" vertical-offset="35" horizontal-offset="52" style="display: inline-block;">
-            <paper-button class="dropdown-trigger">
+            <paper-button class="dropdown-trigger" style="padding: 0">
                 <iron-icon icon="create-new-folder" style="padding-right: 3px; padding-bottom: 3px;"></iron-icon>
                 <span class="buttontext">New Folder from items</span>
             </paper-button>
@@ -100,7 +107,7 @@
             </paper-menu>
         </paper-menu-button>
 
-		<paper-button id="removeFolderButton" style="display: none;" on-tap="delete">
+		<paper-button id="removeFolderButton" style="display: none; padding: 0px;" onclick="confirmation.open()">
 			<iron-icon icon="delete" style="padding: 0px 3px 3px 15px;"></iron-icon>
 			<span class="buttontext">Delete folder</span>
 		</paper-button>
@@ -109,6 +116,10 @@
 
         <paper-toast id="noItems" class="red" duration="2000" text="No items selected."></paper-toast>
         <paper-toast id="done" class="green" duration="3000" text="placeholder"></paper-toast>
+		<paper-toast id="confirmation" duration="10000" text="Are you sure you want to delete this folder?">
+			<paper-button on-tap="delete" raised class="green-button">DELETE</paper-button>
+			<paper-button onclick="confirmation.close()" raised class="red-button">CANCEL</paper-button>
+		</paper-toast>
 	</template>
 
 	<script>
@@ -217,6 +228,7 @@
 					this.clearVal = true;
                     this.$.done.text = 'Folder Deleted';
                     this.$.done.show();
+					page('#!/all');
     			},
 				watchPrevPassword: function() {
 					ipcRenderer.send('update-prevpass', this.prevPassword);

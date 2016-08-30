@@ -40,6 +40,10 @@
 					return this.url + 'request'
 				},
     			setTime: function() {
+					var temp = this.response.results.sort(function(a, b) {
+						return (a.name < b.name) ? -1 : 1;
+					});
+					this.response.results = temp;
     				this.data = this.response.results;
     				this.keytime = this.response.keytime;
     			},
