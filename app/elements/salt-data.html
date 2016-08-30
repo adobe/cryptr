@@ -25,8 +25,8 @@
 				<colgroup>
 					<col name="Name" sortable hidable>
 					<col name="Username" sortable hidable>
-					<col name="Password" sortable hidable width="185">
-					<col name="Previous" sortable hidable hidden width="185">
+					<col name="Password" hidable width="185">
+					<col name="Previous" hidable hidden width="185">
 					<col name="Note" sortable hidable>
 					<col name="Hash" sortable hidable hidden>
 				</colgroup>
@@ -46,19 +46,19 @@
 							<td>{{item.name}}</td>
 							<td>
 								<div>
-									<input type="text" value$="[[item.username]]" disabled></input>
+									<input type="text" value$="[[item.username]]" disabled class="noselect"></input>
 									<paper-icon-button icon="content-copy" onclick="copy(this)"></paper-icon-button>
 								</div>
 							</td>
 							<td>
 								<div onmousedown="showPassword(this)" onmouseout="hidePassword(this)" onmouseup="hidePassword(this)">
-									<input type="password" value$="[[item.password]]" disabled></input>
+									<input type="password" value$="[[item.password]]" disabled class="noselect"></input>
 									<paper-icon-button icon="content-copy" onclick="copy(this)"></paper-icon-button>
 								</div>
 							</td>
 							<td>
 								<div onmousedown="showPassword(this)" onmouseout="hidePassword(this)" onmouseup="hidePassword(this)">
-									<input type="password" value$="[[item.password_previous]]" disabled></input>
+									<input type="password" value$="[[item.password_previous]]" disabled class="noselect"></input>
 									<paper-icon-button icon="content-copy" onclick="copy(this)"></paper-icon-button>
 								</div>
 							</td>
@@ -169,17 +169,17 @@
 					}
 				}
 				this.data = temp;
+			},
+			sortOrder: function() {
+				var index = this.$.vaadingrid.sortOrder[0].column;
+				var lookup = ['name', 'username', 'password', 'password_previous', 'note'];
+				var lesser = this.$.vaadingrid.sortOrder[0].direction == 'asc' ? -1 : 1;
+				var temp = this.data.sort(function(a, b) {
+					return (a[lookup[index]] < b[lookup[index]]) ? lesser : -lesser;
+				});
+				this.data = [];
+				this.data = temp;
 			}
-			// sortOrder: function() {
-			// 	var index = this.$.vaadingrid.sortOrder[0].column;
-			// 	var lookup = ['name', 'username', 'password', 'password_previous', 'note'];
-			// 	var lesser = this.$.vaadingrid.sortOrder[0].direction == 'asc' ? -1 : 1;
-			// 	this.data.sort(function(a, b) {
-			// 		console.log(a[lookup[index]]);
-			// 		return (a[lookup[index]] < b[lookup[index]]) ? lesser : -lesser;
-			// 	});
-			// 	console.log(this.data);
-			// }
 		});
 		function showPassword(e) {
 			e.children[0].type = 'text';
