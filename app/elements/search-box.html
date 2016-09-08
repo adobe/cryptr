@@ -8,6 +8,7 @@
 			<iron-icon icon="search"></iron-icon>
 			<iron-a11y-keys id="a11y" target="[[target]]" keys="esc" on-keys-pressed="clear"></iron-a11y-keys>
 			<iron-a11y-keys id="a11y" target="[[target]]" keys="enter" on-keys-pressed="enterKey"></iron-a11y-keys>
+			<iron-a11y-keys id="a11y" target="[[global]]" keys="meta+f alt+f" on-keys-pressed="focusSearch"></iron-a11y-keys>
 			<paper-input id="searchinput" value="{{query}}" label="Search All Keys" no-label-float class="noselect"></paper-input>
 		</paper-item>
 	</template>
@@ -28,6 +29,12 @@
 						return this.$.searchinput;
 					}
 				},
+				global: {
+					type: Object,
+					value: function() {
+						return document.querySelector('body');
+					}
+				},
 			},
 			queryEntered: function() {
 				if (this.query != '') {
@@ -42,6 +49,9 @@
 			enterKey: function() {
 				this.query += ' ';
 				this.query = this.query.substring(0, this.query.length - 1);
+			},
+			focusSearch: function() {
+				this.$.searchinput.focus();
 			}
 		});
 	</script>
