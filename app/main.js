@@ -97,10 +97,14 @@ app.on('activate', function () {
 
 ipcMain.on('initialized', function(event, arg) {
 	event.sender.send('url', settings.init);
+	event.sender.send('user', settings.user);
 	event.sender.send('prevpass', settings.prevpass);
 });
 ipcMain.on('update-url', function(event, arg) {
 	settings.init = arg;
+});
+ipcMain.on('update-user', function(event, arg) {
+	settings.user = arg;
 });
 ipcMain.on('update-prevpass', function(event, arg) {
 	settings.prevpass = arg;

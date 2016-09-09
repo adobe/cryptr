@@ -81,7 +81,8 @@
 					username: {
 						type: String,
 						value: '',
-						notify: true
+						notify: true,
+						observer: 'observeInit'
 					},
 					password: {
 						type: String,
@@ -151,6 +152,7 @@
 				},
 				observeInit: function() {
 					ipcRenderer.send('update-url', this.url);
+					ipcRenderer.send('update-user', this.username);
 				}
 			});
 		})();

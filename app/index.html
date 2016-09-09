@@ -109,6 +109,7 @@
 		const ipcRenderer = require('electron').ipcRenderer;
 		app.url = 'start';
 		ipcRenderer.on('url', function(event, arg) { app.url = arg; });
+		ipcRenderer.on('user', function(event, arg) { app.u = arg; });
 		ipcRenderer.on('prevpass', function(event, arg) { app.prevPassword = arg; });
 		ipcRenderer.send('initialized', 'ping');
 	</script>
