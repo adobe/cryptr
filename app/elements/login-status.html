@@ -59,6 +59,7 @@
 				error: function() {
 					this.status = 'none';
 					app.response = {};
+					app.query = '';
 					clearInterval(this.timer);
 				}
 			});
