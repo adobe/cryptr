@@ -10,6 +10,7 @@
 			<iron-a11y-keys id="a11y" target="[[target]]" keys="enter" on-keys-pressed="enterKey"></iron-a11y-keys>
 			<iron-a11y-keys id="a11y" target="[[global]]" keys="meta+f alt+f" on-keys-pressed="focusSearch"></iron-a11y-keys>
 			<paper-input id="searchinput" value="{{query}}" label="Search All Keys" no-label-float class="noselect"></paper-input>
+			<paper-icon-button id="clearbutton" icon="highlight-off" on-tap="clear" class="noselect" style="display: none; cursor: pointer; color: #AAA"></paper-input>
 		</paper-item>
 	</template>
 
@@ -39,12 +40,14 @@
 			queryEntered: function() {
 				if (this.query != '') {
 					page('#!/search');
+					this.$.clearbutton.style.display = 'inline-block';
 				} else {
 					page('#!/all');
 				}
 			},
 			clear: function() {
 				this.query = '';
+				this.$.clearbutton.style.display = 'none';
 			},
 			enterKey: function() {
 				this.query += ' ';
