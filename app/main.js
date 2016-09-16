@@ -30,7 +30,7 @@ function createWindow() {
 	// Create the browser window.
 	settings.minWidth = 500;
 	settings.minHeight = 500;
-	settings.icon = 'images/cryptr.png';
+	settings.icon = __dirname + '/images/sizes/128x128.png';
 	mainWindow = new BrowserWindow(settings);
 	mainWindow.loadURL('file://' + __dirname + '/index.html');
 
