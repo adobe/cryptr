@@ -108,6 +108,7 @@
 					return 'username=' + u + '&password=' + Base64.encode(p);
 				},
 				computeURL: function(url) {
+					if (!(this.url.endsWith('/'))) this.url += '/';
 					return this.url + 'auth'
 				},
 				login: function() {
