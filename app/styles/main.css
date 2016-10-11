@@ -29,3 +29,8 @@ body {
 #topBar {
 	padding: 0px;
 }
+
+#logo {
+    width: 75px;
+    height: 50px;
+}
