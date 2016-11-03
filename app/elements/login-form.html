@@ -105,9 +105,12 @@
 						computed: '_computeURL(url, username)'
 					},
 					header: {
-						type: String,
-						notify: true,
-						value: ''
+						type: Object,
+						notify: true
+					},
+					initialResponse: {
+						type: Array,
+						notify: true
 					}
 				},
 				attached: function() {
@@ -133,6 +136,7 @@
 				_success: function() {
 					if (this.loginResponse.auth.client_token) {
 						this.header = {"X-Vault-Token": this.loginResponse.auth.client_token };
+						this.initialResponse = this.loginResponse.auth;
 						this.status = 'watch';
 						this.password = '';
 						this.disabled = false;

@@ -61,6 +61,8 @@
 				_error: function() {
 					this.status = 'none';
 					app.response = {};
+					app.initialResponse = [];
+					app.header = {};
 					app.query = '';
 					clearInterval(this.timer);
 				}

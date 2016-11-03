@@ -4,7 +4,7 @@
 			url="{{refresh}}"
 			handle-as="json">
 		</iron-ajax>
-        <paper-icon-button icon="refresh" on-click="refreshKeys"></paper-icon-button>
+        <paper-icon-button icon="refresh" on-click="_refreshKeys"></paper-icon-button>
 	</template>
 
 	<script>
@@ -17,13 +17,13 @@
 						type: String
 					},
 					refresh: {
-						computed: 'computeURL(url)'
+						computed: '_computeURL(url)'
 					}
 				},
-				computeURL: function(url) {
+				_computeURL: function(url) {
 					return this.url + 'refresh'
 				},
-                refreshKeys: function() {
+                _refreshKeys: function() {
                     this.$.refreshKeys.generateRequest();
                 }
 			});

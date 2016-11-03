@@ -1,11 +1,11 @@
 <dom-module id="request-data">
 	<template>
 
-        <iron-ajax id="requestKeys"
-			url="{{request}}"
+		<iron-ajax id="getPolicy"
+			url="{{getPoliciesURL}}"
 			handle-as="json"
-			last-response="{{response}}"
-			on-response="setTime">
+			headers="{{header}}"
+			on-response="_policySuccess">
 		</iron-ajax>
 
 	</template>
@@ -15,43 +15,39 @@
 			Polymer({
 				is: 'request-data',
                 properties: {
-                    response: {
-                        notify: true
-                    },
                     status: {
     					notify: true,
-    					observer: 'watchStatus'
-    				},
-    				keytime: {
-    					type: String,
-                        notify: true
+    					observer: '_watchStatus'
     				},
     				data: {
     					notify: true
     				},
-					url: {
-						type: String
+					access: {
+						type: Object,
+						value: {}
 					},
-					request: {
-						computed: 'computeURL(url)'
+					header: Object,
+					initialResponse: Array
+				},
+				_policySuccess: function(e) {
+					var rules = hcltojson(e.detail.response.data.rules).path;
+					for (var key in rules) {
+						for (var i = 0; i < this.initialResponse.policies.length; i++) {
+							if (key == 'sys/policy/' + this.initialResponse.policies[i]) delete rules[key];
+						}
+						if (key in rules) this.access[key] = rules[key];
 					}
 				},
-				computeURL: function(url) {
-					return this.url + 'request'
-				},
-    			setTime: function() {
-					var temp = this.response.results.sort(function(a, b) {
-						return (a.name < b.name) ? -1 : 1;
-					});
-					this.response.results = temp;
-    				this.data = this.response.results;
-    				this.keytime = this.response.keytime;
-    			},
-    			watchStatus: function() {
+    			_watchStatus: function() {
     				if (this.status != 'none' && this.status != '') {
-    					this.$.requestKeys.generateRequest();
-    				}
-    			},
+						if (this.initialResponse.policies.length > 0) {
+							for (var i = 0; i < this.initialResponse.policies.length; i++) {
+								this.getPoliciesURL = app.url + 'v1/sys/policy/' + this.initialResponse.policies[i];
+								this.$.getPolicy.generateRequest();
+							}
+						}
+					}
+    			}
 			});
 		})();
 	</script>

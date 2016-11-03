@@ -32,3 +32,22 @@ MIT License.
 ## HTTPS
 
 Encryption in transit (HTTPS) is required. These are your secrets. Don't be stupid.
+
+# Policies
+
+Cryptr requires the policies associated with the current token to be readable by itself. Example ACL for policy named "allsecrets":
+
+
+```
+path "secret/*" {
+  policy = "write"
+}
+
+path "sys/policy/allsecrets" {
+    policy = "read"
+}
+```
+
+Only read permissions are necessary.
+
+This policy note is critical. Without this, there is no programatic way for Cryptr to know what secrets it may access.
