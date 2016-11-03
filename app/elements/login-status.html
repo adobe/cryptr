@@ -10,9 +10,10 @@
 		<iron-ajax id="checkStatus"
 			url="{{statusURL}}"
 			handle-as="json"
+			headers="{{header}}"
 			last-response="{{response}}"
-			on-response="update"
-			on-error="error">
+			on-response="_success"
+			on-error="_error">
 		</iron-ajax>
 
 	</template>
@@ -27,7 +28,7 @@
 					status: {
 						type: String,
 						notify: true,
-						observer: 'watchStatus'
+						observer: '_watchStatus'
 					},
 					timer: {
 						type: Number,
@@ -37,26 +38,27 @@
 						type: String
 					},
 					statusURL: {
-						computed: 'computeURL(url)'
-					}
+						computed: '_computeURL(url)'
+					},
+					header: Object
 				},
-				computeURL: function(url) {
-					return this.url + 'status'
+				_computeURL: function(url) {
+					return this.url + 'v1/auth/token/lookup-self'
 				},
-				update: function() {
-					if (this.response.status == 'success') {
-						this.status = 'watch';
-					}
-				},
-				watchStatus: function() {
+				_watchStatus: function() {
 					if (this.status == 'watch') {
 						this.timer = setInterval(function() {
 							var stat = document.querySelector('#checkStatus');
 							stat.generateRequest();
-						}, 11000);
+						}, 61000);
 					}
 				},
-				error: function() {
+				_success: function() {
+					if (this.response.status == 'success') {
+						this.status = 'watch';
+					}
+				},
+				_error: function() {
 					this.status = 'none';
 					app.response = {};
 					app.query = '';

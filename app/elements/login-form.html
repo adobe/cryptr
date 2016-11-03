@@ -6,7 +6,7 @@
 			#errortoast {
 				background-color: #EF5350;
 			}
-			#sub1, #sub2, #initfield {
+			#userfield, #passfield, #initfield {
 				margin: 0;
 			}
 			paper-dialog > *:last-child {
@@ -22,33 +22,37 @@
 		</style>
 
 		<iron-ajax id="authenticateReq"
-			url="{{auth}}"
+			url="{{authURL}}"
 			handle-as="json"
-			content-type="application/x-www-form-urlencoded"
-			body="{{data}}"
 			method="POST"
+			body="{{body}}"
+			content-type="application/json"
 			last-response="{{loginResponse}}"
-			on-response="success"
-			timeout="9000"
-			on-error="showError">
+			last-error={{loginError}}
+			on-response="_success"
+			on-error="_error"
+			timeout="5000">
 		</iron-ajax>
+
+		<!-- Todo: First talk to v1/sys/init to verify the URL as a Vault instance -->
+		<!-- Todo: When implementing token auth, set username as "TOKEN" -->
 
 		<paper-dialog id="modal" class="white noselect" modal no-cancel-on-esc-key no-cancel-on-outside-click>
 			<h1>Login</h1>
 			<div id="initfield">
 				<paper-input value="{{url}}" label="Server URL (HTTPS)"></paper-input>
 			</div>
-			<paper-input id="sub1" value="{{username}}" label="LDAP Username"></paper-input>
-			<paper-input id="sub2" value="{{password}}" label="Password" type="password"></paper-input>
+			<paper-input id="userfield" value="{{username}}" label="LDAP Username"></paper-input>
+			<paper-input id="passfield" value="{{password}}" label="Password" type="password"></paper-input>
 			<div class="buttons">
-				<iron-a11y-keys id="a11y" target="[[target]]" keys="enter" on-keys-pressed="login"></iron-a11y-keys>
-				<iron-a11y-keys id="a11y" target="[[alttarget]]" keys="enter" on-keys-pressed="login"></iron-a11y-keys>
-				<paper-button on-tap="login" autofocus disabled="{{disabled}}">Login</paper-button>
+				<iron-a11y-keys target="[[targetuser]]" keys="enter" on-keys-pressed="_login"></iron-a11y-keys>
+				<iron-a11y-keys target="[[targetpass]]" keys="enter" on-keys-pressed="_login"></iron-a11y-keys>
+				<paper-button on-tap="_login" autofocus disabled="{{disabled}}">Login</paper-button>
 			</div>
 			<paper-progress class="blue" indeterminate disabled="{{!disabled}}"></paper-progress>
 		</paper-dialog>
 
-		<paper-toast id="errortoast" class="fit-bottom" duration="6000" text""></paper-toast>
+		<paper-toast id="errortoast" class="fit-bottom" duration="5000" text""></paper-toast>
 	</template>
 
 	<script>
@@ -61,28 +65,28 @@
 						type: String,
 						value: '',
 						notify: true,
-						observer: 'watchStatus'
+						observer: '_watchStatus'
 					},
-					data: {
-						computed: 'computeData(username, password)'
+					body: {
+						computed: '_computeBody(password)'
 					},
-					target: {
+					targetuser: {
 						type: Object,
 						value: function() {
-							return this.$.sub1;
+							return this.$.userfield;
 						}
 					},
-					alttarget: {
+					targetpass: {
 						type: Object,
 						value: function() {
-							return this.$.sub2;
+							return this.$.passfield;
 						}
 					},
 					username: {
 						type: String,
 						value: '',
 						notify: true,
-						observer: 'observeInit'
+						observer: '_persistData'
 					},
 					password: {
 						type: String,
@@ -95,62 +99,59 @@
 					url: {
 						type: String,
 						notify: true,
-						observer: 'observeInit'
+						observer: '_persistData'
 					},
-					auth: {
-						computed: 'computeURL(url)'
+					authURL: {
+						computed: '_computeURL(url, username)'
+					},
+					header: {
+						type: String,
+						notify: true,
+						value: ''
 					}
 				},
 				attached: function() {
 					this.status = 'none';
 				},
-				computeData: function(u, p) {
-					return 'username=' + u + '&password=' + Base64.encode(p);
+				_computeBody: function(p) {
+					return {"password": p };
 				},
-				computeURL: function(url) {
-					return this.url + 'auth'
+				_computeURL: function(url, u) {
+					return this.url + 'v1/auth/ldap/login/' + u
 				},
-				login: function() {
+				_login: function() {
 					this.url = this.url.trim();
 					if (this.url.toLowerCase().startsWith('https')) {
 						if (!(this.url.endsWith('/'))) this.url += '/';
 						this.disabled = true;
 						this.$.authenticateReq.generateRequest();
 					} else {
-						this.$.errortoast.text = 'A trusted HTTPS based URL is required.';
+						this.$.errortoast.text = 'An HTTPS based URL is required.';
 						this.$.errortoast.show();
 					}
 				},
-				success: function() {
-					if (this.loginResponse.status == "success") {
+				_success: function() {
+					if (this.loginResponse.auth.client_token) {
+						this.header = {"X-Vault-Token": this.loginResponse.auth.client_token };
 						this.status = 'watch';
 						this.password = '';
 						this.disabled = false;
 						this.$.modal.close();
-					} else if (this.loginResponse.status == "error") {
-						this.$.errortoast.text = this.loginResponse.message;
-						this.$.errortoast.show();
-						this.disabled = false;
-					} else if (this.loginResponse.message) {
-						this.$.errortoast.text = this.loginResponse.message;
-						this.$.errortoast.show();
-						this.disabled = false;
 					}
 				},
-				showError: function(e) {
+				_error: function(e) {
 					this.disabled = false;
-					if (!e.detail.error.message) this.$.errortoast.text = 'Error: Connection timed out.';
-					else if (e.detail.error.message.includes('503')) this.$.errortoast.text = 'Error: Cannot contact server. Please try again later.';
-					else if (e.detail.error.message.includes('401')) this.$.errortoast.text = 'Error: Unauthorized Request.';
-					else this.$.errortoast.text = 'Error: Please try again later.';
+					if (this.loginError.response.errors[0].includes('Invalid Credentials')) this.$.errortoast.text = 'Invalid Credentials.';
+					if (this.loginError.response.errors[0] == 'missing client token') this.$.errortoast.text = 'Auth Backend not supported!';
+					// else if (e.detail.error.message.includes('503')) this.$.errortoast.text = 'Cannot contact server. Please try again later.';
+					// else if (e.detail.error.message.includes('401')) this.$.errortoast.text = 'Unauthorized Request.';
+					else this.$.errortoast.text = 'Unkown Error: Please try again later.';
 					this.$.errortoast.show();
 				},
-				watchStatus: function() {
-					if (this.status == 'none') {
-						this.$.modal.open();
-					}
+				_watchStatus: function() {
+					if (this.status == 'none') this.$.modal.open();
 				},
-				observeInit: function() {
+				_persistData: function() {
 					ipcRenderer.send('update-url', this.url);
 					ipcRenderer.send('update-user', this.username);
 				}

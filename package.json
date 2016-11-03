@@ -2,7 +2,7 @@
   "name": "cryptr",
   "author": "Jacob Crowther",
   "version": "1.0.9",
-  "description": "A password-manager GUI built for SaltStack's GPG Renderer",
+  "description": "A GUI for Vault",
   "main": "app/main.js",
   "repository": {
     "url": "https://github.com/jcrowthe/cryptr.git"

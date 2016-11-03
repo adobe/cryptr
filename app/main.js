@@ -9,8 +9,7 @@ let mainWindow;
 
 var path = require("path");
 var fs = require("fs");
-var repoPath = path.join(app.getPath('appData'), "Cryptr/Cache/repo");
-var initPath = path.join(app.getPath('appData'), "Cryptr/Cache/init.json");
+var initPath = path.join(app.getPath('appData'), "Cryptr/Cache/initvault.json");
 
 
 var settings = {};
@@ -35,7 +34,7 @@ function createWindow() {
 	mainWindow.loadURL('file://' + __dirname + '/index.html');
 
 	// Open the DevTools.
-	// mainWindow.webContents.openDevTools();
+	mainWindow.webContents.openDevTools();
 
 	if (process.platform == 'darwin') {
 		// Menu items for MacOS. Specifically, this enables Copy/Paste while disallowing opening DevTools.

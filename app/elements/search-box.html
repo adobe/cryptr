@@ -5,12 +5,13 @@
 	<style></style>
 	<template>
 		<paper-item>
-			<iron-icon icon="search"></iron-icon>
-			<iron-a11y-keys id="a11y" target="[[target]]" keys="esc" on-keys-pressed="clear"></iron-a11y-keys>
-			<iron-a11y-keys id="a11y" target="[[target]]" keys="enter" on-keys-pressed="enterKey"></iron-a11y-keys>
-			<iron-a11y-keys id="a11y" target="[[global]]" keys="meta+f alt+f ctrl+f" on-keys-pressed="focusSearch"></iron-a11y-keys>
-			<paper-input id="searchinput" value="{{query}}" label="Search All Keys" no-label-float class="noselect"></paper-input>
-			<paper-icon-button id="clearbutton" icon="highlight-off" on-tap="clear" class="noselect" style="display: none; cursor: pointer; color: #AAA"></paper-input>
+			<iron-icon icon="search" style="padding-right: 10px"></iron-icon>
+			<iron-a11y-keys target="[[targetsearch]]" keys="esc" on-keys-pressed="_clear"></iron-a11y-keys>
+			<iron-a11y-keys target="[[targetsearch]]" keys="enter" on-keys-pressed="_enterKey"></iron-a11y-keys>
+			<iron-a11y-keys target="[[targetbody]]" keys="meta+f alt+f ctrl+f" on-keys-pressed="_focusSearch"></iron-a11y-keys>
+			<paper-input id="searchinput" value="{{query}}" label="Search" no-label-float class="noselect"></paper-input>
+			<!-- Todo: Make the search box expand on click to add animation -->
+			<paper-icon-button id="clearbutton" icon="highlight-off" on-tap="_clear" class="noselect" style="display: none; cursor: pointer; color: #AAA"></paper-input>
 		</paper-item>
 	</template>
 
@@ -22,22 +23,22 @@
 					type: String,
 					value: '',
 					notify: true,
-					observer: 'queryEntered'
+					observer: '_queryEntered'
 				},
-				target: {
+				targetsearch: {
 					type: Object,
 					value: function() {
 						return this.$.searchinput;
 					}
 				},
-				global: {
+				targetbody: {
 					type: Object,
 					value: function() {
 						return document.querySelector('body');
 					}
 				},
 			},
-			queryEntered: function() {
+			_queryEntered: function() {
 				if (this.query != '') {
 					page('#!/search');
 					this.$.clearbutton.style.display = 'inline-block';
@@ -45,15 +46,15 @@
 					page('#!/all');
 				}
 			},
-			clear: function() {
+			_clear: function() {
 				this.query = '';
 				this.$.clearbutton.style.display = 'none';
 			},
-			enterKey: function() {
+			_enterKey: function() {
 				this.query += ' ';
 				this.query = this.query.substring(0, this.query.length - 1);
 			},
-			focusSearch: function() {
+			_focusSearch: function() {
 				this.$.searchinput.focus();
 			}
 		});
