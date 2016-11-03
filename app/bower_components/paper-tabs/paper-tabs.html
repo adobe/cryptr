@@ -88,6 +88,8 @@ Custom property | Description | Default
 `--paper-tabs-selection-bar-color` | Color for the selection bar | `--paper-yellow-a100`
 `--paper-tabs-selection-bar` | Mixin applied to the selection bar | `{}`
 `--paper-tabs` | Mixin applied to the tabs | `{}`
+`--paper-tabs-content` | Mixin applied to the content container of tabs | `{}`
+`--paper-tabs-container` | Mixin applied to the layout container of tabs | `{}`
 
 @hero hero.svg
 @demo demo/index.html
@@ -126,6 +128,7 @@ Custom property | Description | Default
         white-space: nowrap;
         overflow: hidden;
         @apply(--layout-flex-auto);
+        @apply(--paper-tabs-container);
       }
 
       #tabsContent {
@@ -133,6 +136,7 @@ Custom property | Description | Default
         -moz-flex-basis: auto;
         -ms-flex-basis: auto;
         flex-basis: auto;
+        @apply(--paper-tabs-content);
       }
 
       #tabsContent.scrollable {

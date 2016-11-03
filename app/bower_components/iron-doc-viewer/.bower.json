@@ -41,6 +41,6 @@
     "commit": "f4dca35485bc6b053cb33eb404f2b745dbcc3181"
   },
   "_source": "git://github.com/PolymerElements/iron-doc-viewer.git",
-  "_target": "^1.0.1",
+  "_target": "^1.0.0",
   "_originalSource": "PolymerElements/iron-doc-viewer"
 }

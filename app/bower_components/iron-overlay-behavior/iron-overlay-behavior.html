@@ -12,6 +12,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../iron-fit-behavior/iron-fit-behavior.html">
 <link rel="import" href="../iron-resizable-behavior/iron-resizable-behavior.html">
 <link rel="import" href="iron-overlay-manager.html">
+<link rel="import" href="iron-focusables-helper.html">
 
 <script>
 (function() {
@@ -195,45 +196,7 @@ context. You should place this element as a child of `<body>` whenever possible.
      * @protected
      */
     get _focusableNodes() {
-      // Elements that can be focused even if they have [disabled] attribute.
-      var FOCUSABLE_WITH_DISABLED = [
-        'a[href]',
-        'area[href]',
-        'iframe',
-        '[tabindex]',
-        '[contentEditable=true]'
-      ];
-
-      // Elements that cannot be focused if they have [disabled] attribute.
-      var FOCUSABLE_WITHOUT_DISABLED = [
-        'input',
-        'select',
-        'textarea',
-        'button'
-      ];
-
-      // Discard elements with tabindex=-1 (makes them not focusable).
-      var selector = FOCUSABLE_WITH_DISABLED.join(':not([tabindex="-1"]),') +
-        ':not([tabindex="-1"]),' +
-        FOCUSABLE_WITHOUT_DISABLED.join(':not([disabled]):not([tabindex="-1"]),') +
-        ':not([disabled]):not([tabindex="-1"])';
-
-      var focusables = Polymer.dom(this).querySelectorAll(selector);
-      if (this.tabIndex >= 0) {
-        // Insert at the beginning because we might have all elements with tabIndex = 0,
-        // and the overlay should be the first of the list.
-        focusables.splice(0, 0, this);
-      }
-      // Sort by tabindex.
-      return focusables.sort(function (a, b) {
-        if (a.tabIndex === b.tabIndex) {
-          return 0;
-        }
-        if (a.tabIndex === 0 || a.tabIndex > b.tabIndex) {
-          return 1;
-        }
-        return -1;
-      });
+      return Polymer.IronFocusablesHelper.getTabbableNodes(this);
     },
 
     ready: function() {
@@ -305,6 +268,14 @@ context. You should place this element as a child of `<body>` whenever possible.
 
       this._setCanceled(true);
       this.opened = false;
+    },
+
+    /**
+     * Invalidates the cached tabbable nodes. To be called when any of the focusable
+     * content changes (e.g. a button is disabled).
+     */
+    invalidateTabbables: function() {
+      this.__firstFocusableNode = this.__lastFocusableNode = null;
     },
 
     _ensureSetup: function() {
@@ -404,11 +375,6 @@ context. You should place this element as a child of `<body>` whenever possible.
     _finishRenderOpened: function() {
       this.notifyResize();
       this.__isAnimating = false;
-
-      // Store it so we don't query too much.
-      var focusableNodes = this._focusableNodes;
-      this.__firstFocusableNode = focusableNodes[0];
-      this.__lastFocusableNode = focusableNodes[focusableNodes.length - 1];
 
       this.fire('iron-overlay-opened');
     },
@@ -526,6 +492,7 @@ context. You should place this element as a child of `<body>` whenever possible.
       if (!this.withBackdrop) {
         return;
       }
+      this.__ensureFirstLastFocusables();
       // TAB wraps from last to first focusable.
       // Shift + TAB wraps from first to last focusable.
       var shift = event.shiftKey;
@@ -582,7 +549,21 @@ context. You should place this element as a child of `<body>` whenever possible.
      */
     _onNodesChange: function() {
       if (this.opened && !this.__isAnimating) {
+        // It might have added focusable nodes, so invalidate cached values.
+        this.invalidateTabbables();
         this.notifyResize();
+      }
+    },
+
+    /**
+     * Will set first and last focusable nodes if any of them is not set.
+     * @private
+     */
+    __ensureFirstLastFocusables: function() {
+      if (!this.__firstFocusableNode || !this.__lastFocusableNode) {
+        var focusableNodes = this._focusableNodes;
+        this.__firstFocusableNode = focusableNodes[0];
+        this.__lastFocusableNode = focusableNodes[focusableNodes.length - 1];
       }
     },
 

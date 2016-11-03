@@ -213,7 +213,10 @@ layout: page
     <p>Columns can be hidden or visible.
       By default none of the columns are user-hidable. Setting a column's <code>hidable</code> property
       true appends it to the dropdown menu on the right where individual columns can be toggled
-      hidden/visible by the user.</p>
+      hidden/visible by the user.
+      When a column is is set as <code>hidden</code> but is not <code>hidable</code>, it will no appear
+      in the dropdown menu.
+    </p>
     <code-example source>
       <vaadin-grid demo>
         <table>
@@ -227,8 +230,8 @@ layout: page
             <tr>
               <th>Name</th>
               <th>Surname</th>
-              <th>Activity</th>
-              <th>Target</th>
+              <th>Team Activity</th>
+              <th>Project Target</th>
             </tr>
           </thead>
         </table>
@@ -264,6 +267,104 @@ layout: page
       </code>
     </code-example>
   </section>
+
+  <section>
+    <h3>Column reordering</h3>
+    <p>
+      The end users can reorder non-frozen columns by dragging the header cells.
+      By default, column reordering is disabled, but can be enabled by adding the
+      <code>column-reordering-allowed</code> attribute or setting the
+      <code>columnReorderingAllowed</code> property to true.
+    </p>
+    <p>
+      Column reordering works only when the data source is based on
+      objects bound to the column configuration using the <code>name</code> attribute.
+      When using arrays as data, you need to take care of reordering the data after
+      the column order is changed. You will get notified of this by listening to
+      the <code>column-order-changed</code> event.
+    </p>
+    <code-example source>
+      <vaadin-grid demo column-reordering-allowed frozen-columns="1">
+        <table>
+          <colgroup>
+            <col name="first">
+            <col name="second">
+            <col name="third">
+            <col name="fourth">
+            <col name="fifth">
+          </colgroup>
+          <thead>
+          <tr>
+            <th>Frozen 1st column</th>
+            <th>2nd column</th>
+            <th>3rd column</th>
+            <th>4th column</th>
+            <th>5th column</th>
+          </tr>
+          </thead>
+        </table>
+      </vaadin-grid>
+      <code demo-var="grid">
+        var grid = grid || document.querySelector('vaadin-grid');
+
+        HTMLImports.whenReady(function() {
+          // code
+          grid.items = [
+            {first: 'One', second: 'Two', third: 'Three', fourth: 'Four', fifth: 'Five'},
+            {first: 'Six', second: 'Seven', third: 'Eight', fourth: 'Nine', fifth: 'Ten'}
+          ];
+          // end-code
+        });
+      </code>
+    </code-example>
+
+  </section>
+
+  <section>
+    <h3>Column resizing</h3>
+    <p>Columns can be resized by dragging the separation line in the headers. To enable resizing, add the <code>resizable</code>
+       attribute to each column you want to resize. In this example, the first and the second column are resizable.</p>
+    <code-example source>
+      <vaadin-grid demo>
+        <table>
+          <colgroup>
+            <col resizable>
+            <col resizable>
+            <col>
+            <col>
+          </colgroup>
+        <thead>
+          <tr>
+            <th>First Column</th>
+            <th>Second Column</th>
+            <th>Third Column</th>
+            <th>Fourth Column</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>One</td>
+            <td>Two</td>
+            <td>Three</td>
+            <td>Four</td>
+          </tr>
+          <tr>
+            <td>Five</td>
+            <td>Six</td>
+            <td>Seven</td>
+            <td>Eight</td>
+          </tr>
+          <tr>
+            <td>Nine</td>
+            <td>Ten</td>
+            <td>Eleven</td>
+            <td>Twelve</td>
+          </tr>
+        </tbody>
+      </table>
+      </vaadin-grid>
+      </code-example>
+    </section>
 </body>
 
 </html>

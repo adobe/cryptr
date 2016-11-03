@@ -5,6 +5,7 @@
 			url="{{getPoliciesURL}}"
 			handle-as="json"
 			headers="{{header}}"
+			on-error="_policyFailure"
 			on-response="_policySuccess">
 		</iron-ajax>
 
@@ -26,8 +27,18 @@
 						type: Object,
 						value: {}
 					},
+					policyRequests: {
+						type: Array,
+						value: []
+					},
 					header: Object,
-					initialResponse: Array
+					initialResponse: {
+						type: Array,
+						value: []
+					}
+				},
+				_parseAccess: function() {
+
 				},
 				_policySuccess: function(e) {
 					var rules = hcltojson(e.detail.response.data.rules).path;
@@ -37,13 +48,29 @@
 						}
 						if (key in rules) this.access[key] = rules[key];
 					}
+					this._watchPolicyRequests();
+				},
+				_policyFailure: function() {
+					this._watchPolicyRequests();
+				},
+				_watchPolicyRequests: function() {
+					if (this.initialResponse && this.initialResponse.policies && this.policyRequests.length == this.initialResponse.policies.length) {
+						var bool = true;
+						// Wait for all requests to return. Once complete, trigger _parseAccess()
+						for (var i = 0; i < this.policyRequests.length; i++)
+							if (this.policyRequests[i].status == 0) bool = false;
+						if (bool) {
+							this.policyRequests = [];
+							this._parseAccess();
+						}
+					}
 				},
     			_watchStatus: function() {
     				if (this.status != 'none' && this.status != '') {
 						if (this.initialResponse.policies.length > 0) {
 							for (var i = 0; i < this.initialResponse.policies.length; i++) {
 								this.getPoliciesURL = app.url + 'v1/sys/policy/' + this.initialResponse.policies[i];
-								this.$.getPolicy.generateRequest();
+								this.push('policyRequests', this.$.getPolicy.generateRequest());
 							}
 						}
 					}

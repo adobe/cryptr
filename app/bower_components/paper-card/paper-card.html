@@ -131,12 +131,13 @@ Custom property | Description | Default
     <div class="header">
       <iron-image
           hidden$="[[!image]]"
+          aria-hidden$="[[_isHidden(image)]]"
           src="[[image]]"
           alt="[[alt]]"
           placeholder="[[placeholderImage]]"
           preload="[[preloadImage]]"
           fade="[[fadeImage]]"></iron-image>
-      <div hidden$="[[!heading]]" class$="[[_computeHeadingClass(image)]]">[[heading]]</div>
+      <div hidden$="[[!heading]]" class$="title-text [[_computeHeadingClass(image)]]">[[heading]]</div>
     </div>
 
     <content></content>
@@ -227,6 +228,14 @@ Custom property | Description | Default
           computed: '_computeAnimated(animatedShadow)'
         }
       },
+      
+      /**
+       * Format function for aria-hidden. Use the ! operator results in the
+       * empty string when given a falsy value.
+       */
+      _isHidden: function(image) {
+        return image ? 'false' : 'true';
+      },
 
       _headingChanged: function(heading) {
         var label = this.getAttribute('aria-label');
@@ -234,10 +243,7 @@ Custom property | Description | Default
       },
 
       _computeHeadingClass: function(image) {
-        var cls = 'title-text';
-        if (image)
-          cls += ' over-image';
-        return cls;
+        return image ? ' over-image' : '';
       },
 
       _computeAnimated: function(animatedShadow) {

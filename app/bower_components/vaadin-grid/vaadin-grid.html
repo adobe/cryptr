@@ -29,7 +29,7 @@ This program is available under Apache License Version 2.0, available at https:/
     content: url(img/ic_check_black_24px.svg);
     opacity: 0.6;
     display: inline-block;
-    padding: 0 20px;
+    padding: 0 10px;
   }
 
   .vaadin-grid-sidebar-content span div {
@@ -55,6 +55,7 @@ This program is available under Apache License Version 2.0, available at https:/
 
   .vaadin-grid-sidebar-content .column-hiding-toggle {
     cursor: pointer;
+    white-space: nowrap;
   }
 
   .vaadin-grid-sidebar-content .gwt-MenuItem-selected {
@@ -116,8 +117,8 @@ Custom property | Description | Default
 `--vaadin-grid-header-row-height` | Header row height | `56px`
 `--vaadin-grid-footer-row-height` | Footer row height | `56px`
 `--vaadin-grid-selected-row-cell` | Mixin which applies to the cell elements of a selected row | {}
-'--vaadin-grid-row-cell' | Mixin which applies to the cell elements of the table | {}
-
+`--vaadin-grid-row-cell` | Mixin which applies to the cell elements of the table | {}
+`--vaadin-grid-row-stripe-cell` | Mixin applied on the cells of the striped rows | {}
 
 See the [demo](demo/index.html) for use case examples.
 
@@ -199,7 +200,7 @@ See the [demo](demo/index.html) for use case examples.
   .vaadin-grid-loading-data .vaadin-grid-tablewrapper:before {
     -webkit-animation: vaadin-grid-spin-360 400ms linear infinite;
     animation: vaadin-grid-spin-360 400ms linear infinite;
-    border: 2px solid #03A9F4;
+    border: 2px solid var(--primary-color, #03A9F4);
     border-radius: 50%;
     border-right-color: transparent;
     border-top-color: transparent;
@@ -305,6 +306,10 @@ See the [demo](demo/index.html) for use case examples.
     background-color: #eeeeee;
   }
 
+  .vaadin-grid-row-stripe td {
+    @apply(--vaadin-grid-row-stripe-cell);
+  }
+
   .vaadin-grid-row-selected td {
     background-color: #f5f5f5;
     @apply(--vaadin-grid-selected-row-cell);
@@ -329,27 +334,6 @@ See the [demo](demo/index.html) for use case examples.
   :focus .vaadin-grid-row-focused:after {
     -webkit-transform: scaleX(1.0);
     transform: scaleX(1.0);
-  }
-
-  :focus .vaadin-grid-row-focused {
-    -webkit-animation: v-grid-row-focused 820ms ease-in-out;
-    animation: v-grid-row-focused 820ms ease-in-out;
-  }
-
-  @-webkit-keyframes vaadin-grid-row-focused {
-    50% {
-      color: #03A9F4;
-    } 100% {
-      color: inherit;
-    }
-  }
-
-  @keyframes vaadin-grid-row-focused {
-    50% {
-      color: #03A9F4;
-    } 100% {
-      color: inherit;
-    }
   }
 
   /* Grid cell */
@@ -381,14 +365,15 @@ See the [demo](demo/index.html) for use case examples.
   }
 
   .vaadin-grid-header tr {
-    color: rgba(0, 0, 0, 0.54);
-    font-size: 12px;
     height: var(--vaadin-grid-header-row-height, 56px);
   }
 
   .vaadin-grid-header th {
+    color: rgba(0, 0, 0, 0.54);
+    font-size: 12px;
     font-weight: 500;
     text-align: left;
+    position: relative;
   }
 
   .vaadin-grid-header-deco {
@@ -542,7 +527,6 @@ See the [demo](demo/index.html) for use case examples.
     width: 41px;
     height: 41px;
     border-radius: 50%;
-    background-color: #666;
     opacity: 0;
     -webkit-transform: scale(0.8);
     transform: scale(0.8);
@@ -609,8 +593,8 @@ See the [demo](demo/index.html) for use case examples.
   }
 
   .vaadin-grid-sidebar-button {
-    width: 56px;
-    height: 56px;
+    width: var(--vaadin-grid-header-row-height, 56px);
+    height: var(--vaadin-grid-header-row-height, 56px);
     border: none;
     background: none;
     outline: none;
@@ -663,7 +647,94 @@ See the [demo](demo/index.html) for use case examples.
     }
   }
 
+  :host ::content .header-drag-table,
+  .header-drag-table {
+    display: block;
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
 
+  .dragged-column-header {
+    background-color: var(--primary-background-color, #EEEEEE);
+    position: absolute;
+    margin-top: calc(var(--vaadin-grid-header-row-height, 56px) * 0.75);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+  }
+
+  :host ::content .vaadin-grid-drop-marker,
+  .vaadin-grid-drop-marker {
+    background-color: var(--primary-color, #03A9F4);
+    position: absolute;
+    width: 2px;
+  }
+
+  :host ::content .vaadin-grid-drop-marker::before,
+  .vaadin-grid-drop-marker::before {
+    content: "";
+    display: block;
+    width: 1px;
+    background: rgba(0,0,0,0.07);
+    height: 9999px;
+    margin-top: var(--vaadin-grid-header-row-height, 56px);
+  }
+
+  .vaadin-grid-header th.dragged {
+    opacity: 0.3;
+  }
+
+  :host ::content th.vaadin-grid-cell,
+  th.vaadin-grid-cell {
+    overflow: visible;
+  }
+
+  :host ::content div.vaadin-grid-column-header-content,
+  div.vaadin-grid-column-header-content {
+    overflow: hidden;
+    width: 100%;
+  }
+
+  :host ::content .vaadin-grid-column-resize-handle,
+  .vaadin-grid-column-resize-handle {
+    position: absolute;
+    cursor: col-resize;
+    right: 0;
+    top: 0;
+    height: 100%;
+    width: 36px;
+    transform: translateX(50%);
+    text-align: center;
+    z-index: 10;
+  }
+
+  :host ::content .vaadin-grid-column-resize-handle:after,
+  .vaadin-grid-column-resize-handle:after {
+    display: inline-block;
+    height: 100%;
+    content:"";
+    border-left: solid 1px #e3e3e3;
+  }
+
+  :host ::content .vaadin-grid-column-resize-handle:active:after,
+  .vaadin-grid-column-resize-handle:active:after,
+  :host ::content .vaadin-grid-column-resize-handle:hover:after,
+  .vaadin-grid-column-resize-handle:hover:after {
+    border-left: solid 1px var(--primary-color, #03A9F4);
+  }
+
+  :host ::content .vaadin-grid-column-resize-handle-dragged,
+  .vaadin-grid-column-resize-handle-dragged,
+  :host ::content .vaadin-grid-column-resize-handle:active,
+  .vaadin-grid-column-resize-handle:active {
+    transition: all 0.16s ease-in-out;
+    height: 3000px;
+  }
+
+  :host ::content .header-drag-table .vaadin-grid-header,
+  .header-drag-table .vaadin-grid-header {
+    box-shadow: none;
+  }
 
   </style>
   <template>
@@ -995,7 +1066,6 @@ See the [demo](demo/index.html) for use case examples.
        */
       sortOrder: {
         type: Array,
-        notify: true,
         observer: '_sortOrderChanged'
       },
 
@@ -1035,7 +1105,41 @@ See the [demo](demo/index.html) for use case examples.
 
       _currentItems: {
         value: undefined
-      }
+      },
+
+      /**
+       * Boolean property to set whether column reordering is allowed by the grid.
+       *
+       * @property {boolean} columnReorderingAllowed
+       * @default false
+       * @type {boolean}
+       */
+      columnReorderingAllowed: {
+        type: Boolean,
+        value: false,
+        observer: '_columnReorderingAllowedChanged'
+      },
+
+      _currentDetailed: {
+        value: function() {
+          return [];
+        }
+      },
+
+      /**
+       * List of the events that should be observed in the internal grid implementation.
+       * When any of the observed events is performed, the grid will fire a `detailed-event`
+       * where -event is replaced by the original event type.
+       *
+       * @property {Array<Sting>} detailedEvents
+       * @type {Array<Sting>}
+       */
+      detailedEvents: {
+        type: Array,
+        value: function() {
+          return [];
+        }
+      },
     },
 
     attributeChanged: function(name, type, value) {
@@ -1062,13 +1166,46 @@ See the [demo](demo/index.html) for use case examples.
        *
        * @event selection-mode-changed
        */
-      'selection-mode-changed': '_onSelectionModeChange'
+      'selection-mode-changed': '_onSelectionModeChange',
+
+      /**
+       * A change in the column order.
+       *
+       * @event column-order-changed
+       */
+      'column-order-changed': '_columnOrderChanged',
+
+      /**
+       * A change in column sizes
+       *
+       * @event column-resized
+       */
+
+      /**
+       * Fired when an event registered in the `detailedEvents` array is fired.
+       * The name of the event depends of the original event type, for instance if the
+       * original event is `contextmenu` the event name will be `detailed-contextmenu`.
+       *
+       * @event detailed-event
+       * @param {Object} detail
+       *  @param {Event} detail.event The original event.
+       *  @param {Number} detail.column The column index where the element is located.
+       *  @param {Number} detail.row The row index where the element is located
+       *  @param {String} detail.section The section name in the grid (header|body|footer)
+       *  @param {Object} detail.data The row data if the event was on the body, otherwise undefined
+       */
     },
 
     observers: [
       '_columnsChanged(columns, columns.*)',
       '_itemsChanged(items, items.*)',
+      '_detailedChanged(detailedEvents, detailedEvents.*)'
     ],
+
+    _columnOrderChanged: function() {
+      this.columns = this._grid.getColumns();
+      this.refreshItems();
+    },
 
     _columnsChanged: function() {
       this._grid.setColumns(this.columns);
@@ -1102,7 +1239,29 @@ See the [demo](demo/index.html) for use case examples.
     },
 
     _sortOrderChanged: function(sortOrder) {
+      var evt = this.fire('sort-order-changed', {value: sortOrder}, {cancelable: true});
+
+      function _compare(a, b) {
+        return (a < b ? -1 : a > b ? 1 : 0);
+      }
+
+      if (!evt.defaultPrevented && Array.isArray(this.items) && sortOrder.length > 0) {
+        this.items.sort(function(a, b) {
+          return sortOrder.map(function(sort) {
+            var col = this.columns[sort.column];
+            var prop = col.name || sort.column;
+            return (sort.direction === 'asc' ? 1 : -1) * _compare(a[prop], b[prop]);
+          }.bind(this)).reduce(function firstNonZeroValue(p, n) {
+            return p ? p : n;
+          }, 0);
+        }.bind(this));
+      }
+
       this._grid.setSortOrder(sortOrder);
+    },
+
+    _columnReorderingAllowedChanged: function() {
+      this._grid.setColumnReorderingAllowed(this.columnReorderingAllowed);
     },
 
     created: function() {
@@ -1298,7 +1457,10 @@ See the [demo](demo/index.html) for use case examples.
      * @type {Function}
      */
     refreshItems: function() {
-      this._grid.getDataSource().refreshItems();
+      this.selection.clear();
+      if (this._grid.getDataSource()) {
+        this._grid.getDataSource().refreshItems();
+      }
     },
 
     /**
@@ -1313,6 +1475,30 @@ See the [demo](demo/index.html) for use case examples.
      */
     getItem: function(rowIndex, callback, onlyCached) {
       this._grid.getItem(rowIndex, callback, onlyCached);
+    },
+
+    _onDetailed: function(event) {
+      var details = this._grid.getElementDetails(Polymer.dom(event).rootTarget);
+      details.sourceEvent = event;
+      var detailedEvent = this.fire('detailed-' + event.type, details);
+      if (detailedEvent.defaultPrevented) {
+        event.stopPropagation();
+        event.preventDefault();
+      }
+    },
+
+    _detailedChanged: function() {
+      this._currentDetailed.forEach(function(name) {
+        if (this.detailedEvents.indexOf(name) < 0) {
+          this.unlisten(this, name, '_onDetailed');
+        }
+      }.bind(this));
+      this.detailedEvents.forEach(function(name) {
+        if (this._currentDetailed.indexOf(name) < 0) {
+          this.listen(this, name, '_onDetailed');
+        }
+      }.bind(this));
+      this._currentDetailed = this.detailedEvents.slice(0);
     }
-  }); // End Polymer prototype
+  });
 </script>

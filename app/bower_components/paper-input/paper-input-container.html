@@ -15,7 +15,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
 <!--
 `<paper-input-container>` is a container for a `<label>`, an `<input is="iron-input">` or
-`<iron-autogrow-textarea>` and optional add-on elements such as an error message or character
+`<textarea>` and optional add-on elements such as an error message or character
 counter, used to implement Material Design text fields.
 
 For example:
@@ -272,6 +272,7 @@ This element is `display:block` by default, but you can set the `inline` attribu
         color: var(--paper-input-container-input-color, --primary-text-color);
         -webkit-appearance: none;
         text-align: inherit;
+        vertical-align: bottom;
 
         @apply(--paper-font-subhead);
         @apply(--paper-input-container-input);

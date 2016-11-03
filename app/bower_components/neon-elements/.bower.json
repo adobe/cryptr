@@ -31,5 +31,6 @@
   },
   "_source": "git://github.com/PolymerElements/neon-elements.git",
   "_target": "^1.0.0",
-  "_originalSource": "PolymerElements/neon-elements"
+  "_originalSource": "PolymerElements/neon-elements",
+  "_direct": true
 }

@@ -114,6 +114,7 @@ Custom property | Description | Default
         required$="[[required]]"
         disabled$="[[disabled]]"
         rows$="[[rows]]"
+        minlength$="[[minlength]]"
         maxlength$="[[maxlength]]"></textarea>
     </div>
   </template>
@@ -212,6 +213,13 @@ Custom property | Description | Default
        */
       required: {
         type: Boolean
+      },
+
+      /**
+       * The minimum length of the input value.
+       */
+      minlength: {
+        type: Number
       },
 
       /**

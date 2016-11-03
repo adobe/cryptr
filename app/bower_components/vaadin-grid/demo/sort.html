@@ -72,8 +72,8 @@ layout: page
   <section>
     <h3>Sorting the Data Source</h3>
     <p>As mentioned in the previous example, there are multiple ways to change <code>vaadin-grid</code> sort order.
-    None of them will, however, automatically order any data inside <code>vaadin-grid</code>. The data source implementation
-    is always responsible of providing appropriate data that's ordered by the sort-order definitions.</p>
+    <code>vaadin-grid</code> provides an in-place sorting functionality for array data sources.
+    Other kinds of data sources are always responsible of providing appropriate data that is ordered by the sort order definitions.</p>
     <code-example source>
       <vaadin-grid demo>
         <table>
@@ -107,7 +107,9 @@ layout: page
           grid.items = data;
 
           // Re-order the data array on sort-order-changed event
-          grid.addEventListener('sort-order-changed', function() {
+          grid.addEventListener('sort-order-changed', function(e) {
+            e.preventDefault();
+
             var idx = grid.sortOrder[0].column;
             var lesser = grid.sortOrder[0].direction == 'asc' ? -1 : 1;
             data.sort(function(a, b) {
