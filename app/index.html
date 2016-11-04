@@ -14,7 +14,7 @@
 
 <body unresolved>
 	<template is="dom-bind" id="app">
-		<login-form status="{{status}}" username="{{u}}" url="{{url}}" header="{{header}}" initial-response="{{initialResponse}}"></login-form>
+		<login-form status="{{status}}" username="{{u}}" url="{{url}}" header="{{header}}" initial-response="{{initialResponse}}" selected="{{loginPage}}"></login-form>
 		<login-status timer="{{timer}}" status="{{status}}" url="{{url}}" header="{{header}}"></login-status>
 		<request-data status="{{status}}" response="{{response}}" header="{{header}}" initial-response="{{initialResponse}}" access="{{access}}" data="{{data}}"></request-data>
 
@@ -106,6 +106,7 @@
 			else document.getElementById('passfield').autofocus = true;
 		});
 		ipcRenderer.on('prevpass', function(event, arg) { app.prevPassword = arg; });
+		ipcRenderer.on('loginpage', function(event, arg) { app.loginPage = arg; });
 		ipcRenderer.send('initialized', 'ping');
 	</script>
 </body>

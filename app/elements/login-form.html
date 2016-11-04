@@ -136,6 +136,7 @@
 					selected: {
 						type: Number,
 						value: 0,
+						notify: true,
 						observer: '_watchSelected'
 					},
 					authMethod: {
@@ -214,10 +215,12 @@
 					this.username = '';
 					this.password = '';
 					this.token = '';
+					this._persistData();
 				},
 				_persistData: function() {
 					ipcRenderer.send('update-url', this.url);
 					ipcRenderer.send('update-user', this.username);
+					ipcRenderer.send('update-loginpage', this.selected);
 				}
 			});
 		})();

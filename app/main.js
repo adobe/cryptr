@@ -18,12 +18,14 @@ function createWindow() {
 		settings = JSON.parse(fs.readFileSync(initPath, 'utf8'));
 		if (settings.init === undefined || settings.init === null) settings.init = '';
 		if (settings.prevpass === undefined || settings.prevpass === null) settings.prevpass = false;
+		if (settings.loginpage === undefined || settings.loginpage === null) settings.loginpage = 0;
 	}
 	catch(e) {
 		settings.width = 1052;
 		settings.height = 612;
 		settings.init = '';
 		settings.prevpass = false;
+		settings.loginpage = 0;
 	}
 
 	// Create the browser window.
@@ -98,6 +100,7 @@ ipcMain.on('initialized', function(event, arg) {
 	event.sender.send('url', settings.init);
 	event.sender.send('user', settings.user);
 	event.sender.send('prevpass', settings.prevpass);
+	event.sender.send('loginpage', settings.loginpage);
 });
 ipcMain.on('update-url', function(event, arg) {
 	settings.init = arg;
@@ -107,4 +110,7 @@ ipcMain.on('update-user', function(event, arg) {
 });
 ipcMain.on('update-prevpass', function(event, arg) {
 	settings.prevpass = arg;
+});
+ipcMain.on('update-loginpage', function(event, arg) {
+	settings.loginpage = arg;
 });
