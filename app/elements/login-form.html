@@ -8,15 +8,16 @@
 				--paper-tabs-selection-bar: {
 					color: white;
 				};
-				/*--paper-tabs: {
-					background-color: blue;
-				}*/
 			}
 			#errortoast {
 				background-color: #EF5350;
 			}
-			#userfield, #passfield, #initfield {
+			#userfield, #passfield {
 				margin: 0;
+			}
+			#initfield {
+				margin: 0;
+				padding: 0 8px 0 24px;
 			}
 			paper-dialog > iron-pages {
 				margin: 0;
@@ -25,11 +26,25 @@
 				margin: 0;
 				padding: 0px;
 			}
-			paper-progress {
-				width: auto;
-			}
 			paper-progress.blue {
 				--paper-progress-active-color: #03A9F4;
+			}
+			.flex-horizontal {
+				@apply(--layout-horizontal);
+			}
+			.flexchild {
+				@apply(--layout-flex);
+			}
+			.checkFail {
+				color: #EF5350;
+				padding: 28px 0px 0px 9px;
+				width: 18px;
+			}
+			.checkPass {
+				color: #4CAF50;
+				display: none;
+				padding: 28px 0px 0px 9px;
+				width: 18px;
 			}
 		</style>
 
@@ -47,7 +62,14 @@
 			timeout="5000">
 		</iron-ajax>
 
-		<!-- Todo: First talk to v1/sys/init to verify the URL as a Vault instance -->
+		<iron-ajax id="testReq"
+			url="{{testURL}}"
+			handle-as="json"
+			last-response="{{testResponse}}"
+			on-response="_testSuccess"
+			on-error="_testError"
+			timeout="5000">
+		</iron-ajax>
 
 		<paper-dialog id="modal"class="noselect" modal no-cancel-on-esc-key no-cancel-on-outside-click auto-fit-on-attach>
 			<h1>Login</h1>
@@ -56,25 +78,32 @@
 				<paper-tab>Token</paper-tab>
 				<paper-tab>User/Pass</paper-tab>
 			</paper-tabs>
-			<div id="initfield">
-				<paper-input value="{{url}}" label="Server URL (HTTPS)"></paper-input>
+			<div id="initfield" class="flex-horizontal">
+				<div class="flexchild">
+					<paper-input value="{{url}}" label="Server URL (HTTPS)"></paper-input>
+				</div>
+				<iron-icon id="checkpass" icon="check-circle" class="checkPass"></iron-icon>
+				<iron-icon id="checkfail" icon="cancel" class="checkFail"></iron-icon>
 			</div>
 			<iron-pages selected="{{selected}}">
 				<div>
-					<paper-input id="userfield" value="{{username}}" label="LDAP Username"></paper-input>
-					<paper-input id="passfield" value="{{password}}" label="LDAP Password" type="password"></paper-input>
+					<iron-a11y-keys target="[[targetuserldap]]" keys="enter" on-keys-pressed="_login"></iron-a11y-keys>
+					<iron-a11y-keys target="[[targetpassldap]]" keys="enter" on-keys-pressed="_login"></iron-a11y-keys>
+					<paper-input id="userfieldldap" value="{{username}}" label="LDAP Username"></paper-input>
+					<paper-input id="passfieldldap" value="{{password}}" label="LDAP Password" type="password"></paper-input>
 				</div>
 				<div>
-					<paper-input id="userfield" value="{{token}}" label="Token"></paper-input>
+					<iron-a11y-keys target="[[targettoken]]" keys="enter" on-keys-pressed="_login"></iron-a11y-keys>
+					<paper-input id="tokenfield" value="{{token}}" label="Token"></paper-input>
 				</div>
 				<div>
+					<iron-a11y-keys target="[[targetuser]]" keys="enter" on-keys-pressed="_login"></iron-a11y-keys>
+					<iron-a11y-keys target="[[targetpass]]" keys="enter" on-keys-pressed="_login"></iron-a11y-keys>
 					<paper-input id="userfield" value="{{username}}" label="Username"></paper-input>
 					<paper-input id="passfield" value="{{password}}" label="Password" type="password"></paper-input>
 				</div>
 			</iron-pages>
 			<div class="buttons">
-				<iron-a11y-keys target="[[targetuser]]" keys="enter" on-keys-pressed="_login"></iron-a11y-keys>
-				<iron-a11y-keys target="[[targetpass]]" keys="enter" on-keys-pressed="_login"></iron-a11y-keys>
 				<paper-button on-tap="_login" autofocus disabled="{{disabled}}">Login</paper-button>
 			</div>
 			<paper-progress class="blue" indeterminate disabled="{{!disabled}}"></paper-progress>
@@ -96,16 +125,19 @@
 						observer: '_watchStatus'
 					},
 					targetuser: {
-						type: Object,
-						value: function() {
-							return this.$.userfield;
-						}
+						value: function() { return this.$.userfield; }
 					},
 					targetpass: {
-						type: Object,
-						value: function() {
-							return this.$.passfield;
-						}
+						value: function() { return this.$.passfield; }
+					},
+					targetuserldap: {
+						value: function() { return this.$.userfieldldap; }
+					},
+					targetpassldap: {
+						value: function() { return this.$.passfieldldap; }
+					},
+					targettoken: {
+						value: function() { return this.$.tokenfield; }
 					},
 					username: {
 						type: String,
@@ -123,7 +155,7 @@
 					url: {
 						type: String,
 						notify: true,
-						observer: '_persistData'
+						observer: '_watchURL'
 					},
 					header: {
 						type: Object,
@@ -142,6 +174,10 @@
 					authMethod: {
 						type: String,
 						value: 'POST'
+					},
+					approvedURL: {
+						type: Boolean,
+						value: false
 					}
 				},
 				attached: function() {
@@ -154,25 +190,45 @@
 					return this.url + 'v1/auth/ldap/login/' + u
 				},
 				_login: function() {
+					if (!this.approvedURL) {
+						this.$.errortoast.text = 'No Vault instance found at the this URL';
+						this.$.errortoast.show();
+						return;
+					}
 					this.url = this.url.trim();
 					if (this.url.toLowerCase().startsWith('https')) {
 						if (!(this.url.endsWith('/'))) this.url += '/';
-						this.disabled = true;
 						// Switch for LDAP, Token, and UserPass auth backends
 						if (this.selected == 0) {
+							if (!this.username && !this.password) { //Check fields have content
+								this.$.errortoast.text = 'Username and Password are required';
+								this.$.errortoast.show();
+								return;
+							}
 							this.authMethod = 'POST';
 							this.authURL = this.url + 'v1/auth/ldap/login/' + this.username;
 							this.body = {"password": this.password };
 						} else if (this.selected == 1) {
+							if (!this.token) { //Check field has content
+								this.$.errortoast.text = 'Token is required';
+								this.$.errortoast.show();
+								return;
+							}
 							this.authMethod = 'GET';
 							this.authURL = this.url + 'v1/auth/token/lookup-self';
 							this.header = {"X-Vault-Token": this.token };
 							this.body = '';
 						} else if (this.selected == 2) {
+							if (!this.username && !this.password) { //Check fields have content
+								this.$.errortoast.text = 'Username and Password are required';
+								this.$.errortoast.show();
+								return;
+							}
 							this.authMethod = 'POST';
 							this.authURL = this.url + 'v1/auth/userpass/login/' + this.username;
 							this.body = {"password": this.password };
 						}
+						this.disabled = true;
 						this.$.authenticateReq.generateRequest();
 					} else {
 						this.$.errortoast.text = 'An HTTPS based URL is required.';
@@ -201,12 +257,26 @@
 				_error: function(e) {
 					this.disabled = false;
 					if (this.loginError.response.errors[0].includes('Invalid Credentials')) this.$.errortoast.text = 'Invalid Credentials.';
+					if (this.loginError.response.errors[0].includes('No Such Object')) this.$.errortoast.text = 'Invalid Username or Password.';
 					else if (this.loginError.response.errors[0] == 'invalid username or password') this.$.errortoast.text = 'Invalid Username or Password';
 					else if (this.loginError.response.errors[0] == 'missing client token') this.$.errortoast.text = 'Permission Denied';
-					else if (this.loginError.response.errors[0] == 'Vault is sealed') this.$.errortoast.text = 'Vault is still sealed!';
+					else if (this.loginError.response.errors[0] == 'Vault is sealed') this.$.errortoast.text = 'This vault is currently sealed';
 					else if (this.loginError.response.errors[0] == 'permission denied') this.$.errortoast.text = 'Permission Denied';
+					else if (this.loginError.response.errors[0] == 'unsupported path') this.$.errortoast.text = 'This auth backend is not supported by the server';
 					else this.$.errortoast.text = 'Unkown Error: Please try again later.';
 					this.$.errortoast.show();
+				},
+				_testSuccess: function() {
+					console.log('success');
+					this.$.checkpass.style.display = 'block';
+					this.$.checkfail.style.display = 'none';
+					this.approvedURL = true;
+				},
+				_testError: function() {
+					console.log('failure');
+					this.$.checkpass.style.display = 'none';
+					this.$.checkfail.style.display = 'block';
+					this.approvedURL = false;
 				},
 				_watchStatus: function() {
 					if (this.status == 'none') this.$.modal.open();
@@ -216,6 +286,24 @@
 					this.password = '';
 					this.token = '';
 					this._persistData();
+				},
+				_watchURL: function() {
+					this.debounce('checkURL', function () {
+						if (this.url.toLowerCase().startsWith('https')) {
+							if (!(this.url.endsWith('/'))) {
+								this.testURL = this.url + '/v1/sys/init';
+								this.$.testReq.generateRequest();
+							} else {
+								this.testURL = this.url + 'v1/sys/init';
+								this.$.testReq.generateRequest();
+							}
+						} else {
+							this.$.checkpass.style.display = 'none';
+							this.$.checkfail.style.display = 'block';
+							this.approvedURL = false;
+						}
+						this._persistData();
+					}, 400);
 				},
 				_persistData: function() {
 					ipcRenderer.send('update-url', this.url);
