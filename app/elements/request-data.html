@@ -5,8 +5,16 @@
 			url="{{getPoliciesURL}}"
 			handle-as="json"
 			headers="{{header}}"
-			on-error="_policyFailure"
+			on-error="_watchPolicyRequests"
 			on-response="_policySuccess">
+		</iron-ajax>
+
+		<iron-ajax id="getSecrets"
+			url="{{getSecretsURL}}"
+			handle-as="json"
+			headers="{{header}}"
+			on-error="_watchSecretsRequests"
+			on-response="_secretsSuccess">
 		</iron-ajax>
 
 	</template>
@@ -37,20 +45,71 @@
 						value: []
 					}
 				},
+				// ------ SECRETS ------
+				_secretsSuccess: function(e) {
+					// var rules = hcltojson(e.detail.response.data.rules).path;
+					// for (var key in rules) {
+					// 	for (var i = 0; i < this.initialResponse.policies.length; i++) {
+					// 		if (key == 'sys/policy/' + this.initialResponse.policies[i]) delete rules[key];
+					// 	}
+					// 	if (key in rules) this.access[key] = rules[key];
+					// }
+					// this._watchSecretsRequests();
+				},
+				_watchSecretsRequests: function() {
+					// if (this.access && this.policyRequests.length == this.initialResponse.policies.length) {
+					// 	var bool = true;
+					// 	// Wait for all requests to return. Once complete, trigger _parseAccess()
+					// 	for (var i = 0; i < this.policyRequests.length; i++)
+					// 		if (this.policyRequests[i].status == 0) bool = false;
+					// 	if (bool) {
+					// 		this.policyRequests = [];
+					// 		this._parseAccess();
+					// 	}
+					// }
+				},
+				// ----- POLICIES ------
 				_parseAccess: function() {
-
+					console.log('ACCESS: ', this.access);
 				},
 				_policySuccess: function(e) {
 					var rules = hcltojson(e.detail.response.data.rules).path;
+					var rights = {
+						sudo: ["create", "read", "update", "delete", "list", "sudo"],
+						write: ["create", "read", "update", "delete", "list"],
+						read: ["read", "list"]
+					}
+					// Todo: The following requires an environment for testing of merging rights, merging of "policy" and "capabilities", and denying rights
+					// Todo: Account for Root token login
 					for (var key in rules) {
 						for (var i = 0; i < this.initialResponse.policies.length; i++) {
-							if (key == 'sys/policy/' + this.initialResponse.policies[i]) delete rules[key];
+							if (key == 'sys/policy/' + this.initialResponse.policies[i]) delete rules[key]; // Todo: Modify this when adding Admin functions
 						}
-						if (key in rules) this.access[key] = rules[key];
+						if (key in rules) {
+							// Translate old rights policies into capabilities
+							if (rules[key].policy && rules[key].capabilities) {
+								rules[key].capabilities = rights[rules[key].policy];
+								rules[key].capabilities = rules[key].capabilities.concat(rights[rules[key].policy].capabilities.filter(function (item) {
+									return rules[key].capabilities.indexOf(item) < 0;
+								}));
+								delete rules[key].policy;
+							} else if (rules[key].policy) {
+								rules[key].capabilities = rights[rules[key].policy];
+								delete rules[key].policy;
+							}
+							// Merge current rights with existing rights if there are duplicates
+							if (this.access[key]) {
+								var temp = rules[key].capabilities.concat(access[key].capabilities.filter(function (item) {
+									return rules[key].capabilities.indexOf(item) < 0;
+								}));
+								if (temp.indexOf('deny') >= 0) temp = ['deny'];
+								rules[key].capabilities = temp;
+							}
+							this.access[key] = rules[key];
+						}
 					}
-					this._watchPolicyRequests();
-				},
-				_policyFailure: function() {
+					for (var key in this.access)
+						if (this.access[key].capabilities.indexOf('deny') >= 0) delete this.access[key];
 					this._watchPolicyRequests();
 				},
 				_watchPolicyRequests: function() {
@@ -65,6 +124,7 @@
 						}
 					}
 				},
+				// ------ STATUS ------
     			_watchStatus: function() {
     				if (this.status != 'none' && this.status != '') {
 						if (this.initialResponse.policies.length > 0) {

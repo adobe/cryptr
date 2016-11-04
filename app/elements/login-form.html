@@ -3,10 +3,22 @@
 <dom-module id="login-form">
 	<template>
 		<style>
+			:host {
+				--paper-tabs-selection-bar-color: blue;
+				--paper-tabs-selection-bar: {
+					color: white;
+				};
+				/*--paper-tabs: {
+					background-color: blue;
+				}*/
+			}
 			#errortoast {
 				background-color: #EF5350;
 			}
 			#userfield, #passfield, #initfield {
+				margin: 0;
+			}
+			paper-dialog > iron-pages {
 				margin: 0;
 			}
 			paper-dialog > *:last-child {
@@ -24,8 +36,9 @@
 		<iron-ajax id="authenticateReq"
 			url="{{authURL}}"
 			handle-as="json"
-			method="POST"
+			method="{{authMethod}}"
 			body="{{body}}"
+			headers="{{header}}"
 			content-type="application/json"
 			last-response="{{loginResponse}}"
 			last-error={{loginError}}
@@ -35,15 +48,30 @@
 		</iron-ajax>
 
 		<!-- Todo: First talk to v1/sys/init to verify the URL as a Vault instance -->
-		<!-- Todo: When implementing token auth, set username as "TOKEN" -->
 
-		<paper-dialog id="modal" class="white noselect" modal no-cancel-on-esc-key no-cancel-on-outside-click>
+		<paper-dialog id="modal"class="noselect" modal no-cancel-on-esc-key no-cancel-on-outside-click auto-fit-on-attach>
 			<h1>Login</h1>
+			<paper-tabs selected="{{selected}}">
+				<paper-tab>LDAP</paper-tab>
+				<paper-tab>Token</paper-tab>
+				<paper-tab>User/Pass</paper-tab>
+			</paper-tabs>
 			<div id="initfield">
 				<paper-input value="{{url}}" label="Server URL (HTTPS)"></paper-input>
 			</div>
-			<paper-input id="userfield" value="{{username}}" label="LDAP Username"></paper-input>
-			<paper-input id="passfield" value="{{password}}" label="Password" type="password"></paper-input>
+			<iron-pages selected="{{selected}}">
+				<div>
+					<paper-input id="userfield" value="{{username}}" label="LDAP Username"></paper-input>
+					<paper-input id="passfield" value="{{password}}" label="LDAP Password" type="password"></paper-input>
+				</div>
+				<div>
+					<paper-input id="userfield" value="{{token}}" label="Token"></paper-input>
+				</div>
+				<div>
+					<paper-input id="userfield" value="{{username}}" label="Username"></paper-input>
+					<paper-input id="passfield" value="{{password}}" label="Password" type="password"></paper-input>
+				</div>
+			</iron-pages>
 			<div class="buttons">
 				<iron-a11y-keys target="[[targetuser]]" keys="enter" on-keys-pressed="_login"></iron-a11y-keys>
 				<iron-a11y-keys target="[[targetpass]]" keys="enter" on-keys-pressed="_login"></iron-a11y-keys>
@@ -67,9 +95,6 @@
 						notify: true,
 						observer: '_watchStatus'
 					},
-					body: {
-						computed: '_computeBody(password)'
-					},
 					targetuser: {
 						type: Object,
 						value: function() {
@@ -88,10 +113,9 @@
 						notify: true,
 						observer: '_persistData'
 					},
-					password: {
-						type: String,
-						value: ''
-					},
+					body: Object,
+					password: String,
+					authURL: String,
 					disabled: {
 						type: Boolean,
 						value: false
@@ -101,9 +125,6 @@
 						notify: true,
 						observer: '_persistData'
 					},
-					authURL: {
-						computed: '_computeURL(url, username)'
-					},
 					header: {
 						type: Object,
 						notify: true
@@ -111,6 +132,15 @@
 					initialResponse: {
 						type: Array,
 						notify: true
+					},
+					selected: {
+						type: Number,
+						value: 0,
+						observer: '_watchSelected'
+					},
+					authMethod: {
+						type: String,
+						value: 'POST'
 					}
 				},
 				attached: function() {
@@ -127,6 +157,21 @@
 					if (this.url.toLowerCase().startsWith('https')) {
 						if (!(this.url.endsWith('/'))) this.url += '/';
 						this.disabled = true;
+						// Switch for LDAP, Token, and UserPass auth backends
+						if (this.selected == 0) {
+							this.authMethod = 'POST';
+							this.authURL = this.url + 'v1/auth/ldap/login/' + this.username;
+							this.body = {"password": this.password };
+						} else if (this.selected == 1) {
+							this.authMethod = 'GET';
+							this.authURL = this.url + 'v1/auth/token/lookup-self';
+							this.header = {"X-Vault-Token": this.token };
+							this.body = '';
+						} else if (this.selected == 2) {
+							this.authMethod = 'POST';
+							this.authURL = this.url + 'v1/auth/userpass/login/' + this.username;
+							this.body = {"password": this.password };
+						}
 						this.$.authenticateReq.generateRequest();
 					} else {
 						this.$.errortoast.text = 'An HTTPS based URL is required.';
@@ -134,9 +179,18 @@
 					}
 				},
 				_success: function() {
-					if (this.loginResponse.auth.client_token) {
+					// UserPass / LDAP
+					if (this.loginResponse.auth && this.loginResponse.auth.client_token) {
 						this.header = {"X-Vault-Token": this.loginResponse.auth.client_token };
 						this.initialResponse = this.loginResponse.auth;
+						this.status = 'watch';
+						this.password = '';
+						this.disabled = false;
+						this.$.modal.close();
+					// Token Auth
+					} else if (this.loginResponse.data) {
+						this.initialResponse = this.loginResponse.data;
+						this.username = 'TOKEN';
 						this.status = 'watch';
 						this.password = '';
 						this.disabled = false;
@@ -146,14 +200,20 @@
 				_error: function(e) {
 					this.disabled = false;
 					if (this.loginError.response.errors[0].includes('Invalid Credentials')) this.$.errortoast.text = 'Invalid Credentials.';
-					if (this.loginError.response.errors[0] == 'missing client token') this.$.errortoast.text = 'Auth Backend not supported!';
-					// else if (e.detail.error.message.includes('503')) this.$.errortoast.text = 'Cannot contact server. Please try again later.';
-					// else if (e.detail.error.message.includes('401')) this.$.errortoast.text = 'Unauthorized Request.';
+					else if (this.loginError.response.errors[0] == 'invalid username or password') this.$.errortoast.text = 'Invalid Username or Password';
+					else if (this.loginError.response.errors[0] == 'missing client token') this.$.errortoast.text = 'Permission Denied';
+					else if (this.loginError.response.errors[0] == 'Vault is sealed') this.$.errortoast.text = 'Vault is still sealed!';
+					else if (this.loginError.response.errors[0] == 'permission denied') this.$.errortoast.text = 'Permission Denied';
 					else this.$.errortoast.text = 'Unkown Error: Please try again later.';
 					this.$.errortoast.show();
 				},
 				_watchStatus: function() {
 					if (this.status == 'none') this.$.modal.open();
+				},
+				_watchSelected: function() {
+					this.username = '';
+					this.password = '';
+					this.token = '';
 				},
 				_persistData: function() {
 					ipcRenderer.send('update-url', this.url);
