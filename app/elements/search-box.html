@@ -5,13 +5,13 @@
 	<style></style>
 	<template>
 		<paper-item>
-			<iron-icon icon="search" style="padding-right: 10px"></iron-icon>
+			<iron-icon icon="search" style="padding-right: 10px; -webkit-app-region: no-drag;"></iron-icon>
 			<iron-a11y-keys target="[[targetsearch]]" keys="esc" on-keys-pressed="_clear"></iron-a11y-keys>
 			<iron-a11y-keys target="[[targetsearch]]" keys="enter" on-keys-pressed="_enterKey"></iron-a11y-keys>
 			<iron-a11y-keys target="[[targetbody]]" keys="meta+f alt+f ctrl+f" on-keys-pressed="_focusSearch"></iron-a11y-keys>
-			<paper-input id="searchinput" value="{{query}}" label="Search" no-label-float class="noselect"></paper-input>
+			<paper-input id="searchinput" value="{{query}}" label="Search" no-label-float class="noselect" style="-webkit-app-region: no-drag;"></paper-input>
 			<!-- Todo: Make the search box expand on click to add animation -->
-			<paper-icon-button id="clearbutton" icon="highlight-off" on-tap="_clear" class="noselect" style="display: none; cursor: pointer; color: #AAA"></paper-input>
+			<paper-icon-button id="clearbutton" icon="highlight-off" on-tap="_clear" class="noselect" style="display: none; cursor: pointer; color: #AAA; -webkit-app-region: no-drag;"></paper-input>
 		</paper-item>
 	</template>
 

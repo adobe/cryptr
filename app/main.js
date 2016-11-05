@@ -32,6 +32,7 @@ function createWindow() {
 	settings.minWidth = 500;
 	settings.minHeight = 500;
 	settings.icon = __dirname + '/images/sizes/128x128.png';
+	settings.titleBarStyle = 'hidden';
 	mainWindow = new BrowserWindow(settings);
 	mainWindow.loadURL('file://' + __dirname + '/index.html');
 
