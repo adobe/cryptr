@@ -148,6 +148,10 @@
 					body: Object,
 					password: String,
 					authURL: String,
+					token: {
+						type: String,
+						value: '2834a590-9a72-4796-3df0-d2088761becb' // a token for a dev environment, containing no secrets
+					},
 					disabled: {
 						type: Boolean,
 						value: false
@@ -190,13 +194,13 @@
 					return this.url + 'v1/auth/ldap/login/' + u
 				},
 				_login: function() {
-					if (!this.approvedURL) {
-						this.$.errortoast.text = 'No Vault instance found at the this URL';
-						this.$.errortoast.show();
-						return;
-					}
 					this.url = this.url.trim();
 					if (this.url.toLowerCase().startsWith('https')) {
+						if (!this.approvedURL) {
+							this.$.errortoast.text = 'No Vault instance found at the this URL';
+							this.$.errortoast.show();
+							return;
+						}
 						if (!(this.url.endsWith('/'))) this.url += '/';
 						// Switch for LDAP, Token, and UserPass auth backends
 						if (this.selected == 0) {
