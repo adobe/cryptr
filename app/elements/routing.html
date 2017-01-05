@@ -14,27 +14,22 @@
 
 		page('/', function() {
 			app.route = 'home';
-			app.pageroute = 'home';
 		});
 
 		page(app.baseUrl, function() {
 			app.route = 'home';
-			app.pageroute = 'home';
 		});
 
 		page('/all', function() {
 			app.route = 'all';
-			app.pageroute = 'all';
 		});
 
-		page('/folder/:id', function(data) {
-			app.route = 'folder' + data.params.id;
-			app.pageroute = 'all';
+		page('/folder/*', function(data) {
+			app.route = data.params[0];
 		});
 
 		page('/search', function() {
 			app.route = 'search';
-			app.pageroute = 'all';
 		});
 
 		// 404
@@ -49,6 +44,5 @@
 		page({
 			hashbang: true
 		});
-
 	});
 </script>

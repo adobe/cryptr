@@ -14,9 +14,9 @@
 
 <body unresolved>
 	<template is="dom-bind" id="app">
-		<login-form status="{{status}}" username="{{u}}" url="{{url}}" header="{{header}}" initial-response="{{initialResponse}}" selected="{{loginPage}}"></login-form>
-		<login-status timer="{{timer}}" status="{{status}}" url="{{url}}" header="{{header}}"></login-status>
-		<request-data status="{{status}}" response="{{response}}" header="{{header}}" initial-response="{{initialResponse}}" access="{{access}}" data="{{data}}"></request-data>
+		<login-form status="{{status}}" username="{{u}}" url="{{url}}" header="{{header}}" initial-response="{{loginResponse}}" page="{{loginPage}}"></login-form>
+		<login-status status="{{status}}" url="{{url}}" header="{{header}}"></login-status>
+		<secrets-init status="{{status}}" header="{{header}}" login-response="{{loginResponse}}" secrets="{{secrets}}"></secrets-init>
 
 		<paper-drawer-panel id="paperDrawerPanel" drawer-width="170px">
 			<!-- Drawer Area -->
@@ -27,7 +27,7 @@
 				</paper-toolbar>
 
 				<span id="drawerMenuText" class="noselect">Home</span>
-				<paper-menu attr-for-selected="data-route" selected="[[route]]">
+				<paper-menu attr-for-selected="data-route" selected="{{route}}">
 					<a data-route="home" href="{{baseUrl}}" class="noselect">
 						<iron-icon icon="dashboard"></iron-icon>
 						<span>Dashboard</span>
@@ -38,20 +38,10 @@
 							<span>Search</span>
 						</a>
 					</template>
-
-					<span id="drawerMenuText" class="noselect">Folders</span>
-					<a data-route="all" href="{{baseUrl}}all" class="noselect">
-						<iron-icon icon="folder-open"></iron-icon>
-						<span>All</span>
-					</a>
-
-					<template is="dom-repeat" items="{{response.folders}}">
-						<a data-route="folder{{index}}" href="{{baseUrl}}folder/{{index}}" class="noselect">
-							<iron-icon icon="folder-open"></iron-icon>
-							<span>{{item}}</span>
-						</a>
-					</template>
 				</paper-menu>
+
+				<span id="drawerMenuText" class="noselect">Folders</span>
+				<folder-structure secrets="[[secrets]]" route="{{route}}" base-url="{{baseUrl}}" base-folder="/"></folder-structure>
 			</paper-scroll-header-panel>
 
 			<!-- Main Area -->
@@ -68,7 +58,7 @@
 
 				<!-- Main Content -->
 				<div class="content" style="height: 100%">
-					<iron-pages attr-for-selected="data-route" selected="{{pageroute}}" style="height: 100%">
+					<iron-pages attr-for-selected="data-route" selected="{{route}}" style="height: 100%">
 						<section data-route="home">
 							<paper-material elevation="1">
 								<h2 class="page-title">Dashboard</h2>
@@ -77,8 +67,13 @@
 						</section>
 
 						<section data-route="all" style="height: 100%">
-							<secret-data route="{{route}}" response="{{response}}" query="{{query}}" url="{{url}}" prev-password="{{prevPassword}}"></secret-data>
+							<secrets-manager data="{{data}}"></secrets-manager>
 						</section>
+						<template is="dom-repeat" items="{{secrets}}">
+							<section data-route="{{item.location}}" style="height: 100%">
+								This is a test: {{item.location}}
+							</section>
+						</template>
 					</iron-pages>
 				</div>
 			</paper-scroll-header-panel>

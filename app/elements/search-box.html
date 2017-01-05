@@ -1,8 +1,17 @@
-<!DOCTYPE html>
-<html>
-
 <dom-module id="search-box">
-	<style></style>
+	<style>
+		paper-input {
+			--paper-input-container-underline: {
+				background: none;
+			};
+			--paper-input-container-focus-color: #666;
+		}
+		.container {
+			background-color: #EEE;
+			margin-left: 35px;
+			border-radius: 4px;
+		}
+	</style>
 	<template>
 		<paper-item>
 			<iron-icon icon="search" style="padding-right: 10px; -webkit-app-region: no-drag;"></iron-icon>
@@ -60,4 +69,3 @@
 		});
 	</script>
 </dom-module>
-</html>

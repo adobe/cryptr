@@ -4,7 +4,8 @@
 	<template>
 		<style>
 			:host {
-				--paper-tabs-selection-bar-color: blue;
+				--paper-tabs-selection-bar-color: #4496ff;
+				--paper-tab-ink: #1671ea;
 				--paper-tabs-selection-bar: {
 					color: white;
 				};
@@ -26,6 +27,9 @@
 				margin: 0;
 				padding: 0px;
 			}
+			paper-dialog > *:nth-child(2) {
+				margin-top: 60px;
+			}
 			paper-progress.blue {
 				--paper-progress-active-color: #03A9F4;
 			}
@@ -45,6 +49,20 @@
 				display: none;
 				padding: 28px 0px 0px 9px;
 				width: 18px;
+			}
+			#modal {
+				-moz-border-radius: 8px;
+				-webkit-border-radius: 8px;
+				border-radius: 8px;
+			}
+			#logo {
+				width: 200px;
+				height: 200px;
+				left: 50%;
+				position: absolute;
+				top: -122px;
+				-webkit-transform: translateX(-50%);
+				transform: translateX(-50%);
 			}
 		</style>
 
@@ -72,8 +90,8 @@
 		</iron-ajax>
 
 		<paper-dialog id="modal"class="noselect" modal no-cancel-on-esc-key no-cancel-on-outside-click auto-fit-on-attach>
-			<h1>Login</h1>
-			<paper-tabs selected="{{selected}}">
+			<iron-image id="logo" sizing="contain" src="../images/cryptr-internal.png"></iron-image>
+			<paper-tabs selected="{{page}}">
 				<paper-tab>LDAP</paper-tab>
 				<paper-tab>Token</paper-tab>
 				<paper-tab>User/Pass</paper-tab>
@@ -85,7 +103,7 @@
 				<iron-icon id="checkpass" icon="check-circle" class="checkPass"></iron-icon>
 				<iron-icon id="checkfail" icon="cancel" class="checkFail"></iron-icon>
 			</div>
-			<iron-pages selected="{{selected}}">
+			<iron-pages selected="{{page}}">
 				<div>
 					<iron-a11y-keys target="[[targetuserldap]]" keys="enter" on-keys-pressed="_login"></iron-a11y-keys>
 					<iron-a11y-keys target="[[targetpassldap]]" keys="enter" on-keys-pressed="_login"></iron-a11y-keys>
@@ -106,7 +124,7 @@
 			<div class="buttons">
 				<paper-button on-tap="_login" autofocus disabled="{{disabled}}">Login</paper-button>
 			</div>
-			<paper-progress class="blue" indeterminate disabled="{{!disabled}}"></paper-progress>
+			<paper-progress style="padding-left:10px" class="blue" indeterminate disabled="{{!disabled}}"></paper-progress>
 		</paper-dialog>
 
 		<paper-toast id="errortoast" class="fit-bottom" duration="5000" text""></paper-toast>
@@ -150,7 +168,7 @@
 					authURL: String,
 					token: {
 						type: String,
-						value: '2834a590-9a72-4796-3df0-d2088761becb' // a token for a dev environment, containing no secrets
+						value: ''
 					},
 					disabled: {
 						type: Boolean,
@@ -169,7 +187,7 @@
 						type: Array,
 						notify: true
 					},
-					selected: {
+					page: {
 						type: Number,
 						value: 0,
 						notify: true,
@@ -203,7 +221,7 @@
 						}
 						if (!(this.url.endsWith('/'))) this.url += '/';
 						// Switch for LDAP, Token, and UserPass auth backends
-						if (this.selected == 0) {
+						if (this.page == 0) {
 							if (!this.username && !this.password) { //Check fields have content
 								this.$.errortoast.text = 'Username and Password are required';
 								this.$.errortoast.show();
@@ -212,7 +230,7 @@
 							this.authMethod = 'POST';
 							this.authURL = this.url + 'v1/auth/ldap/login/' + this.username;
 							this.body = {"password": this.password };
-						} else if (this.selected == 1) {
+						} else if (this.page == 1) {
 							if (!this.token) { //Check field has content
 								this.$.errortoast.text = 'Token is required';
 								this.$.errortoast.show();
@@ -222,7 +240,7 @@
 							this.authURL = this.url + 'v1/auth/token/lookup-self';
 							this.header = {"X-Vault-Token": this.token };
 							this.body = '';
-						} else if (this.selected == 2) {
+						} else if (this.page == 2) {
 							if (!this.username && !this.password) { //Check fields have content
 								this.$.errortoast.text = 'Username and Password are required';
 								this.$.errortoast.show();
@@ -260,8 +278,8 @@
 				},
 				_error: function(e) {
 					this.disabled = false;
-					if (this.loginError.response.errors[0].includes('Invalid Credentials')) this.$.errortoast.text = 'Invalid Credentials.';
-					if (this.loginError.response.errors[0].includes('No Such Object')) this.$.errortoast.text = 'Invalid Username or Password.';
+					if (this.loginError.response.errors[0].includes('Invalid Credentials')) this.$.errortoast.text = 'Invalid Credentials';
+					else if (this.loginError.response.errors[0].includes('No Such Object')) this.$.errortoast.text = 'Invalid Username or Password';
 					else if (this.loginError.response.errors[0] == 'invalid username or password') this.$.errortoast.text = 'Invalid Username or Password';
 					else if (this.loginError.response.errors[0] == 'missing client token') this.$.errortoast.text = 'Permission Denied';
 					else if (this.loginError.response.errors[0] == 'Vault is sealed') this.$.errortoast.text = 'This vault is currently sealed';
@@ -271,13 +289,11 @@
 					this.$.errortoast.show();
 				},
 				_testSuccess: function() {
-					console.log('success');
 					this.$.checkpass.style.display = 'block';
 					this.$.checkfail.style.display = 'none';
 					this.approvedURL = true;
 				},
 				_testError: function() {
-					console.log('failure');
 					this.$.checkpass.style.display = 'none';
 					this.$.checkfail.style.display = 'block';
 					this.approvedURL = false;
@@ -312,7 +328,7 @@
 				_persistData: function() {
 					ipcRenderer.send('update-url', this.url);
 					ipcRenderer.send('update-user', this.username);
-					ipcRenderer.send('update-loginpage', this.selected);
+					ipcRenderer.send('update-loginpage', this.page);
 				}
 			});
 		})();
