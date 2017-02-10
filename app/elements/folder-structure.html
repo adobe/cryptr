@@ -16,6 +16,7 @@
 		}
 		paper-menu {
 			min-height: 36px;
+			padding: 0px;
 			--paper-menu-selected-item: {
 				color: var(--primary-color);
 			}
@@ -24,7 +25,7 @@
 			}
 		}
 		paper-menu iron-icon {
-			margin-right: 20px;
+			margin-right: 10px;
 			opacity: 0.54;
 		}
 		paper-menu a {
@@ -47,16 +48,21 @@
 		}
 	</style>
 	<template>
-		<paper-menu attr-for-selected="data-route" selected="[[route]]">
-			<a data-route="all" href="{{baseUrl}}all" class="noselect">
-				<iron-icon icon="folder-open"></iron-icon>
-				<span>All</span>
-			</a>
-
-			<template is="dom-repeat" items="{{secrets}}">
-				<a data-route="{{item.location}}" href="{{baseUrl}}folder/{{item.location}}" class="noselect">
-					<iron-icon icon="folder-open"></iron-icon>
-					<span>{{item.location}}</span>
+		<paper-menu attr-for-selected="data-route" selected="{{route}}" class="menu-content">
+			<template is="dom-repeat" items="{{secrets}}" filter="filterFolders">
+				<paper-submenu attr-for-selected="data-route" selected="{{route}}">
+						<a data-route="{{item.type}}/{{item.location}}" href="{{baseUrl}}folder/{{item.location}}" class="noselect menu-trigger" style="padding-left: {{indent}}px">
+							<iron-icon icon="folder-open"></iron-icon>
+							<span>{{item.name}}</span>
+						</a>
+					<paper-menu class="menu-content">
+						<folder-structure secrets="[[secrets]]" route="{{route}}" base-url="{{baseUrl}}" base-folder="{{item.location}}" indent="{{spacing}}"></folder-structure>
+					</paper-menu>
+				</paper-submenu>
+			</template>
+			<template is="dom-repeat" items="{{secrets}}" filter="filterSecrets">
+				<a data-route="{{item.type}}/{{item.location}}" href="{{baseUrl}}secret/{{item.location}}" class="noselect">
+					<span style="padding-left: {{indent}}px">{{item.name}}</span>
 				</a>
 			</template>
 		</paper-menu>
@@ -69,7 +75,24 @@
 				route: String,
 				baseURL: String,
 				secrets: Array,
-				baseFolder: String
+				baseFolder: String,
+				baseUrl: String,
+				spacing: Number,
+				indent: {
+					type: Number,
+					observer: 'watchIndent'
+				}
+			},
+			watchIndent: function(){
+				this.spacing = this.indent + 20;
+			},
+			filterFolders: function(item) {
+				if (item.parent == this.baseFolder) return item.type == 'folder';
+				else return false;
+			},
+			filterSecrets: function(item) {
+				if (item.parent == this.baseFolder) return item.type == 'secret';
+				else return false;
 			}
 		});
 	</script>

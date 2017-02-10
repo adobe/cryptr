@@ -25,7 +25,10 @@
 		});
 
 		page('/folder/*', function(data) {
-			app.route = data.params[0];
+			app.route = 'folder/' + data.params[0];
+		});
+		page('/secret/*', function(data) {
+			app.route = 'secret/' + data.params[0];
 		});
 
 		page('/search', function() {

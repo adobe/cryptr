@@ -26,7 +26,7 @@
 					<span class="menu-name noselect">Cryptr</span>
 				</paper-toolbar>
 
-				<span id="drawerMenuText" class="noselect">Home</span>
+				<span id="drawerMenuText" class="noselect">HOME</span>
 				<paper-menu attr-for-selected="data-route" selected="{{route}}">
 					<a data-route="home" href="{{baseUrl}}" class="noselect">
 						<iron-icon icon="dashboard"></iron-icon>
@@ -40,8 +40,10 @@
 					</template>
 				</paper-menu>
 
-				<span id="drawerMenuText" class="noselect">Folders</span>
-				<folder-structure secrets="[[secrets]]" route="{{route}}" base-url="{{baseUrl}}" base-folder="/"></folder-structure>
+				<span id="drawerMenuText" class="noselect">SECRETS</span>
+				<!-- <paper-menu attr-for-selected="data-route" selected="[[route]]"> -->
+					<folder-structure secrets="[[secrets]]" route="{{route}}" base-url="{{baseUrl}}" base-folder="secret" indent="35"></folder-structure>
+				<!-- </paper-menu> -->
 			</paper-scroll-header-panel>
 
 			<!-- Main Area -->
@@ -66,12 +68,9 @@
 							</paper-material>
 						</section>
 
-						<section data-route="all" style="height: 100%">
-							<secrets-manager data="{{data}}"></secrets-manager>
-						</section>
 						<template is="dom-repeat" items="{{secrets}}">
-							<section data-route="{{item.location}}" style="height: 100%">
-								This is a test: {{item.location}}
+							<section data-route="{{item.type}}/{{item.location}}" style="height: 100%">
+								This is a test: {{item.type}} {{item.name}}
 							</section>
 						</template>
 					</iron-pages>
