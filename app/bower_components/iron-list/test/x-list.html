@@ -35,7 +35,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       iron-list {
-        overflow: hidden;
         background-color: black;
       }
     </style>
@@ -101,7 +100,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     },
 
     _computedListHeight: function(listHeight) {
-      return 'height: ' + (listHeight) + 'px;';
+      return 'height: ' + (listHeight) + 'px; overflow: hidden;';
     },
 
     _computedTabIndex: function(tabIndex, useTabIndex) {

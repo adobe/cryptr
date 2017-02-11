@@ -9,8 +9,9 @@ let mainWindow;
 
 var path = require("path");
 var fs = require("fs");
-var initPath = path.join(app.getPath('appData'), "Cryptr/Cache/initvault.json");
-
+var initPath = path.join(app.getPath('appData'), "Cryptr");
+if (!fs.existsSync(initPath)) fs.mkdirSync(initPath);
+initPath += '/init.json';
 
 var settings = {};
 function createWindow() {

@@ -8,8 +8,14 @@
  * subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
  */
 
-(function(global) {
+// We declare it as a namespace to be compatible with JSCompiler.
+/** @const */ var MockInteractions = {};
+
+(function(scope, global) {
   'use strict';
+
+  // In case the var above was not global, or if it was renamed.
+  global.MockInteractions = scope;
 
   var HAS_NEW_MOUSE = (function() {
     var has = false;
@@ -22,7 +28,7 @@
   /**
    * Returns the (x,y) coordinates representing the middle of a node.
    *
-   * @param {!HTMLElement} node An element.
+   * @param {!Element} node An element.
    */
   function middleOfNode(node) {
     var bcr = node.getBoundingClientRect();
@@ -35,7 +41,7 @@
   /**
    * Returns the (x,y) coordinates representing the top left corner of a node.
    *
-   * @param {!HTMLElement} node An element.
+   * @param {!Element} node An element.
    */
   function topLeftOfNode(node) {
     var bcr = node.getBoundingClientRect();
@@ -51,7 +57,7 @@
    * identifier.
    *
    * @param {!Array<{ x: number, y: number }>} xyList A list of (x,y) coordinate objects.
-   * @param {!HTMLElement} node A target element node.
+   * @param {!Element} node A target element node.
    */
   function makeTouches(xyList, node) {
     var id = 0;
@@ -75,7 +81,7 @@
    * @param {string} type The type of TouchEvent to generate.
    * @param {{ x: number, y: number }} xy An (x,y) coordinate for the generated
    * TouchEvent.
-   * @param {!HTMLElement} node The target element node for the generated
+   * @param {!Element} node The target element node for the generated
    * TouchEvent to be dispatched on.
    */
   function makeSoloTouchEvent(type, xy, node) {
@@ -89,6 +95,8 @@
     var event;
 
     if (window.TouchEvent) {
+      touchEventInit.bubbles = true;
+      touchEventInit.cancelable = true;
       event = new TouchEvent(type, touchEventInit);
     } else {
       event = new CustomEvent(type, { bubbles: true, cancelable: true });
@@ -106,7 +114,7 @@
    *
    * @param {string} type The type of mouse event (such as 'tap' or 'down').
    * @param {{ x: number, y: number }} xy The (x,y) coordinates the mouse event should be fired from.
-   * @param {!HTMLElement} node The node to fire the event on.
+   * @param {!Element} node The node to fire the event on.
    */
   function makeMouseEvent(type, xy, node) {
     var props = {
@@ -143,10 +151,10 @@
    * Simulates a mouse move action by firing a `move` mouse event on a
    * specific node, between a set of coordinates.
    *
-   * @param {!HTMLElement} node The node to fire the event on.
+   * @param {!Element} node The node to fire the event on.
    * @param {Object} fromXY The (x,y) coordinates the dragging should start from.
    * @param {Object} toXY The (x,y) coordinates the dragging should end at.
-   * @param {?number} steps Optional. The numbers of steps in the move motion.
+   * @param {?number=} steps Optional. The numbers of steps in the move motion.
    *    If not specified, the default is 5.
    */
   function move(node, fromXY, toXY, steps) {
@@ -171,10 +179,10 @@
   /**
    * Simulates a mouse dragging action originating in the middle of a specific node.
    *
-   * @param {!HTMLElement} target The node to fire the event on.
+   * @param {!Element} target The node to fire the event on.
    * @param {?number} dx The horizontal displacement.
    * @param {?number} dy The vertical displacement
-   * @param {?number} steps Optional. The numbers of steps in the dragging motion.
+   * @param {?number=} steps Optional. The numbers of steps in the dragging motion.
    *    If not specified, the default is 5.
    */
   function track(target, dx, dy, steps) {
@@ -196,7 +204,7 @@
    * This event bubbles and is cancellable. If the (x,y) coordinates are
    * not specified, the middle of the node will be used instead.
    *
-   * @param {!HTMLElement} node The node to fire the event on.
+   * @param {!Element} node The node to fire the event on.
    * @param {{ x: number, y: number }=} xy Optional. The (x,y) coordinates the mouse event should be fired from.
    */
   function down(node, xy) {
@@ -209,7 +217,7 @@
    * This event bubbles and is cancellable. If the (x,y) coordinates are
    * not specified, the middle of the node will be used instead.
    *
-   * @param {!HTMLElement} node The node to fire the event on.
+   * @param {!Element} node The node to fire the event on.
    * @param {{ x: number, y: number }=} xy Optional. The (x,y) coordinates the mouse event should be fired from.
    */
   function up(node, xy) {
@@ -219,7 +227,7 @@
 
   /**
    * Generate a click event on a given node, optionally at a given coordinate.
-   * @param {!HTMLElement} node The node to fire the click event on.
+   * @param {!Element} node The node to fire the click event on.
    * @param {{ x: number, y: number }=} xy Optional. The (x,y) coordinates the mouse event should
    * be fired from.
    */
@@ -230,7 +238,7 @@
 
   /**
    * Generate a touchstart event on a given node, optionally at a given coordinate.
-   * @param {!HTMLElement} node The node to fire the click event on.
+   * @param {!Element} node The node to fire the click event on.
    * @param {{ x: number, y: number }=} xy Optional. The (x,y) coordinates the touch event should
    * be fired from.
    */
@@ -242,7 +250,7 @@
 
   /**
    * Generate a touchend event on a given node, optionally at a given coordinate.
-   * @param {!HTMLElement} node The node to fire the click event on.
+   * @param {!Element} node The node to fire the click event on.
    * @param {{ x: number, y: number }=} xy Optional. The (x,y) coordinates the touch event should
    * be fired from.
    */
@@ -256,11 +264,11 @@
    * by an asynchronous `up` and `tap` events on a specific node. Calls the
    *`callback` after the `tap` event is fired.
    *
-   * @param {!HTMLElement} target The node to fire the event on.
-   * @param {?Function} callback Optional. The function to be called after the action ends.
+   * @param {!Element} target The node to fire the event on.
+   * @param {?Function=} callback Optional. The function to be called after the action ends.
    * @param {?{
    *   emulateTouch: boolean
-   * }} options Optional. Configure the emulation fidelity of the mouse events.
+   * }=} options Optional. Configure the emulation fidelity of the mouse events.
    */
   function downAndUp(target, callback, options) {
     if (options && options.emulateTouch) {
@@ -280,10 +288,10 @@
    * Fires a 'tap' mouse event on a specific node. This respects the pointer-events
    * set on the node, and will not fire on disabled nodes.
    *
-   * @param {!HTMLElement} node The node to fire the event on.
+   * @param {!Element} node The node to fire the event on.
    * @param {?{
    *   emulateTouch: boolean
-   * }} options Optional. Configure the emulation fidelity of the mouse event.
+   * }=} options Optional. Configure the emulation fidelity of the mouse event.
    */
   function tap(node, options) {
     // Respect nodes that are disabled in the UI.
@@ -305,7 +313,7 @@
   /**
    * Focuses a node by firing a `focus` event. This event does not bubble.
    *
-   * @param {!HTMLElement} target The node to fire the event on.
+   * @param {!Element} target The node to fire the event on.
    */
   function focus(target) {
     Polymer.Base.fire('focus', {}, {
@@ -317,7 +325,7 @@
   /**
    * Blurs a node by firing a `blur` event. This event does not bubble.
    *
-   * @param {!HTMLElement} target The node to fire the event on.
+   * @param {!Element} target The node to fire the event on.
    */
   function blur(target) {
     Polymer.Base.fire('blur', {}, {
@@ -362,7 +370,7 @@
   /**
    * Fires a keyboard event on a specific node. This event bubbles and is cancellable.
    *
-   * @param {!HTMLElement} target The node to fire the event on.
+   * @param {!Element} target The node to fire the event on.
    * @param {string} type The type of keyboard event (such as 'keyup' or 'keydown').
    * @param {number} keyCode The keyCode for the event.
    * @param {(string|Array<string>)=} modifiers The key modifiers for the event.
@@ -376,7 +384,7 @@
   /**
    * Fires a 'keydown' event on a specific node. This event bubbles and is cancellable.
    *
-   * @param {!HTMLElement} target The node to fire the event on.
+   * @param {!Element} target The node to fire the event on.
    * @param {number} keyCode The keyCode for the event.
    * @param {(string|Array<string>)=} modifiers The key modifiers for the event.
    *     Accepted values are shift, ctrl, alt, meta.
@@ -389,7 +397,7 @@
   /**
    * Fires a 'keyup' event on a specific node. This event bubbles and is cancellable.
    *
-   * @param {!HTMLElement} target The node to fire the event on.
+   * @param {!Element} target The node to fire the event on.
    * @param {number} keyCode The keyCode for the event.
    * @param {(string|Array<string>)=} modifiers The key modifiers for the event.
    *     Accepted values are shift, ctrl, alt, meta.
@@ -403,7 +411,7 @@
    * Simulates a complete key press by firing a `keydown` keyboard event, followed
    * by an asynchronous `keyup` event on a specific node.
    *
-   * @param {!HTMLElement} target The node to fire the event on.
+   * @param {!Element} target The node to fire the event on.
    * @param {number} keyCode The keyCode for the event.
    * @param {(string|Array<string>)=} modifiers The key modifiers for the event.
    *     Accepted values are shift, ctrl, alt, meta.
@@ -420,7 +428,7 @@
    * Simulates a complete 'enter' key press by firing a `keydown` keyboard event,
    * followed by an asynchronous `keyup` event on a specific node.
    *
-   * @param {!HTMLElement} target The node to fire the event on.
+   * @param {!Element} target The node to fire the event on.
    */
   function pressEnter(target) {
     pressAndReleaseKeyOn(target, 13);
@@ -430,28 +438,30 @@
    * Simulates a complete 'space' key press by firing a `keydown` keyboard event,
    * followed by an asynchronous `keyup` event on a specific node.
    *
-   * @param {!HTMLElement} target The node to fire the event on.
+   * @param {!Element} target The node to fire the event on.
    */
   function pressSpace(target) {
     pressAndReleaseKeyOn(target, 32);
   }
 
-  global.MockInteractions = {
-    focus: focus,
-    blur: blur,
-    down: down,
-    up: up,
-    downAndUp: downAndUp,
-    tap: tap,
-    track: track,
-    pressAndReleaseKeyOn: pressAndReleaseKeyOn,
-    pressEnter: pressEnter,
-    pressSpace: pressSpace,
-    keyDownOn: keyDownOn,
-    keyUpOn: keyUpOn,
-    keyboardEventFor: keyboardEventFor,
-    keyEventOn: keyEventOn,
-    middleOfNode: middleOfNode,
-    topLeftOfNode: topLeftOfNode
-  };
-})(this);
+  scope.focus = focus;
+  scope.blur = blur;
+  scope.down = down;
+  scope.up = up;
+  scope.downAndUp = downAndUp;
+  scope.tap = tap;
+  scope.move = move;
+  scope.touchstart = touchstart;
+  scope.touchend = touchend;
+  scope.makeSoloTouchEvent = makeSoloTouchEvent;
+  scope.track = track;
+  scope.pressAndReleaseKeyOn = pressAndReleaseKeyOn;
+  scope.pressEnter = pressEnter;
+  scope.pressSpace = pressSpace;
+  scope.keyDownOn = keyDownOn;
+  scope.keyUpOn = keyUpOn;
+  scope.keyboardEventFor = keyboardEventFor;
+  scope.keyEventOn = keyEventOn;
+  scope.middleOfNode = middleOfNode;
+  scope.topLeftOfNode = topLeftOfNode;
+})(MockInteractions, this);

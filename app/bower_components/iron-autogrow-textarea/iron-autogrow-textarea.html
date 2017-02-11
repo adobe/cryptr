@@ -277,6 +277,18 @@ Custom property | Description | Default
       this.$.textarea.selectionEnd = value;
     },
 
+    attached: function() {
+      /* iOS has an arbitrary left margin of 3px that isn't present
+       * in any other browser, and means that the paper-textarea's cursor
+       * overlaps the label.
+       * See https://github.com/PolymerElements/paper-input/issues/468.
+       */
+      var IS_IOS = navigator.userAgent.match(/iP(?:[oa]d|hone)/);
+      if (IS_IOS) {
+        this.$.textarea.style.marginLeft = '-3px';
+      }
+    },
+
     /**
      * Returns true if `value` is valid. The validator provided in `validator`
      * will be used first, if it exists; otherwise, the `textarea`'s validity

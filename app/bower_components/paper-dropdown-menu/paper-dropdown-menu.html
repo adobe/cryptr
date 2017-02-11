@@ -98,7 +98,8 @@ respectively.
       on-iron-deselect="_onIronDeselect"
       opened="{{opened}}"
       close-on-activate
-      allow-outside-scroll="[[allowOutsideScroll]]">
+      allow-outside-scroll="[[allowOutsideScroll]]"
+      restore-focus-on-close="[[restoreFocusOnClose]]">
       <div class="dropdown-trigger">
         <paper-ripple></paper-ripple>
         <!-- paper-input has type="text" for a11y, do not remove -->
@@ -266,6 +267,14 @@ respectively.
            */
           dynamicAlign: {
             type: Boolean
+          },
+            
+          /**
+           * Whether focus should be restored to the dropdown when the menu closes.
+           */
+          restoreFocusOnClose: {
+            type: Boolean,
+            value: true
           },
         },
 
