@@ -100,7 +100,7 @@ layout means (e.g. the `flex` or `fit` classes).
 <body>
   <template is="dom-bind">
     <app-toolbar>App name</app-toolbar>
-    <iron-list target="document" items="[[items]]">
+    <iron-list scroll-target="document" items="[[items]]">
       <template>
         ...
       </template>

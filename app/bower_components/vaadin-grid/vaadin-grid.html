@@ -754,7 +754,7 @@ See the [demo](demo/index.html) for use case examples.
       /**
        * A function which is used for generating CSS class names for data cells.
        *
-       * See the API documentation for the “cell” object for more details about
+       * See the API documentation for the `Cell` object for more details about
        * the parameter of this function.
        *
        * #### Example:
@@ -765,8 +765,8 @@ See the [demo](demo/index.html) for use case examples.
        *    }
        *  };
        * ```
-       * @property {function} cellClassGenerator
-       * @type {function}
+       * @property {Function} cellClassGenerator
+       * @type {Function}
        */
       cellClassGenerator: {
         type: Function,
@@ -782,7 +782,7 @@ See the [demo](demo/index.html) for use case examples.
        * ```
        *
        * @default false
-       * @type {boolean}
+       * @type {Boolean}
        */
       disabled: {
         type: Boolean,
@@ -794,10 +794,10 @@ See the [demo](demo/index.html) for use case examples.
       /**
        * Object for controlling and accessing the header rows in the grid.
        *
-       * See the API documentation for “header” for more details.
+       * See the API documentation for `Header` for more details.
        *
-       * @property {header} footer
-       * @type {header}
+       * @property {Header} footer
+       * @type {Header}
        */
       header: {
         type: Object,
@@ -839,10 +839,10 @@ See the [demo](demo/index.html) for use case examples.
       /**
        * Object for controlling and accessing the footer rows in the grid.
        *
-       * See the API documentation for “footer” for more details.
+       * See the API documentation for `Footer` for more details.
        *
-       * @property {footer} footer
-       * @type {footer}
+       * @property {Footer} footer
+       * @type {Footer}
        */
       footer: {
         type: Object,
@@ -891,7 +891,7 @@ See the [demo](demo/index.html) for use case examples.
        * ```
        *
        * @default 0
-       * @type {number}
+       * @type {Number}
        */
       frozenColumns: {
         type: Number,
@@ -908,7 +908,7 @@ See the [demo](demo/index.html) for use case examples.
        * lazily to the grid, for example from a REST service, to get only the
        * items that are necessary in the grid viewport.
        *
-       * See the API documentation for "items function" for more details.
+       * See the API documentation for `ItemsFunction` for more details.
        *
        * For an in-memory list of items, use the `items` array property instead.
        *
@@ -936,8 +936,8 @@ See the [demo](demo/index.html) for use case examples.
        *  };
        *  ```
        *
-       * @property {(Array<Object>|function)} items
-       * @type {(Array<Object>|function)}
+       * @property {(Array<Object>|Function)} items
+       * @type {(Array<Object>|Function)}
        */
       items: {
         type: Object
@@ -946,11 +946,11 @@ See the [demo](demo/index.html) for use case examples.
       /**
        * The array of columns attached to the grid.
        *
-       * See the API documentation for “column” for more details about the
+       * See the API documentation for `Column` for more details about the
        * column objects.
        *
-       * @property {Array<object>} columns
-       * @type {Array<object>}
+       * @property {Array<Object>} columns
+       * @type {Array<Object>}
        */
       columns: {
         type: Array,
@@ -960,7 +960,7 @@ See the [demo](demo/index.html) for use case examples.
       /**
        * A function which is used for generating CSS class names for data rows.
        *
-       * See the API documentation for the “row” object for more details about
+       * See the API documentation for the `Row` object for more details about
        * the parameter of this function.
        *
        * #### Example:
@@ -971,8 +971,8 @@ See the [demo](demo/index.html) for use case examples.
        * };
        *```
        *
-       * @property {function} rowClassGenerator
-       * @type {function}
+       * @property {Function} rowClassGenerator
+       * @type {Function}
        */
       rowClassGenerator: {
         type: Function,
@@ -992,8 +992,8 @@ See the [demo](demo/index.html) for use case examples.
        * };
        *```
        *
-       * @property {function} rowDetailsGenerator
-       * @type {function}
+       * @property {Function} rowDetailsGenerator
+       * @type {Function}
        */
       rowDetailsGenerator: {
         type: Function,
@@ -1003,10 +1003,10 @@ See the [demo](demo/index.html) for use case examples.
       /**
        * Object for controlling and accessing the selected rows in the grid.
        *
-       * See the API documentation for the “selection” object for more details.
+       * See the API documentation for the `Selection` object for more details.
        *
-       * @property {selection} selection
-       * @type {selection}
+       * @property {Selection} selection
+       * @type {Selection}
        * @default {}
        */
       selection: {
@@ -1059,10 +1059,10 @@ See the [demo](demo/index.html) for use case examples.
        * the array defines the order of sort (if the grid is sorted by
        * multiple columns).
        *
-       * See the API documentation for the “sort-order” object for more details.
+       * See the API documentation for the `SortOrder` object for more details.
        *
-       * @property {Array<sort-order>}
-       * @type {Array<sort-order>}
+       * @property {Array<SortOrder>}
+       * @type {Array<SortOrder>}
        */
       sortOrder: {
         type: Array,
@@ -1093,9 +1093,9 @@ See the [demo](demo/index.html) for use case examples.
        * <vaadin-grid visible-rows="5">...</vaadin-grid>
        * ```
        *
-       * @property {number} visibleRows
+       * @property {Number} visibleRows
        * @default 10
-       * @type {number}
+       * @type {Number}
        */
       visibleRows: {
         type: Number,
@@ -1110,9 +1110,9 @@ See the [demo](demo/index.html) for use case examples.
       /**
        * Boolean property to set whether column reordering is allowed by the grid.
        *
-       * @property {boolean} columnReorderingAllowed
+       * @property {Boolean} columnReorderingAllowed
        * @default false
-       * @type {boolean}
+       * @type {Boolean}
        */
       columnReorderingAllowed: {
         type: Boolean,
@@ -1127,12 +1127,12 @@ See the [demo](demo/index.html) for use case examples.
       },
 
       /**
-       * List of the events that should be observed in the internal grid implementation.
+       * List of the pointer events that should be observed in the internal grid implementation.
        * When any of the observed events is performed, the grid will fire a `detailed-event`
        * where -event is replaced by the original event type.
        *
-       * @property {Array<Sting>} detailedEvents
-       * @type {Array<Sting>}
+       * @property {Array<String>} detailedEvents
+       * @type {Array<String>}
        */
       detailedEvents: {
         type: Array,
@@ -1333,8 +1333,8 @@ See the [demo](demo/index.html) for use case examples.
      * grid.scrollToRow(10, "end").then(function() {...});
      * ```
      *
-     * @param {number} index - Zero-based index of the row to scroll to.
-     * @param {string} scrollDestination - Desired destination placement of scrolled-to-row. Valid values are `any`, `start`, `middle` and `end`. Defaults to `any`.
+     * @param {Number} index - Zero-based index of the row to scroll to.
+     * @param {String} scrollDestination - Desired destination placement of scrolled-to-row. Valid values are `any`, `start`, `middle` and `end`. Defaults to `any`.
      * @return {vaadin-grid}
      */
     scrollToRow: function(index, scrollDestination) {
@@ -1381,8 +1381,8 @@ See the [demo](demo/index.html) for use case examples.
     /**
      * Adds a new column. Column is added at the end if `beforeColumn` is not defined.
      *
-     * @param {column} column - Column object to be added.
-     * @param {string} beforeColumn - Index or id of the column before which the new column should be added.
+     * @param {Column} column - Column object to be added.
+     * @param {String} beforeColumn - Index or id of the column before which the new column should be added.
      */
     addColumn: function(column, beforeColumn) {
       this._grid.addColumn(column, beforeColumn);
@@ -1392,7 +1392,7 @@ See the [demo](demo/index.html) for use case examples.
      * Removes a column with certain id
      *
      * @method removeColumn
-     * @param {string} id - Column to be removed.
+     * @param {String} id - Column to be removed.
      */
     removeColumn: function(id) {
       this._grid.removeColumn(id);
@@ -1439,8 +1439,8 @@ See the [demo](demo/index.html) for use case examples.
      * Shows or hides row details for the row at the given index.
      *
      * @method setRowDetailsVisible
-     * @param {number} rowIndex
-     * @param {boolean} visible
+     * @param {Number} rowIndex
+     * @param {Boolean} visible
      */
     setRowDetailsVisible: function(rowIndex, visible) {
       this._grid.setRowDetailsVisible(rowIndex, visible);
@@ -1469,9 +1469,9 @@ See the [demo](demo/index.html) for use case examples.
      * first.
      *
      * @method getItem
-     * @param {number} rowIndex - Index of the row.
+     * @param {Number} rowIndex - Index of the row.
      * @param {Function} callback - Gets arguments (err, item) where item is the desired data item.
-     * @param {boolean} onlyCached - Only fetch cached rows (don't fall back to data source request).
+     * @param {Boolean} onlyCached - Only fetch cached rows (don't fall back to data source request).
      */
     getItem: function(rowIndex, callback, onlyCached) {
       this._grid.getItem(rowIndex, callback, onlyCached);
@@ -1480,7 +1480,9 @@ See the [demo](demo/index.html) for use case examples.
     _onDetailed: function(event) {
       var details = this._grid.getElementDetails(Polymer.dom(event).rootTarget);
       details.sourceEvent = event;
-      var detailedEvent = this.fire('detailed-' + event.type, details);
+      var detailedEvent = this.fire('detailed-' + event.type, details, {
+        cancelable: event.cancelable
+      });
       if (detailedEvent.defaultPrevented) {
         event.stopPropagation();
         event.preventDefault();

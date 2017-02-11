@@ -155,7 +155,7 @@ Custom property | Description | Default
         @apply(--paper-drawer-panel-drawer-container);
       }
 
-      .transition > #drawer {
+      .transition-drawer {
         transition: -webkit-transform ease-in-out 0.3s, width ease-in-out 0.3s, visibility 0.3s;
         transition: transform ease-in-out 0.3s, width ease-in-out 0.3s, visibility 0.3s;
       }
@@ -570,7 +570,11 @@ Custom property | Description | Default
          * @method openDrawer
          */
         openDrawer: function() {
-          this.selected = 'drawer';
+          requestAnimationFrame(function() {
+            this.toggleClass("transition-drawer", true, this.$.drawer);
+            this.selected = 'drawer';
+          }.bind(this));
+          
         },
 
         /**
@@ -579,7 +583,10 @@ Custom property | Description | Default
          * @method closeDrawer
          */
         closeDrawer: function() {
-          this.selected = 'main';
+          requestAnimationFrame(function() {
+            this.toggleClass("transition-drawer", true, this.$.drawer);
+            this.selected = 'main';
+          }.bind(this));
         },
 
         _onTransitionEnd: function (e) {
@@ -591,9 +598,14 @@ Custom property | Description | Default
           if (e.propertyName === 'left' || e.propertyName === 'right') {
             this.notifyResize();
           }
-          if (e.propertyName === 'transform' && this.selected === 'drawer') {
-            var focusedChild = this._getAutoFocusedNode();
-            focusedChild && focusedChild.focus();
+          if (e.propertyName === 'transform') {
+            requestAnimationFrame(function() {
+              this.toggleClass("transition-drawer", false, this.$.drawer);
+            }.bind(this));
+            if (this.selected === 'drawer') {
+              var focusedChild = this._getAutoFocusedNode();
+              focusedChild && focusedChild.focus();
+            }
           }
         },
 

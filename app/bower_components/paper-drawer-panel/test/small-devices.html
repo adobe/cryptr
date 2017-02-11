@@ -64,7 +64,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         f.set('forceNarrow', true);
         f._forceNarrowChanged();
 
-        Polymer.Base.async(function() {
+       requestAnimationFrame(function() {
           var drawerBoundingRect = drawer.getBoundingClientRect();
           var mainStyle = window.getComputedStyle(main);
           expect(f._isMainSelected()).to.be.equal(true);
@@ -83,7 +83,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         f.set('forceNarrow', true);
         f._forceNarrowChanged();
 
-        Polymer.Base.async(function() {
+        requestAnimationFrame(function() {
           var drawerBoundingRect = drawer.getBoundingClientRect();
           var mainStyle = window.getComputedStyle(main);
           expect(drawerBoundingRect.right).to.be.equal(f.offsetWidth + 256);
@@ -102,7 +102,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         f._forceNarrowChanged();
         f.openDrawer();
 
-        Polymer.Base.async(function() {
+       requestAnimationFrame(function() {
           var drawerBoundingRect = drawer.getBoundingClientRect();
           var mainStyle = window.getComputedStyle(main);
           expect(f.selected).to.be.equal('drawer');
@@ -123,7 +123,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         f._forceNarrowChanged();
         f.openDrawer();
 
-        Polymer.Base.async(function() {
+        requestAnimationFrame(function() {
           var drawerBoundingRect = drawer.getBoundingClientRect();
           var mainStyle = window.getComputedStyle(main);
           expect(drawerBoundingRect.right).to.be.equal(f.offsetWidth);

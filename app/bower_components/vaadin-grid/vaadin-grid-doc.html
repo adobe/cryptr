@@ -6,10 +6,10 @@
   /**
    * Object referencing a cell in the grid body and its data.
    *
-   * A `cell` object is passed as a parameter for both column renderers and for
+   * A `Cell` object is passed as a parameter for both column renderers and for
    * the cell class generator.
    *
-   * @polymerBehavior cell
+   * @polymerBehavior Cell
    */
   Polymer.Vaadin.Cell = {
     properties: {
@@ -25,10 +25,10 @@
       element: HTMLElement,
 
       /**
-       * Owner row of the cell. See the API documentation for `row` for more
+       * Owner row of the cell. See the API documentation for `Row` for more
        * details.
        *
-       * @property {row} row
+       * @property {Row} row
        */
       row: Object,
 
@@ -59,7 +59,7 @@
    * column.width = "200px";
    * ```
    *
-   * @polymerBehavior column
+   * @polymerBehavior Column
    */
   Polymer.Vaadin.Column = {
     properties: {
@@ -205,10 +205,10 @@
        *      cell.element.innerHTML = '$' + cell.data;
        *  };
        *  ```
-       * @property {function} renderer
-       * @param {cell} cell - Reference to the cell being rendered. See the
-       * documentation for `cell` for more details.
-       * @type {function}
+       * @property {Function} renderer
+       * @param {Cell} cell - Reference to the cell being rendered. See the
+       * documentation for `Cell` for more details.
+       * @type {Function}
        */
       renderer: function(cell) {},
 
@@ -216,7 +216,7 @@
        * Enables sorting the column data by the end user.
        *
        * To programmatically or declaratively sort the columns, use the
-       * `grid.sortOrder`property, or the `sort-direction` attribute. Columns
+       * `grid.sortOrder` property, or the `sort-direction` attribute. Columns
        * can be sorted even if this property is `false`, it only controls the
        * end user sorting.
        *
@@ -261,7 +261,7 @@
    * var footerCell = grid.footer.getCell(0,0);
    * ```
    *
-   * @polymerBehavior footer
+   * @polymerBehavior Footer
    */
   Polymer.Vaadin.Footer = {
     properties: {
@@ -296,7 +296,7 @@
     /**
      * Adds a new footer row.
      *
-     * @param {number} index - Index of the new footer row. The footer rows in
+     * @param {Number} index - Index of the new footer row. The footer rows in
      * subsequent indexes are shifted by one index. If undefined, the new row is
      * inserted as last
      */
@@ -305,24 +305,24 @@
     /**
      * Removes a specific footer row.
      *
-     * @param {number} index - Index of the row to be removed.
+     * @param {Number} index - Index of the row to be removed.
      */
     removeRow: function(index) {},
 
     /**
      * Returns an object reference to a particular footer cell.
      *
-     * @param {number} rowIndex - Index of the row.
-     * @param {number|string} column - Index or name of the column.
-     * @return {header-and-footer-cell} An object reference to a particular footer cell.
+     * @param {Number} rowIndex - Index of the row.
+     * @param {Number|String} column - Index or name of the column.
+     * @return {HeaderAndFooterCell} An object reference to a particular footer cell.
      */
     getCell: function(rowIndex, column) {},
 
     /**
      * Sets the CSS class name for a footer row.
      *
-     * @param {number} rowIndex - Index of the row.
-     * @param {string} className - New class name.
+     * @param {Number} rowIndex - Index of the row.
+     * @param {String} className - New class name.
      */
     setRowClassName: function(rowIndex, className) {}
   };
@@ -336,7 +336,7 @@
    * var headerCell = grid.header.getCell(1,0);
    * ```
    *
-   * @polymerBehavior header
+   * @polymerBehavior Header
    */
   Polymer.Vaadin.Header = {
     properties: {
@@ -378,7 +378,7 @@
     /**
      * Adds a new header row.
      *
-     * @param {number} index - Index of the new header row. The header rows in
+     * @param {Number} index - Index of the new header row. The header rows in
      * subsequent indexes are shifted by one index. If undefined, the new row is
      * inserted as last.
      */
@@ -387,24 +387,24 @@
     /**
      * Removes a specific header row.
      *
-     * @param {number} index - Index of the row to be removed.
+     * @param {Number} index - Index of the row to be removed.
      */
     removeRow: function(index) {},
 
     /**
      * Returns an object reference to a particular header cell.
      *
-     * @param {number} rowIndex - Index of the row.
-     * @param {number|string} column - Index or name of the column.
-     * @return {header-and-footer-cell} An object reference to a particular header cell.
+     * @param {Number} rowIndex - Index of the row.
+     * @param {Number|String} column - Index or name of the column.
+     * @return {HeaderAndFooterCell} An object reference to a particular header cell.
      */
     getCell: function(rowIndex, column) {},
 
     /**
      * Sets the CSS class name for a header row.
      *
-     * @param {number} rowIndex - Index of the row.
-     * @param {string} className - New class name.
+     * @param {Number} rowIndex - Index of the row.
+     * @param {String} className - New class name.
      */
     setRowClassName: function(rowIndex, className) {}
   };
@@ -419,7 +419,7 @@
    * headerCell.className = "filter";
    * ```
    *
-   * @polymerBehavior header-and-footer-cell
+   * @polymerBehavior HeaderAndFooterCell
    */
   Polymer.Vaadin.HeaderAndFooterCell = {
     properties: {
@@ -464,7 +464,7 @@
    * }
    * ```
    *
-   * @polymerBehavior items-function
+   * @polymerBehavior ItemsFunction
    */
   Polymer.Vaadin.ItemsFunction = {
     properties: {
@@ -483,7 +483,7 @@
        * Sorting order for the fetched data items.
        *
        * See the API documentation for the `sortOrder` property and the
-       * “SortOrder” object for more details.
+       * `SortOrder` object for more details.
        *
        * @property {Array<SortOrder>} sortOrder
        * @type {Array<SortOrder>}
@@ -495,14 +495,14 @@
   /**
    * Object referencing to a row and it's data.
    *
-   * A `row` object is passed as a parameter to the row class generator
+   * A `Row` object is passed as a parameter to the row class generator
    * function.
    *
-   * A `row` object is also referenced from a `cell` object, passed as a
+   * A `Row` object is also referenced from a `Cell` object, passed as a
    * parameter to column renderer functions and the cell class generator
    * function.
    *
-   * @polymerBehavior row
+   * @polymerBehavior Row
    */
   Polymer.Vaadin.Row = {
     properties: {
@@ -548,7 +548,7 @@
    * });
    * ```
    *
-   * @polymerBehavior selection
+   * @polymerBehavior Selection
    */
   Polymer.Vaadin.Selection = {
     properties: {
@@ -588,13 +588,13 @@
 
     /**
      * Select a row.
-     * @param {number} index – Index of the row to select.
+     * @param {Number} index – Index of the row to select.
      */
     select: function(index) {},
 
     /**
      * Deselect a row.
-     * @param {number} index – Index of the row to deselect.
+     * @param {Number} index – Index of the row to deselect.
      */
     deselect: function(index) {},
 
@@ -618,10 +618,10 @@
     /**
      * Selected row indexes.
      *
-     * @param {function} iterator (optional) - A function to iterate over the selected indexes. If the function returns values, it is used to map the indexes to a new array.
-     * @param {number} startIndex (optional) - Provide a starting index if you wish to process the selection array in batches.
-     * @param {number} endIndex (optional) - Used together with startIndex to process the selection in batches.
-     * @return {Array<number>} Indexes of the selected rows.
+     * @param {Function} iterator (optional) - A function to iterate over the selected indexes. If the function returns values, it is used to map the indexes to a new array.
+     * @param {Number} startIndex (optional) - Provide a starting index if you wish to process the selection array in batches.
+     * @param {Number} endIndex (optional) - Used together with startIndex to process the selection in batches.
+     * @return {Array<Number>} Indexes of the selected rows.
      */
     selected: function(iterator, startIndex, endIndex) {},
 
@@ -629,10 +629,10 @@
      * Deselected row indexes. Only returns indexes when selection mode is
      * "all", otherwise returns an empty array.
      *
-     * @param {function} iterator (optional) - A function to iterate over the deselected indexes. If the function returns values, it is used to map the indexes to a new array.
-     * @param {number} startIndex (optional) - Provide a starting index if you wish to process the deselection array in batches.
-     * @param {number} endIndex (optional) - Used together with startIndex to process the deselection in batches.
-     * @return {Array<number>} Indexes of the deselected rows.
+     * @param {Function} iterator (optional) - A function to iterate over the deselected indexes. If the function returns values, it is used to map the indexes to a new array.
+     * @param {Number} startIndex (optional) - Provide a starting index if you wish to process the deselection array in batches.
+     * @param {Number} endIndex (optional) - Used together with startIndex to process the deselection in batches.
+     * @return {Array<Number>} Indexes of the deselected rows.
      */
     deselected: function() {}
   };
@@ -655,7 +655,7 @@
    * ];
    * ```
    *
-   * @polymerBehavior sort-order
+   * @polymerBehavior SortOrder
    */
   Polymer.Vaadin.SortOrder = {
     properties: {

@@ -5,7 +5,7 @@
     "web-components",
     "polymer"
   ],
-  "version": "1.0.2",
+  "version": "1.0.3",
   "homepage": "https://github.com/PolymerElements/iron-scroll-threshold",
   "authors": [
     "The Polymer Authors"
@@ -26,11 +26,11 @@
     "webcomponentsjs": "webcomponents/webcomponentsjs#^0.7.2",
     "web-component-tester": "^4.0.0"
   },
-  "_release": "1.0.2",
+  "_release": "1.0.3",
   "_resolution": {
     "type": "version",
-    "tag": "v1.0.2",
-    "commit": "3b0ded11ea87703a4f1ef48cea93226fb0e71ef1"
+    "tag": "v1.0.3",
+    "commit": "77e1c4bf204e26ed07d670374608f3a050b9206c"
   },
   "_source": "git://github.com/PolymerElements/iron-scroll-threshold.git",
   "_target": "^1.0.0",

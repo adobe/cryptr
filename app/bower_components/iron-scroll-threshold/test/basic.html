@@ -106,12 +106,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         });
       });
 
-      test('checkScrollThesholds', function(done) {
+      test('checkScrollThresholds', function(done) {
         flush(function() {
           scrollThreshold._scrollTop = scrollThreshold.scrollTarget.scrollHeight;
 
           assert.isFalse(scrollThreshold.lowerTriggered, 'check assumption');
-          scrollThreshold.checkScrollThesholds();
+          scrollThreshold.checkScrollThresholds();
           assert.isTrue(scrollThreshold.lowerTriggered, 'check triggers');
           scrollThreshold.clearTriggers();
           assert.isFalse(scrollThreshold.lowerTriggered, 'reset triggers');
@@ -126,10 +126,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           scrollThreshold._scrollLeft = scrollThreshold.scrollTarget.scrollWidth;
 
           assert.isFalse(scrollThreshold.lowerTriggered, 'check assumption');
-          scrollThreshold.checkScrollThesholds();
+          scrollThreshold.checkScrollThresholds();
           assert.isTrue(scrollThreshold.lowerTriggered, 'check lowerTriggered');
           scrollThreshold._scrollLeft = 0;
-          scrollThreshold.checkScrollThesholds();
+          scrollThreshold.checkScrollThresholds();
           assert.isTrue(scrollThreshold.upperTriggered, 'upperTriggered');
           done();
         });
@@ -187,12 +187,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         });
       });
 
-      test('checkScrollThesholds', function(done) {
+      test('checkScrollThresholds', function(done) {
         flush(function() {
           scrollThreshold._scrollTop = scrollThreshold.scrollTarget.scrollHeight;
 
           assert.isFalse(scrollThreshold.lowerTriggered, 'check assumption');
-          scrollThreshold.checkScrollThesholds();
+          scrollThreshold.checkScrollThresholds();
           assert.isTrue(scrollThreshold.lowerTriggered, 'check triggers');
           scrollThreshold.clearTriggers();
           assert.isFalse(scrollThreshold.lowerTriggered, 'reset triggers');
@@ -207,10 +207,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           scrollThreshold._scrollLeft = scrollThreshold.scrollTarget.scrollWidth;
 
           assert.isFalse(scrollThreshold.lowerTriggered, 'check assumption');
-          scrollThreshold.checkScrollThesholds();
+          scrollThreshold.checkScrollThresholds();
           assert.isTrue(scrollThreshold.lowerTriggered, 'check lowerTriggered');
           scrollThreshold._scrollLeft = 0;
-          scrollThreshold.checkScrollThesholds();
+          scrollThreshold.checkScrollThresholds();
           assert.isTrue(scrollThreshold.upperTriggered, 'upperTriggered');
           done();
         });

@@ -1,6 +1,6 @@
 {
   "name": "vaadin-grid",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "authors": [
     "Vaadin Ltd"
   ],
@@ -36,17 +36,17 @@
     "iron-test-helpers": "polymerelements/iron-test-helpers#~1.0.6",
     "test-fixture": "polymerelements/test-fixture#~1.0.1",
     "iron-component-page": "polymerelements/iron-component-page#~1.1.0",
-    "elements-demo-resources": "vaadin/elements-demo-resources#master"
+    "elements-demo-resources": "vaadin/elements-demo-resources#master",
+    "iron-demo-helpers": "polymerelements/iron-demo-helpers#^1.0.0"
   },
   "homepage": "https://github.com/vaadin/vaadin-grid",
-  "_release": "1.2.0",
+  "_release": "1.2.1",
   "_resolution": {
     "type": "version",
-    "tag": "1.2.0",
-    "commit": "2821e80e49f43b15b9b07ee5bae2507fdecbbc81"
+    "tag": "v1.2.1",
+    "commit": "6dd1dc93e356e365f41ec3a2e56c7ff5c88a710e"
   },
   "_source": "https://github.com/vaadin/vaadin-grid.git",
   "_target": "^1.2.0",
-  "_originalSource": "vaadin-grid",
-  "_direct": true
+  "_originalSource": "vaadin-grid"
 }

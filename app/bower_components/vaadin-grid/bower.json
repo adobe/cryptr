@@ -36,6 +36,7 @@
     "iron-test-helpers": "polymerelements/iron-test-helpers#~1.0.6",
     "test-fixture": "polymerelements/test-fixture#~1.0.1",
     "iron-component-page": "polymerelements/iron-component-page#~1.1.0",
-    "elements-demo-resources": "vaadin/elements-demo-resources#master"
+    "elements-demo-resources": "vaadin/elements-demo-resources#master",
+    "iron-demo-helpers": "polymerelements/iron-demo-helpers#^1.0.0"
   }
 }

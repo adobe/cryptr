@@ -28,7 +28,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
     <test-fixture id="test">
       <template>
-        <iron-collapse id="collapse" opened>
+        <iron-collapse opened>
           <div style="height:100px;">
             Lorem ipsum
           </div>
@@ -36,10 +36,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       </template>
     </test-fixture>
 
-    <test-fixture id="test-empty">
-    <template>
-        <iron-collapse id="collapse" opened>
-        </iron-collapse>
+    <test-fixture id="empty">
+      <template>
+        <iron-collapse opened></iron-collapse>
       </template>
     </test-fixture>
 
@@ -63,6 +62,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           assert.isTrue(!collapse.noAnimation, '`noAnimation` is falsy');
         });
 
+        test('not transitioning on attached', function() {
+          assert.isTrue(!collapse.transitioning, '`transitioning` is falsy');
+        });
+
         test('horizontal attribute', function() {
           assert.equal(collapse.horizontal, false);
         });
@@ -75,11 +78,25 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           collapse.opened = false;
           // Animation got enabled.
           assert.notEqual(collapse.style.transitionDuration, '0s');
+          assert.equal(collapse.transitioning, true, 'transitioning became true');
           collapse.addEventListener('transitionend', function() {
             // Animation disabled.
             assert.equal(collapse.style.transitionDuration, '0s');
+            assert.equal(collapse.transitioning, false, 'transitioning became false');
             done();
           });
+        });
+
+        test('transitioning updated only during transitions between open/close states', function() {
+          var spy = sinon.spy();
+          collapse.addEventListener('transitioning-changed', spy);
+          collapse.noAnimation = true;
+          assert.equal(spy.callCount, 0, 'transitioning not affected by noAnimation');
+          collapse.horizontal = true;
+          assert.equal(spy.callCount, 0, 'transitioning not affected by horizontal');
+          collapse.opened = false;
+          assert.equal(spy.callCount, 2, 'transitioning changed twice');
+          assert.equal(collapse.transitioning, false, 'transitioning is false');
         });
 
         test('enableTransition(false) disables animations', function() {
@@ -162,14 +179,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         var collapse;
 
         setup(function() {
-          collapse = fixture('test-empty');
+          collapse = fixture('empty');
         });
 
         test('empty&opened shows dynamically loaded content', function(done) {
           flush(function () {
             collapse.toggle();
             collapse.toggle();
-            assert.equal(collapse.style.maxHeight, "");
+            assert.equal(collapse.style.maxHeight, '');
             done();
           });
         });
