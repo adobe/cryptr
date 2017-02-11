@@ -61,8 +61,9 @@
 				</paper-submenu>
 			</template>
 			<template is="dom-repeat" items="{{secrets}}" filter="filterSecrets">
-				<a data-route="{{item.type}}/{{item.location}}" href="{{baseUrl}}secret/{{item.location}}" class="noselect">
-					<span style="padding-left: {{indent}}px">{{item.name}}</span>
+				<a data-route="{{item.type}}/{{item.location}}" href="{{baseUrl}}secret/{{item.location}}" class="noselect" style="padding-left: {{indent}}px">
+					<iron-icon icon="communication:vpn-key"></iron-icon>
+					<span>{{item.name}}</span>
 				</a>
 			</template>
 		</paper-menu>

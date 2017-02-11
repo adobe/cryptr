@@ -18,7 +18,7 @@
 		<login-status status="{{status}}" url="{{url}}" header="{{header}}"></login-status>
 		<secrets-init status="{{status}}" header="{{header}}" login-response="{{loginResponse}}" secrets="{{secrets}}"></secrets-init>
 
-		<paper-drawer-panel id="paperDrawerPanel" drawer-width="170px">
+		<paper-drawer-panel id="paperDrawerPanel" drawer-width="220px">
 			<!-- Drawer Area -->
 			<paper-scroll-header-panel drawer fixed>
 				<paper-toolbar id="drawerToolbar" style="-webkit-app-region: drag; padding-top: 15px;">
@@ -42,7 +42,7 @@
 
 				<span id="drawerMenuText" class="noselect">SECRETS</span>
 				<!-- <paper-menu attr-for-selected="data-route" selected="[[route]]"> -->
-					<folder-structure secrets="[[secrets]]" route="{{route}}" base-url="{{baseUrl}}" base-folder="secret" indent="35"></folder-structure>
+					<folder-structure secrets="[[secrets]]" route="{{route}}" base-url="{{baseUrl}}" base-folder="secret" indent="20"></folder-structure>
 				<!-- </paper-menu> -->
 			</paper-scroll-header-panel>
 
@@ -68,9 +68,15 @@
 							</paper-material>
 						</section>
 
-						<template is="dom-repeat" items="{{secrets}}">
+						<template is="dom-repeat" items="{{secrets}}" filter="filterFolders">
 							<section data-route="{{item.type}}/{{item.location}}" style="height: 100%">
-								This is a test: {{item.type}} {{item.name}}
+								<secret-folder secrets={{secrets}} header="{{header}}" route="{{route}}" location="{{item.location}}"></secret-folder>
+							</section>
+						</template>
+
+						<template is="dom-repeat" items="{{secrets}}" filter="filterSecrets">
+							<section data-route="{{item.type}}/{{item.location}}" style="height: 100%">
+								<secret-item secrets={{secrets}} header="{{header}}" route="{{route}}" location="{{item.location}}"></secret-item>
 							</section>
 						</template>
 					</iron-pages>
@@ -102,6 +108,12 @@
 		ipcRenderer.on('prevpass', function(event, arg) { app.prevPassword = arg; });
 		ipcRenderer.on('loginpage', function(event, arg) { app.loginPage = arg; });
 		ipcRenderer.send('initialized', 'ping');
+		app.filterFolders = function(item) {
+			return item.type == 'folder';
+		};
+		app.filterSecrets = function(item) {
+			return item.type == 'secret';
+		};
 	</script>
 </body>
 </html>
