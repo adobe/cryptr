@@ -1,7 +1,7 @@
 {
   "name": "cryptr",
   "author": "Jacob Crowther <crowther@adobe.com>",
-  "version": "1.0.9",
+  "version": "0.1",
   "description": "A GUI for Vault",
   "main": "app/main.js",
   "repository": {
