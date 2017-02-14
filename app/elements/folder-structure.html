@@ -49,7 +49,7 @@
 	</style>
 	<template>
 		<paper-menu attr-for-selected="data-route" selected="{{route}}" class="menu-content">
-			<template is="dom-repeat" items="{{secrets}}" filter="filterFolders">
+			<template is="dom-repeat" items="{{secrets}}" filter="_filterFolders">
 				<paper-submenu attr-for-selected="data-route" selected="{{route}}">
 						<a data-route="{{item.type}}/{{item.location}}" href="{{baseUrl}}folder/{{item.location}}" class="noselect menu-trigger" style="padding-left: {{indent}}px">
 							<iron-icon icon="folder-open"></iron-icon>
@@ -60,7 +60,7 @@
 					</paper-menu>
 				</paper-submenu>
 			</template>
-			<template is="dom-repeat" items="{{secrets}}" filter="filterSecrets">
+			<template is="dom-repeat" items="{{secrets}}" filter="_filterSecrets">
 				<a data-route="{{item.type}}/{{item.location}}" href="{{baseUrl}}secret/{{item.location}}" class="noselect" style="padding-left: {{indent}}px">
 					<iron-icon icon="communication:vpn-key"></iron-icon>
 					<span>{{item.name}}</span>
@@ -81,17 +81,17 @@
 				spacing: Number,
 				indent: {
 					type: Number,
-					observer: 'watchIndent'
+					observer: '_watchIndent'
 				}
 			},
-			watchIndent: function(){
+			_watchIndent: function(){
 				this.spacing = this.indent + 20;
 			},
-			filterFolders: function(item) {
+			_filterFolders: function(item) {
 				if (item.parent == this.baseFolder) return item.type == 'folder';
 				else return false;
 			},
-			filterSecrets: function(item) {
+			_filterSecrets: function(item) {
 				if (item.parent == this.baseFolder) return item.type == 'secret';
 				else return false;
 			}

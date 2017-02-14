@@ -34,3 +34,9 @@ body {
     width: 75px;
     height: 50px;
 }
+
+.bottom-corner {
+	position: fixed;
+	left: 0;
+	bottom: 0;
+}

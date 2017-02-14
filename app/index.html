@@ -18,7 +18,7 @@
 		<login-status status="{{status}}" url="{{url}}" header="{{header}}"></login-status>
 		<secrets-init status="{{status}}" header="{{header}}" login-response="{{loginResponse}}" secrets="{{secrets}}"></secrets-init>
 
-		<paper-drawer-panel id="paperDrawerPanel" drawer-width="220px">
+		<paper-drawer-panel id="paperDrawerPanel" drawer-width="{{drawerWidth}}">
 			<!-- Drawer Area -->
 			<paper-scroll-header-panel drawer fixed>
 				<paper-toolbar id="drawerToolbar" style="-webkit-app-region: drag; padding-top: 15px;">
@@ -41,9 +41,13 @@
 				</paper-menu>
 
 				<span id="drawerMenuText" class="noselect">SECRETS</span>
-				<!-- <paper-menu attr-for-selected="data-route" selected="[[route]]"> -->
-					<folder-structure secrets="[[secrets]]" route="{{route}}" base-url="{{baseUrl}}" base-folder="secret" indent="20"></folder-structure>
-				<!-- </paper-menu> -->
+				<folder-structure secrets="[[secrets]]" route="{{route}}" base-url="{{baseUrl}}" base-folder="secret" indent="20"></folder-structure>
+
+				<div style="height: 40px; width: {{drawerWidth}};"></div>  <!--Spacer-->
+
+				<div class="bottom-corner" style="color: #737373; background-color: #262B33; width: {{drawerWidth}};">
+					<paper-icon-button icon="settings"></paper-icon-button>
+				</div>
 			</paper-scroll-header-panel>
 
 			<!-- Main Area -->
@@ -84,6 +88,7 @@
 			</paper-scroll-header-panel>
 		</paper-drawer-panel>
 
+		<paper-toast id="deleted" duration="1500" text="Deleted"></paper-toast>
 		<paper-toast id="toast">
 			<span class="toast-hide-button" role="button" tabindex="0" onclick="app.$.toast.hide()">Ok</span>
 		</paper-toast>
@@ -96,6 +101,7 @@
 		const clipboard = require('electron').clipboard;
 		const ipcRenderer = require('electron').ipcRenderer;
 		app.url = 'start';
+		app.drawerWidth = '220px';
 		ipcRenderer.on('url', function(event, arg) {
 			app.url = arg;
 		});
