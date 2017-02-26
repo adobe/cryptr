@@ -43,6 +43,26 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }, 2500);
       });
 
+      suite('class registration', function() {
+        test('registers to window', function() {
+          expect(MockInteractions).to.exist;
+          expect(MockInteractions.tap).to.exist;
+        });
+
+        test('registers to this', function() {
+          // Download the script with a synchronous xhr.
+          var xhr = new XMLHttpRequest();
+          xhr.open('get', '../mock-interactions.js', false);
+          xhr.send();
+          expect(xhr.responseText).to.exist;
+          // Execute it in a specific context.
+          var context = {};
+          Function(xhr.responseText).call(context);
+          expect(context.MockInteractions).to.exist;
+          expect(context.MockInteractions.tap).to.exist;
+        });
+      });
+
       suite('simulating tap', function() {
         test('only dispatches one tap event', function() {
           var tapSpy = sinon.spy();

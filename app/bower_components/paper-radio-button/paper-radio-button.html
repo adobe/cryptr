@@ -40,6 +40,7 @@ Custom property | Description | Default
 `--paper-radio-button-checked-color` | Radio button color when the input is checked | `--primary-color`
 `--paper-radio-button-checked-ink-color` | Selected/focus ripple color when the input is checked | `--primary-color`
 `--paper-radio-button-size` | Size of the radio button | `16px`
+`--paper-radio-button-ink-size` | Size of the ripple | `48px`
 `--paper-radio-button-label-color` | Label color | `--primary-text-color`
 `--paper-radio-button-label-spacing` | Spacing between the label and the button | `10px`
 
@@ -62,6 +63,8 @@ In order to apply the `Roboto` font to this element, make sure you've imported `
         cursor: pointer;
         @apply(--paper-font-common-base);
         --calculated-paper-radio-button-size: var(--paper-radio-button-size, 16px);
+        /* -1px is a sentinel for the default and is replace in `attached`. */
+        --calculated-paper-radio-button-ink-size: var(--paper-radio-button-ink-size, -1px);
       }
 
       :host(:focus) {
@@ -82,8 +85,8 @@ In order to apply the `Roboto` font to this element, make sure you've imported `
         top: 50%;
         left: 50%;
         right: auto;
-        width: calc(3 * var(--calculated-paper-radio-button-size));
-        height: calc(3 * var(--calculated-paper-radio-button-size));
+        width: var(--calculated-paper-radio-button-ink-size);
+        height: var(--calculated-paper-radio-button-ink-size);
         color: var(--paper-radio-button-unchecked-ink-color, --primary-text-color);
         opacity: 0.6;
         pointer-events: none;
@@ -209,7 +212,25 @@ In order to apply the `Roboto` font to this element, make sure you've imported `
 
       ready: function() {
         this._rippleContainer = this.$.radioContainer;
-      }
+      },
+
+      attached: function() {
+        var inkSize = this.getComputedStyleValue('--calculated-paper-radio-button-ink-size').trim();
+        // If unset, compute and set the default `--paper-radio-button-ink-size`.
+        if (inkSize === '-1px') {
+          var size = parseFloat(this.getComputedStyleValue('--calculated-paper-radio-button-size').trim());
+          var defaultInkSize = Math.floor(3 * size);
+
+          // The button and ripple need to have the same parity so that their
+          // centers align.
+          if (defaultInkSize % 2 !== size % 2) {
+            defaultInkSize++;
+          }
+
+          this.customStyle['--paper-radio-button-ink-size'] = defaultInkSize + 'px';
+          this.updateStyles();
+        }
+      },
     })
   </script>
 </dom-module>

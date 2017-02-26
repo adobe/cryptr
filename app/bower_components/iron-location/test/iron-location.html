@@ -12,7 +12,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <head>
   <title>iron-location</title>
 
-  <script src="../../webcomponentsjs/webcomponents.js"></script>
+  <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
   <script src="../../web-component-tester/browser.js"></script>
 
   <link rel="import" href="../../polymer/polymer.html">
@@ -201,18 +201,30 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           'foo#bar': '?foo%23bar',
           'foo?bar': '?foo?bar',
           '/foo\'bar\'baz': ['?/foo%27bar%27baz', '?/foo\'bar\'baz'],
+          'foo/bar/baz': '?foo/bar/baz'
         };
         for (var plainTextQuery in queryEncodingExamples) {
           var encodedQueries = queryEncodingExamples[plainTextQuery];
           if (typeof encodedQueries === 'string') {
             encodedQueries = [encodedQueries];
           }
+          
+          var ironLocationQuery = encodedQueries.map(function(value) {
+            return value.substring(1);
+          });
 
           expect(urlElem._initialized).to.be.eq(true);
           urlElem.query = plainTextQuery;
           expect(encodedQueries).to.contain(window.location.search);
-          expect(urlElem.query).to.be.equal(plainTextQuery);
-          expect(makeTemporaryIronLocation().query).to.be.equal(plainTextQuery);
+          expect(ironLocationQuery).to.contain(urlElem.query);
+          expect(ironLocationQuery).to.contain(makeTemporaryIronLocation().query);
+
+          urlElem.query = 'dummyValue';
+          urlElem.query = ironLocationQuery[0];
+
+          expect(encodedQueries).to.contain(window.location.search);
+          expect(ironLocationQuery).to.contain(urlElem.query);
+          expect(ironLocationQuery).to.contain(makeTemporaryIronLocation().query);
         }
       });
       test('assigning to a relative path URL', function() {

@@ -212,8 +212,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         test('`--paper-checkbox-ink-size` sets the ink size', function() {
           var checkbox = fixture('CustomInkSize');
-          assert.equal(checkbox.getComputedStyleValue('--calculated-paper-checkbox-size'), '25px');
-          assert.equal(checkbox.getComputedStyleValue('--calculated-paper-checkbox-ink-size'), '30px');
+          assert.equal(checkbox.getComputedStyleValue('--calculated-paper-checkbox-size').trim(), '25px');
+          assert.equal(checkbox.getComputedStyleValue('--calculated-paper-checkbox-ink-size').trim(), '30px');
         });
 
         test('ink sizes are near (8/3 * checkbox size) by default', function() {

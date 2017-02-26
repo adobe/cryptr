@@ -7,16 +7,10 @@
 			}
 		</style>
 
-		<iron-ajax id="logout"
-			url="{{logoutURL}}"
-			handle-as="json"
-            on-response="checkStatus">
-		</iron-ajax>
-
-        <paper-item>
+        <paper-item style="-webkit-app-region: no-drag;">
             <iron-icon icon="account-circle" style="color: #888"></iron-icon>
             <span class="noselect name">{{upperUser}}</span>
-            <paper-button raised on-click="logoutUser">Logout</paper-button>
+            <paper-button raised on-click="_logoutUser">Logout</paper-button>
         </paper-item>
 
 	</template>
@@ -30,28 +24,23 @@
 					username: {
 						type: String
 					},
-                    upperUser: {
-                        type: String,
-                        computed: 'computeToUpper(username)'
-                    },
 					url: {
 						type: String
 					},
-					logoutURL: {
-						computed: 'computeURL(url)'
-					}
+                    upperUser: {
+                        type: String,
+                        computed: '_computeToUpper(username)'
+                    }
 				},
-				computeURL: function(url) {
-					return this.url + 'logout'
-				},
-                computeToUpper: function(username) {
+                _computeToUpper: function(username) {
                     return this.username.toUpperCase();
                 },
-                logoutUser: function() {
-                    this.$.logout.generateRequest();
-                },
-                checkStatus: function() {
-                    document.querySelector('#checkStatus').generateRequest();
+                _logoutUser: function() {
+					// This function simply erases the token from memory, effectively erasing all memory of
+					// the token until it expires naturally. An alternative could be to call the revoke-self
+					// endpoint, however this may have unintended consequences.
+					app.header = {};
+					document.querySelector('#checkStatus').generateRequest();
                 }
 			});
 		})();

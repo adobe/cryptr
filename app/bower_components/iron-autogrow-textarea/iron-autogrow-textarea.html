@@ -114,6 +114,7 @@ Custom property | Description | Default
         required$="[[required]]"
         disabled$="[[disabled]]"
         rows$="[[rows]]"
+        minlength$="[[minlength]]"
         maxlength$="[[maxlength]]"></textarea>
     </div>
   </template>
@@ -215,6 +216,13 @@ Custom property | Description | Default
       },
 
       /**
+       * The minimum length of the input value.
+       */
+      minlength: {
+        type: Number
+      },
+
+      /**
        * The maximum length of the input value.
        */
       maxlength: {
@@ -267,6 +275,18 @@ Custom property | Description | Default
      */
     set selectionEnd(value) {
       this.$.textarea.selectionEnd = value;
+    },
+
+    attached: function() {
+      /* iOS has an arbitrary left margin of 3px that isn't present
+       * in any other browser, and means that the paper-textarea's cursor
+       * overlaps the label.
+       * See https://github.com/PolymerElements/paper-input/issues/468.
+       */
+      var IS_IOS = navigator.userAgent.match(/iP(?:[oa]d|hone)/);
+      if (IS_IOS) {
+        this.$.textarea.style.marginLeft = '-3px';
+      }
     },
 
     /**

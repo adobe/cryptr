@@ -90,9 +90,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       test('pool should not increase if the list has no size', function(done) {
         container.style.display = 'none';
         list.fire('iron-resize');
-        
+
         flush(function() {
-          assert.isFalse(list._increasePoolIfNeeded());
+          assert.equal(list._physicalCount, 0);
           done();
         });
       });

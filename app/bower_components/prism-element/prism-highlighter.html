@@ -37,6 +37,36 @@ This flow is supported by [`<marked-element>`](https://github.com/PolymerElement
   Polymer({
 
     is: 'prism-highlighter',
+    
+    properties: {
+      /**
+       * Adds languages outside of the core Prism languages.
+       *
+       * Prism includes a few languages in the core library:
+       *   - JavaScript
+       *   - Markup
+       *   - CSS
+       *   - C-Like
+       * Use this property to extend the core set with other Prism
+       * components and custom languages.
+       *
+       * Example:
+       *   ```
+       *   <!-- with languages = {'custom': myCustomPrismLang}; -->
+       *   <!-- or languages = Prism.languages; -->
+       *   <prism-highlighter languages="[[languages]]"></prism-highlighter>
+       *   ```
+       *
+       * @attribute languages
+       * @type {!Object}
+       */
+      languages: {
+        type: Object,
+        value: function() {
+          return {};
+        }
+      }
+    },
 
     ready: function() {
       this._handler = this._highlight.bind(this);
@@ -81,7 +111,9 @@ This flow is supported by [`<marked-element>`](https://github.com/PolymerElement
         return code.match(/^\s*</) ? Prism.languages.markup : Prism.languages.javascript;
       }
 
-      if (Prism.languages[lang]) {
+      if (this.languages[lang]) {
+        return this.languages[lang];
+      } else if (Prism.languages[lang]) {
         return Prism.languages[lang];
       }
       switch (lang.substr(0, 2)) {

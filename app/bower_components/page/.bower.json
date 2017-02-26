@@ -27,14 +27,15 @@
   ],
   "license": "MIT",
   "homepage": "https://github.com/visionmedia/page.js",
-  "version": "1.6.4",
-  "_release": "1.6.4",
+  "version": "1.7.1",
+  "_release": "1.7.1",
   "_resolution": {
     "type": "version",
-    "tag": "1.6.4",
-    "commit": "d11509f1f0fed0309391d995919c25dce84b8abd"
+    "tag": "1.7.1",
+    "commit": "415eee81d5a32ad5869073838acc35cd3fbb140f"
   },
   "_source": "git://github.com/visionmedia/page.js.git",
-  "_target": "~1.6.4",
-  "_originalSource": "visionmedia/page.js"
+  "_target": "^1.7.1",
+  "_originalSource": "visionmedia/page.js",
+  "_direct": true
 }

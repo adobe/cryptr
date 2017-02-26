@@ -104,37 +104,30 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       });
     });
 
-    test('scroll to index', function(done) {
+    test('scroll to index', function() {
       list.items = buildDataSet(100);
+      Polymer.dom.flush();
+      list.scrollToIndex(30);
+      assert.equal(list.firstVisibleIndex, 30);
 
-      flush(function() {
-        list.scrollToIndex(30);
-        assert.equal(list.firstVisibleIndex, 30);
+      list.scrollToIndex(0);
+      assert.equal(list.firstVisibleIndex, 0);
 
-        list.scrollToIndex(0);
-        assert.equal(list.firstVisibleIndex, 0);
+      list.scrollToIndex(60);
+      assert.equal(list.firstVisibleIndex, 60);
 
-        list.scrollToIndex(60);
-        assert.equal(list.firstVisibleIndex, 60);
+      var rowHeight = getNthItemFromGrid(list, 0).offsetHeight;
+      var viewportHeight = list.offsetHeight;
+      var itemsPerViewport = Math.floor(viewportHeight/rowHeight) * list._itemsPerRow;
 
-        var rowHeight = getNthItemFromGrid(list, 0).offsetHeight;
-        var viewportHeight = list.offsetHeight;
-        var itemsPerViewport = Math.floor(viewportHeight/rowHeight) * list._itemsPerRow;
+      list.scrollToIndex(99);
+      // make the height of the viewport same as the height of the row
+      // and scroll to the last item
+      list.style.height = list._physicalItems[0].offsetHeight + 'px';
+      list.fire('iron-resize');
 
-        list.scrollToIndex(99);
-        // assert.equal(list.firstVisibleIndex, list.items.length - 7);
-
-        // make the height of the viewport same as the height of the row
-        // and scroll to the last item
-        list.style.height = list._physicalItems[0].offsetHeight + 'px';
-
-        flush(function() {
-          var idx = 99;
-          list.scrollToIndex(idx);
-          assert.equal(list.firstVisibleIndex, idx);
-          done();
-        });
-      });
+      list.scrollToIndex(99);
+      assert.equal(list.firstVisibleIndex, 99);
     });
 
     test('reset items', function(done) {

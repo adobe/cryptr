@@ -1,6 +1,6 @@
 {
   "name": "iron-iconset",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "license": "http://polymer.github.io/LICENSE.txt",
   "description": "Represents a set of icons",
   "authors": [
@@ -25,7 +25,9 @@
     "iron-icon": "polymerelements/iron-icon#^1.0.0",
     "promise-polyfill": "polymerlabs/promise-polyfill#^1.0.0",
     "test-fixture": "PolymerElements/test-fixture#^1.0.0",
-    "web-component-tester": "*",
+    "web-component-tester": "^4.0.0",
     "webcomponentsjs": "webcomponents/webcomponentsjs#^0.7.0"
-  }
+  },
+  "main": "iron-iconset.html",
+  "ignore": []
 }
