@@ -1,0 +1,66 @@
+<link rel="import" href="../../polymer/polymer.html">
+
+<!-- Navigation-Bar for demos -->
+<dom-module id="demo-navigation">
+  <style>
+    :host {
+      margin-left: 0 !important;
+      margin-right: 0 !important;
+      padding-top: 8px !important;
+      padding-bottom: 0 !important;
+    }
+    nav > ul {
+      padding: 0;
+      display: flex;
+    }
+    nav > ul > li {
+      padding: 0 24px 8px 0;
+      list-style: none;
+    }
+    nav a, nav b {
+      @apply(--paper-font-button);
+    }
+    nav a {
+      color: var(--primary-color);
+      text-decoration: none;
+    }
+    nav b {
+      color: var(--secondary-text-color);
+    }
+  </style>
+  <template>
+    <nav>
+      <ul class="layout horizontal wrap">
+        <template is="dom-repeat" items="[[items]]">
+          <template is="dom-if" if="[[_current(item)]]">
+            <li><b>[[_title(item)]]</b></li>
+          </template>
+          <template is="dom-if" if="[[!_current(item)]]">
+            <li><a href="[[item.name]].html">[[_title(item)]]</a></li>
+          </template>
+        </template>
+        <template is="dom-if" if="">
+        </template>
+      </ul>
+    </nav>
+  </template>
+  <script>
+    Polymer({
+      properties: {
+        items: {
+          type: Array,
+          value: function() {
+            return window.demos;
+          }
+        }
+      },
+      is: 'demo-navigation',
+      _current: function(item) {
+        return window.location.href.replace(/^.*\/(.*?)\.html.*$/,'$1') === item.name;
+      },
+      _title: function(item) {
+        return item.title || item.name;
+      }
+    });
+  </script>
+</dom-module>

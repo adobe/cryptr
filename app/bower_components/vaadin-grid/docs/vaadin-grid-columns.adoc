@@ -140,9 +140,9 @@ image::img/vaadin-grid-column-hiding.png[]
   <table>
     <colgroup>
       <col>
-      <col hidable="">
-      <col hidable="" hidden="">
-      <col hidden="">
+      <col hidable>
+      <col hidable hidden>
+      <col hidden>
     </colgroup>
     <!-- ... -->
   </table>
@@ -156,3 +156,85 @@ grid.columns[2].hidable = true;
 grid.columns[2].hidden = true;
 grid.columns[3].hidden = true;
 ----
+
+ifdef::web[]
+====
+See the link:https://cdn.vaadin.com/vaadin-elements/latest/vaadin-grid/demo/columns.html[live example].
+====
+endif::web[]
+
+[[vaadin-grid.columns.reordering]]
+== Column Reordering
+The end users can reorder non-frozen columns by dragging the header cells.
+By default, column reordering is disabled, but it can be enabled by setting the [propertyname]#columnReorderingAllowed# property to true.
+
+Column reordering works only when the data source is based on objects bound to the column configuration using the `name` attribute.
+Usage of object values is described in section <<vaadin-grid-assigning-data#vaadin-grid.data.object, "Using Object Values">>.
+
+When using arrays as data, you need to take care of reordering the data after the column order is changed.
+You will get notified of this by listening to the `column-order-changed` event.
+
+[[figure.vaadin-grid.column-reordering]]
+.User can drag the header cells to reorder the columns
+image::img/vaadin-grid-column-reordering.png[]
+
+[source,html]
+----
+<vaadin-grid column-reordering-allowed>
+  <!-- ... -->
+</vaadin-grid>
+----
+[source,javascript]
+----
+// Setting the property with JS API
+grid.columnReorderingAllowed = true;
+----
+[source,javascript]
+----
+// Listening to column order changes
+grid.addEventListener('column-order-changed', function() {
+  var columnNames = grid.columns.map(function(col) { return col.name; });
+  console.log('Column order is now: ' + columnNames.join(', '));
+});
+----
+
+ifdef::web[]
+====
+See the link:https://cdn.vaadin.com/vaadin-elements/latest/vaadin-grid/demo/columns.html[live example].
+====
+endif::web[]
+
+[[vaadin-grid.columns.resizing]]
+== Column Resizing
+Columns can be resized by dragging the separation line in headers. By default it is disabled. Set the [propertyname]#column.resizable# property to a column to make it resizable.
+
+When a column is resized, you will get notified by listening to the `column-resized` event.
+
+[[figure.vaadin-grid.column-resizing]]
+.User can drag the header separator to resize the column.
+image::img/vaadin-grid-column-resizing.png[]
+
+[source,html]
+----
+<vaadin-grid>
+  <table>
+    <colgroup>
+      <col>
+      <col resizable>
+    </colgroup>
+    <!-- ... -->
+  </table>
+</vaadin-grid>
+----
+[source,javascript]
+----
+// Setting the properties with JS API
+grid.columns[0].resizable = false;
+grid.columns[1].resizable = true;
+----
+
+ifdef::web[]
+====
+See the link:https://cdn.vaadin.com/vaadin-elements/latest/vaadin-grid/demo/columns.html[live example].
+====
+endif::web[]

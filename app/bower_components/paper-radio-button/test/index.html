@@ -16,7 +16,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   <script>
     WCT.loadSuites([
       'basic.html',
-      'basic.html?dom=shadow'
+      'basic.html?dom=shadow',
+      // To enable `useNativeCSSProperties`, the native Shadow DOM and lazy
+      // registration flags must also be enabled.
+      // https://github.com/Polymer/polymer/blob/ff6e884ef4f309d41491333860a8bc9c2f178696/src/lib/settings.html#L55
+      'basic.html?dom=shadow&lazyRegister=true&useNativeCSSProperties=true'
     ]);
   </script>
 

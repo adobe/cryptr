@@ -24,6 +24,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 Loads Polymer element and behavior documentation using
 [Hydrolysis](https://github.com/PolymerLabs/hydrolysis) and renders a complete
 documentation page including demos (if available).
+
+To display a warning inside an `iron-component-page` element,
+add the `.warning` class to a child.
 -->
 
 <dom-module id="iron-component-page">
@@ -226,6 +229,7 @@ documentation page including demos (if available).
             <div id="catalog-heading" catalog-only>
               <h2><span>[[active]]</span> <span class="version" hidden$="[[!version]]">[[version]]</span></h2>
             </div>
+            <content select=".warning"></content>
             <iron-doc-viewer prefix="[[_fragmentPrefix]]" id="viewer" descriptor="{{_activeDescriptor}}"
               on-iron-doc-viewer-component-selected="_handleComponentSelectedEvent"></iron-doc-viewer>
             <div id="nodocs" hidden$="[[_activeDescriptor]]" class="no-docs">
@@ -289,6 +293,15 @@ documentation page including demos (if available).
           docSrc: {
             type: String,
             observer: '_srcChanged',
+          },
+
+          /**
+           * The name of a branch used to fetch source for gh-pages.
+           * If not specified `master` is used.
+           */
+          branchName: {
+            type: String,
+            value: 'master'
           },
 
           /**
@@ -532,7 +545,7 @@ documentation page including demos (if available).
           // Rewrite gh-pages URLs to https://rawgit.com/
           var match = srcUrl.match(/([^\/\.]+)\.github\.io\/([^\/]+)\/?([^\/]*)$/);
           if (match) {
-            srcUrl = "https://cdn.rawgit.com/" + match[1] + "/" + match[2] + "/master/" + match[3];
+            srcUrl = "https://cdn.rawgit.com/" + match[1] + "/" + match[2] + "/" + this.branchName + "/" + match[3];
           }
 
           this._baseUrl = _baseUrl(srcUrl);

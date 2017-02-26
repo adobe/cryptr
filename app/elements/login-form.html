@@ -3,52 +3,131 @@
 <dom-module id="login-form">
 	<template>
 		<style>
+			:host {
+				--paper-tabs-selection-bar-color: #4496ff;
+				--paper-tab-ink: #1671ea;
+				--paper-tabs-selection-bar: {
+					color: white;
+				};
+			}
 			#errortoast {
 				background-color: #EF5350;
 			}
-			#sub1, #sub2, #initfield {
+			#userfield, #passfield {
+				margin: 0;
+			}
+			#initfield {
+				margin: 0;
+				padding: 0 8px 0 24px;
+			}
+			paper-dialog > iron-pages {
 				margin: 0;
 			}
 			paper-dialog > *:last-child {
 				margin: 0;
 				padding: 0px;
 			}
-			paper-progress {
-				width: auto;
+			paper-dialog > *:nth-child(2) {
+				margin-top: 60px;
 			}
 			paper-progress.blue {
 				--paper-progress-active-color: #03A9F4;
 			}
+			.flex-horizontal {
+				@apply(--layout-horizontal);
+			}
+			.flexchild {
+				@apply(--layout-flex);
+			}
+			.checkFail {
+				color: #EF5350;
+				padding: 28px 0px 0px 9px;
+				width: 18px;
+			}
+			.checkPass {
+				color: #4CAF50;
+				display: none;
+				padding: 28px 0px 0px 9px;
+				width: 18px;
+			}
+			#modal {
+				-moz-border-radius: 8px;
+				-webkit-border-radius: 8px;
+				border-radius: 8px;
+			}
+			#logo {
+				width: 200px;
+				height: 200px;
+				left: 50%;
+				position: absolute;
+				top: -122px;
+				-webkit-transform: translateX(-50%);
+				transform: translateX(-50%);
+			}
 		</style>
 
 		<iron-ajax id="authenticateReq"
-			url="{{auth}}"
+			url="{{authURL}}"
 			handle-as="json"
-			content-type="application/x-www-form-urlencoded"
-			body="{{data}}"
-			method="POST"
+			method="{{authMethod}}"
+			body="{{body}}"
+			headers="{{header}}"
+			content-type="application/json"
 			last-response="{{loginResponse}}"
-			on-response="success"
-			timeout="9000"
-			on-error="showError">
+			last-error={{loginError}}
+			on-response="_success"
+			on-error="_error"
+			timeout="30000">
 		</iron-ajax>
 
-		<paper-dialog id="modal" class="white noselect" modal no-cancel-on-esc-key no-cancel-on-outside-click>
-			<h1>Login</h1>
-			<div id="initfield">
-				<paper-input value="{{url}}" label="Server URL (HTTPS)"></paper-input>
+		<iron-ajax id="testReq"
+			url="{{testURL}}"
+			handle-as="json"
+			last-response="{{testResponse}}"
+			on-response="_testSuccess"
+			on-error="_testError"
+			timeout="5000">
+		</iron-ajax>
+
+		<paper-dialog id="modal"class="noselect" modal no-cancel-on-esc-key no-cancel-on-outside-click auto-fit-on-attach>
+			<iron-image id="logo" sizing="contain" src="../images/cryptr-internal.png"></iron-image>
+			<paper-tabs selected="{{page}}">
+				<paper-tab>LDAP</paper-tab>
+				<paper-tab>Token</paper-tab>
+				<paper-tab>User/Pass</paper-tab>
+			</paper-tabs>
+			<div id="initfield" class="flex-horizontal">
+				<div class="flexchild">
+					<paper-input value="{{url}}" label="Server URL (HTTPS)"></paper-input>
+				</div>
+				<iron-icon id="checkpass" icon="check-circle" class="checkPass"></iron-icon>
+				<iron-icon id="checkfail" icon="cancel" class="checkFail"></iron-icon>
 			</div>
-			<paper-input id="sub1" value="{{username}}" label="LDAP Username"></paper-input>
-			<paper-input id="sub2" value="{{password}}" label="Password" type="password"></paper-input>
+			<iron-pages selected="{{page}}">
+				<div>
+					<iron-a11y-keys target="[[targetuserldap]]" keys="enter" on-keys-pressed="_login"></iron-a11y-keys>
+					<iron-a11y-keys target="[[targetpassldap]]" keys="enter" on-keys-pressed="_login"></iron-a11y-keys>
+					<paper-input id="userfieldldap" value="{{username}}" label="LDAP Username"></paper-input>
+					<paper-input id="passfieldldap" value="{{password}}" label="LDAP Password" type="password"></paper-input>
+				</div>
+				<div>
+					<iron-a11y-keys target="[[targettoken]]" keys="enter" on-keys-pressed="_login"></iron-a11y-keys>
+					<paper-input id="tokenfield" value="{{token}}" label="Token"></paper-input>
+				</div>
+				<div>
+					<iron-a11y-keys target="[[targetuser]]" keys="enter" on-keys-pressed="_login"></iron-a11y-keys>
+					<iron-a11y-keys target="[[targetpass]]" keys="enter" on-keys-pressed="_login"></iron-a11y-keys>
+					<paper-input id="userfield" value="{{username}}" label="Username"></paper-input>
+					<paper-input id="passfield" value="{{password}}" label="Password" type="password"></paper-input>
+				</div>
+			</iron-pages>
 			<div class="buttons">
-				<iron-a11y-keys id="a11y" target="[[target]]" keys="enter" on-keys-pressed="login"></iron-a11y-keys>
-				<iron-a11y-keys id="a11y" target="[[alttarget]]" keys="enter" on-keys-pressed="login"></iron-a11y-keys>
-				<paper-button on-tap="login" autofocus disabled="{{disabled}}">Login</paper-button>
+				<paper-button on-tap="_login" autofocus disabled="{{disabled}}">Login</paper-button>
 			</div>
-			<paper-progress class="blue" indeterminate disabled="{{!disabled}}"></paper-progress>
+			<paper-progress style="padding-left:10px" class="blue" indeterminate disabled="{{!disabled}}"></paper-progress>
 		</paper-dialog>
 
-		<paper-toast id="errortoast" class="fit-bottom" duration="6000" text""></paper-toast>
+		<paper-toast id="errortoast" class="fit-bottom" duration="5000" text""></paper-toast>
 	</template>
 
 	<script>
@@ -61,30 +140,33 @@
 						type: String,
 						value: '',
 						notify: true,
-						observer: 'watchStatus'
+						observer: '_watchStatus'
 					},
-					data: {
-						computed: 'computeData(username, password)'
+					targetuser: {
+						value: function() { return this.$.userfield; }
 					},
-					target: {
-						type: Object,
-						value: function() {
-							return this.$.sub1;
-						}
+					targetpass: {
+						value: function() { return this.$.passfield; }
 					},
-					alttarget: {
-						type: Object,
-						value: function() {
-							return this.$.sub2;
-						}
+					targetuserldap: {
+						value: function() { return this.$.userfieldldap; }
+					},
+					targetpassldap: {
+						value: function() { return this.$.passfieldldap; }
+					},
+					targettoken: {
+						value: function() { return this.$.tokenfield; }
 					},
 					username: {
 						type: String,
 						value: '',
 						notify: true,
-						observer: 'observeInit'
+						observer: '_persistData'
 					},
-					password: {
+					body: Object,
+					password: String,
+					authURL: String,
+					token: {
 						type: String,
 						value: ''
 					},
@@ -95,64 +177,157 @@
 					url: {
 						type: String,
 						notify: true,
-						observer: 'observeInit'
+						observer: '_watchURL'
 					},
-					auth: {
-						computed: 'computeURL(url)'
+					header: {
+						type: Object,
+						notify: true
+					},
+					loginResponse: {
+						type: Object,
+						notify: true
+					},
+					page: {
+						type: Number,
+						value: 0,
+						notify: true,
+						observer: '_watchSelected'
+					},
+					authMethod: {
+						type: String,
+						value: 'POST'
+					},
+					approvedURL: {
+						type: Boolean,
+						value: false
 					}
 				},
 				attached: function() {
 					this.status = 'none';
 				},
-				computeData: function(u, p) {
-					return 'username=' + u + '&password=' + Base64.encode(p);
+				_computeBody: function(p) {
+					return {"password": p };
 				},
-				computeURL: function(url) {
-					return this.url + 'auth'
+				_computeURL: function(url, u) {
+					return this.url + 'v1/auth/ldap/login/' + u
 				},
-				login: function() {
+				_login: function() {
 					this.url = this.url.trim();
 					if (this.url.toLowerCase().startsWith('https')) {
+						if (!this.approvedURL) {
+							this.$.errortoast.text = 'No Vault instance found at the this URL';
+							this.$.errortoast.show();
+							return;
+						}
 						if (!(this.url.endsWith('/'))) this.url += '/';
+						// Switch for LDAP, Token, and UserPass auth backends
+						if (this.page == 0) {
+							if (!this.username && !this.password) { //Check fields have content
+								this.$.errortoast.text = 'Username and Password are required';
+								this.$.errortoast.show();
+								return;
+							}
+							this.authMethod = 'POST';
+							this.authURL = this.url + 'v1/auth/ldap/login/' + this.username;
+							this.body = {"password": this.password };
+						} else if (this.page == 1) {
+							if (!this.token) { //Check field has content
+								this.$.errortoast.text = 'Token is required';
+								this.$.errortoast.show();
+								return;
+							}
+							this.authMethod = 'GET';
+							this.authURL = this.url + 'v1/auth/token/lookup-self';
+							this.header = {"X-Vault-Token": this.token };
+							this.body = '';
+						} else if (this.page == 2) {
+							if (!this.username && !this.password) { //Check fields have content
+								this.$.errortoast.text = 'Username and Password are required';
+								this.$.errortoast.show();
+								return;
+							}
+							this.authMethod = 'POST';
+							this.authURL = this.url + 'v1/auth/userpass/login/' + this.username;
+							this.body = {"password": this.password };
+						}
 						this.disabled = true;
 						this.$.authenticateReq.generateRequest();
 					} else {
-						this.$.errortoast.text = 'A trusted HTTPS based URL is required.';
+						this.$.errortoast.text = 'An HTTPS based URL is required.';
 						this.$.errortoast.show();
 					}
 				},
-				success: function() {
-					if (this.loginResponse.status == "success") {
+				_success: function() {
+					// UserPass / LDAP
+					if (this.loginResponse.auth && this.loginResponse.auth.client_token) {
+						this.header = {"X-Vault-Token": this.loginResponse.auth.client_token };
+						this.loginResponse = this.loginResponse.auth;
 						this.status = 'watch';
 						this.password = '';
 						this.disabled = false;
 						this.$.modal.close();
-					} else if (this.loginResponse.status == "error") {
-						this.$.errortoast.text = this.loginResponse.message;
-						this.$.errortoast.show();
+					// Token Auth
+					} else if (this.loginResponse.data) {
+						this.loginResponse = this.loginResponse.data;
+						this.username = 'TOKEN';
+						this.status = 'watch';
+						this.password = '';
 						this.disabled = false;
-					} else if (this.loginResponse.message) {
-						this.$.errortoast.text = this.loginResponse.message;
-						this.$.errortoast.show();
-						this.disabled = false;
+						this.$.modal.close();
 					}
 				},
-				showError: function(e) {
+				_error: function(e) {
 					this.disabled = false;
-					if (!e.detail.error.message) this.$.errortoast.text = 'Error: Connection timed out.';
-					else if (e.detail.error.message.includes('503')) this.$.errortoast.text = 'Error: Cannot contact server. Please try again later.';
-					else if (e.detail.error.message.includes('401')) this.$.errortoast.text = 'Error: Unauthorized Request.';
-					else this.$.errortoast.text = 'Error: Please try again later.';
+					if (this.loginError.response.errors[0].includes('Invalid Credentials')) this.$.errortoast.text = 'Invalid Credentials';
+					else if (this.loginError.response.errors[0].includes('No Such Object')) this.$.errortoast.text = 'Invalid Username or Password';
+					else if (this.loginError.response.errors[0] == 'invalid username or password') this.$.errortoast.text = 'Invalid Username or Password';
+					else if (this.loginError.response.errors[0] == 'missing client token') this.$.errortoast.text = 'Permission Denied';
+					else if (this.loginError.response.errors[0] == 'Vault is sealed') this.$.errortoast.text = 'This vault is currently sealed';
+					else if (this.loginError.response.errors[0] == 'permission denied') this.$.errortoast.text = 'Permission Denied';
+					else if (this.loginError.response.errors[0] == 'unsupported path') this.$.errortoast.text = 'This auth backend is not supported by the server';
+					else this.$.errortoast.text = 'Unkown Error: Please try again later.';
 					this.$.errortoast.show();
 				},
-				watchStatus: function() {
-					if (this.status == 'none') {
-						this.$.modal.open();
-					}
+				_testSuccess: function() {
+					this.$.checkpass.style.display = 'block';
+					this.$.checkfail.style.display = 'none';
+					this.approvedURL = true;
 				},
-				observeInit: function() {
+				_testError: function() {
+					this.$.checkpass.style.display = 'none';
+					this.$.checkfail.style.display = 'block';
+					this.approvedURL = false;
+				},
+				_watchStatus: function() {
+					if (this.status == 'none') this.$.modal.open();
+				},
+				_watchSelected: function() {
+					this.password = '';
+					this.token = '';
+					this._persistData();
+				},
+				_watchURL: function() {
+					this.debounce('checkURL', function () {
+						if (this.url.toLowerCase().startsWith('https')) {
+							if (!(this.url.endsWith('/'))) {
+								this.testURL = this.url + '/v1/sys/init';
+								this.$.testReq.generateRequest();
+							} else {
+								this.testURL = this.url + 'v1/sys/init';
+								this.$.testReq.generateRequest();
+							}
+						} else {
+							this.$.checkpass.style.display = 'none';
+							this.$.checkfail.style.display = 'block';
+							this.approvedURL = false;
+						}
+						this._persistData();
+					}, 400);
+				},
+				_persistData: function() {
 					ipcRenderer.send('update-url', this.url);
 					ipcRenderer.send('update-user', this.username);
+					ipcRenderer.send('update-loginpage', this.page);
 				}
 			});
 		})();

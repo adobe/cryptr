@@ -90,6 +90,7 @@ respectively.
       id="menuButton"
       vertical-align="[[verticalAlign]]"
       horizontal-align="[[horizontalAlign]]"
+      dynamic-align="[[dynamicAlign]]"
       vertical-offset="[[_computeMenuVerticalOffset(noLabelFloat)]]"
       disabled="[[disabled]]"
       no-animations="[[noAnimations]]"
@@ -97,7 +98,8 @@ respectively.
       on-iron-deselect="_onIronDeselect"
       opened="{{opened}}"
       close-on-activate
-      allow-outside-scroll="[[allowOutsideScroll]]">
+      allow-outside-scroll="[[allowOutsideScroll]]"
+      restore-focus-on-close="[[restoreFocusOnClose]]">
       <div class="dropdown-trigger">
         <paper-ripple></paper-ripple>
         <!-- paper-input has type="text" for a11y, do not remove -->
@@ -255,7 +257,25 @@ respectively.
           verticalAlign: {
             type: String,
             value: 'top'
-          }
+          },
+
+          /**
+           * If true, the `horizontalAlign` and `verticalAlign` properties will
+           * be considered preferences instead of strict requirements when
+           * positioning the dropdown and may be changed if doing so reduces
+           * the area of the dropdown falling outside of `fitInto`.
+           */
+          dynamicAlign: {
+            type: Boolean
+          },
+            
+          /**
+           * Whether focus should be restored to the dropdown when the menu closes.
+           */
+          restoreFocusOnClose: {
+            type: Boolean,
+            value: true
+          },
         },
 
         listeners: {

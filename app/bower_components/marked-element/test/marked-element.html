@@ -86,6 +86,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </template>
   </test-fixture>
 
+  <test-fixture id="Renderer">
+    <template>
+      <marked-element>
+        <div id="output" class="markdown-html"></div>
+        <script type="text/markdown">
+          [Link](http://url.com)
+        </script>
+      </marked-element>
+    </template>
+  </test-fixture>
+
   <test-fixture id="CustomCallbackFunction">
     <template>
       <marked-element>
@@ -128,10 +139,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         expect(markedElement.sanitize).to.equal(false);
       });
       test('has pedantic', function() {
-        expect(markedElement.sanitize).to.equal(false);
+        expect(markedElement.pedantic).to.equal(false);
       });
       test('has smartypants', function() {
-        expect(markedElement.sanitize).to.equal(false);
+        expect(markedElement.smartypants).to.equal(true);
       });
     });
 
@@ -268,6 +279,28 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         });
       });
 
+    });
+
+    suite('<marked-element> with custom renderer', function() {
+      var markedElement;
+      var outputElement;
+      var proofElement;
+
+      setup(function() {
+        markedElement = fixture('Renderer');
+        outputElement = document.getElementById('output');
+        proofElement = document.createElement('div');
+      });
+
+      test('takes custom link renderer', function() {
+        markedElement.renderer = function (renderer) {
+          renderer.link = (href, title, text) => {
+            return `<a href="${href}" target="_blank">${text}</a>`;
+          };
+        };
+        proofElement.innerHTML = '<a href="http://url.com" target="_blank">Link</a>';
+        expect(outputElement.innerHTML).to.include(proofElement.innerHTML);
+      });
     });
 
     suite('events', function() {

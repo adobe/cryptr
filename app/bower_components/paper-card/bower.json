@@ -1,6 +1,6 @@
 {
   "name": "paper-card",
-  "version": "1.1.2",
+  "version": "1.1.4",
   "description": "Material design piece of paper with unique related data",
   "authors": [
     "The Polymer Authors"
@@ -11,7 +11,6 @@
     "card"
   ],
   "main": "paper-card.html",
-  "private": true,
   "repository": {
     "type": "git",
     "url": "git://github.com/PolymerElements/paper-card.git"

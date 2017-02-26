@@ -36,9 +36,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
   <script>
     suite('a11y', function() {
-      var f;
+      var f, img;
       setup(function () {
         f = fixture('basic');
+        img = f.$$('iron-image');
       });
 
       test('aria-label set on card', function() {
@@ -49,6 +50,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         assert.strictEqual(f.getAttribute('aria-label'), f.heading);
         f.heading = 'batman';
         assert.strictEqual(f.getAttribute('aria-label'), 'batman');
+      });
+  
+      test('aria-hidden is set on image', function() {
+        assert.strictEqual(img.getAttribute('aria-hidden'), 'true');
+	  });
+
+      test('aria-hidden is removed when image is set', function() {
+        f.image = 'some-image-url';
+        assert.strictEqual(img.getAttribute('aria-hidden'), 'false');
       });
     });
     suite('header image', function() {

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<dom-module id="folder-structure">
+	<style>
+		.noselect {
+			-webkit-user-select: none;
+			-moz-user-select: none;
+			-ms-user-select: none;
+			user-select: none;
+			-webkit-user-drag: none;
+		    -khtml-user-drag: none;
+		    -moz-user-drag: none;
+		    -o-user-drag: none;
+		    user-drag: none;
+			cursor: default;
+		}
+		paper-menu {
+			min-height: 36px;
+			padding: 0px;
+			--paper-menu-selected-item: {
+				color: var(--primary-color);
+			}
+			--paper-menu-focused-item-after: {
+				background: var(--primary-color);
+			}
+		}
+		paper-menu iron-icon {
+			margin-right: 10px;
+			opacity: 0.54;
+		}
+		paper-menu a {
+			@apply(--layout-horizontal);
+			@apply(--layout-center);
+
+			text-decoration: none;
+			color: var(--menu-link-color);
+			font-family: 'Roboto', 'Noto', sans-serif;
+			-webkit-font-smoothing: antialiased;
+			text-rendering: optimizeLegibility;
+			font-size: 14px;
+			font-weight: 400;
+			line-height: 24px;
+			min-height: 36px;
+			padding: 0 16px;
+		}
+		.paper-menu > .iron-selected {
+			color: var(--drawer-menu-text-color);
+		}
+	</style>
+	<template>
+		<paper-menu attr-for-selected="data-route" selected="{{route}}" class="menu-content">
+			<template is="dom-repeat" items="{{secrets}}" filter="_filterFolders">
+				<paper-submenu attr-for-selected="data-route" selected="{{route}}">
+						<a data-route="{{item.type}}/{{item.location}}" href="{{baseUrl}}folder/{{item.location}}" class="noselect menu-trigger" style="padding-left: {{indent}}px">
+							<iron-icon icon="folder-open"></iron-icon>
+							<span>{{item.name}}</span>
+						</a>
+					<paper-menu class="menu-content">
+						<folder-structure secrets="[[secrets]]" route="{{route}}" base-url="{{baseUrl}}" base-folder="{{item.location}}" indent="{{spacing}}"></folder-structure>
+					</paper-menu>
+				</paper-submenu>
+			</template>
+			<template is="dom-repeat" items="{{secrets}}" filter="_filterSecrets">
+				<a data-route="{{item.type}}/{{item.location}}" href="{{baseUrl}}secret/{{item.location}}" class="noselect" style="padding-left: {{indent}}px">
+					<iron-icon icon="communication:vpn-key"></iron-icon>
+					<span>{{item.name}}</span>
+				</a>
+			</template>
+		</paper-menu>
+	</template>
+
+	<script>
+		Polymer({
+			is: "folder-structure",
+			properties: {
+				route: String,
+				baseURL: String,
+				secrets: Array,
+				baseFolder: String,
+				baseUrl: String,
+				spacing: Number,
+				indent: {
+					type: Number,
+					observer: '_watchIndent'
+				}
+			},
+			_watchIndent: function(){
+				this.spacing = this.indent + 20;
+			},
+			_filterFolders: function(item) {
+				if (item.parent == this.baseFolder) return item.type == 'folder';
+				else return false;
+			},
+			_filterSecrets: function(item) {
+				if (item.parent == this.baseFolder) return item.type == 'secret';
+				else return false;
+			}
+		});
+	</script>
+</dom-module>
+</html>

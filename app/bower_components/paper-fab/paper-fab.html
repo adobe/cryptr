@@ -49,6 +49,7 @@ Custom property | Description | Default
 `--paper-fab-mini` | Mixin applied to a mini button | `{}`
 `--paper-fab-disabled` | Mixin applied to a disabled button | `{}`
 `--paper-fab-iron-icon` | Mixin applied to the iron-icon within the button | `{}`
+`--paper-fab-label` | Mixin applied to the label within the button | `{}`
 
 @group Paper Elements
 @demo demo/index.html
@@ -114,6 +115,8 @@ Custom property | Description | Default
         overflow: hidden;
         text-overflow: ellipsis;
         text-align: center;
+
+        @apply(--paper-fab-label);
       }
 
       :host(.keyboard-focus) {
