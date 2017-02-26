@@ -49,7 +49,7 @@
 	</style>
 	<template>
 		<paper-menu attr-for-selected="data-route" selected="{{route}}" class="menu-content">
-			<template is="dom-repeat" items="{{secrets}}" filter="_filterFolders">
+			<template is="dom-repeat" items="{{secrets}}" filter="_filterFolders" sort="_sort">
 				<paper-submenu attr-for-selected="data-route" selected="{{route}}">
 						<a data-route="{{item.type}}/{{item.location}}" href="{{baseUrl}}folder/{{item.location}}" class="noselect menu-trigger" style="padding-left: {{indent}}px">
 							<iron-icon icon="folder-open"></iron-icon>
@@ -60,7 +60,7 @@
 					</paper-menu>
 				</paper-submenu>
 			</template>
-			<template is="dom-repeat" items="{{secrets}}" filter="_filterSecrets">
+			<template is="dom-repeat" items="{{secrets}}" filter="_filterSecrets" sort="_sort">
 				<a data-route="{{item.type}}/{{item.location}}" href="{{baseUrl}}secret/{{item.location}}" class="noselect" style="padding-left: {{indent}}px">
 					<iron-icon icon="communication:vpn-key"></iron-icon>
 					<span>{{item.name}}</span>
@@ -94,6 +94,9 @@
 			_filterSecrets: function(item) {
 				if (item.parent == this.baseFolder) return item.type == 'secret';
 				else return false;
+			},
+			_sort: function(a, b) {
+				return a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1;
 			}
 		});
 	</script>
