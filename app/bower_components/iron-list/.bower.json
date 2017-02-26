@@ -7,7 +7,7 @@
     "list",
     "virtual-list"
   ],
-  "version": "1.3.7",
+  "version": "1.4.1",
   "homepage": "https://github.com/PolymerElements/iron-list",
   "authors": [
     "The Polymer Authors"
@@ -21,9 +21,9 @@
   "ignore": [],
   "dependencies": {
     "polymer": "Polymer/polymer#^1.1.0",
-    "iron-resizable-behavior": "polymerelements/iron-resizable-behavior#^1.0.0",
-    "iron-a11y-keys-behavior": "polymerelements/iron-a11y-keys-behavior#^1.0.0",
-    "iron-scroll-target-behavior": "PolymerElements/iron-scroll-target-behavior#^1.0.0"
+    "iron-resizable-behavior": "PolymerElements/iron-resizable-behavior#^1.0.0",
+    "iron-a11y-keys-behavior": "PolymerElements/iron-a11y-keys-behavior#^1.0.0",
+    "iron-scroll-target-behavior": "PolymerElements/iron-scroll-target-behavior#^1.1.0"
   },
   "devDependencies": {
     "app-layout": "polymerelements/app-layout#^0.10.0",
@@ -34,6 +34,7 @@
     "iron-icons": "polymerelements/iron-icons#^1.0.0",
     "iron-scroll-threshold": "polymerelements/iron-scroll-threshold#^1.0.0",
     "iron-image": "polymerelements/iron-image#^1.0.0",
+    "paper-menu-button": "polymerelements/paper-menu-button#^1.0.0",
     "paper-item": "polymerelements/paper-item#^1.0.0",
     "paper-icon-button": "polymerelements/paper-icon-button#^1.0.0",
     "paper-button": "polymerelements/paper-button#^1.0.0",
@@ -44,11 +45,11 @@
     "webcomponentsjs": "webcomponents/webcomponentsjs#^0.7.2",
     "web-component-tester": "^4.0.0"
   },
-  "_release": "1.3.7",
+  "_release": "1.4.1",
   "_resolution": {
     "type": "version",
-    "tag": "v1.3.7",
-    "commit": "efaad645bcfc4be75e65f4a151397bc70f4ba896"
+    "tag": "v1.4.1",
+    "commit": "a273ed23d84863d01b2dd7e26e56073add650f49"
   },
   "_source": "git://github.com/PolymerElements/iron-list.git",
   "_target": "^1.0.0",

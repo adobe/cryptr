@@ -120,6 +120,24 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       </template>
     </test-fixture>
 
+    <test-fixture id="countries">
+      <template>
+        <test-menu>
+          <div>Ghana</div>
+          <div>Uganda</div>
+        </test-menu>
+      </template>
+    </test-fixture>
+
+    <test-fixture id="bogus-attr-for-item-title">
+      <template>
+        <test-menu attr-for-item-title="totally-doesnt-exist">
+          <div>Focused by default</div>
+          <div>I'm not entitled!</div>
+        </test-menu>
+      </template>
+    </test-fixture>
+
     <script>
       suite('menu a11y tests', function() {
         test('menu has role="menu"', function() {
@@ -379,6 +397,44 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               done();
             });
           });
+        });
+
+        test('focusing on item with multi-char, quick input', function(done) {
+          var menu = fixture('countries');
+          MockInteractions.focus(menu);
+
+          // Wait for async focus
+          Polymer.Base.async(function() {
+            // Key press 'u'
+            MockInteractions.keyDownOn(menu, 85);
+
+            // Key press 'g'
+            MockInteractions.keyDownOn(menu, 71);
+
+            Polymer.Base.async(function() {
+              var focusedItem = Polymer.dom(menu).node.focusedItem;
+              assert.equal(focusedItem, menu.items[1], 'menu.items[1] is focused');
+              done();
+            });
+          });
+        });
+
+        test('focusing on item with bogus attr-for-item-title', function(done) {
+          var menu = fixture('bogus-attr-for-item-title');
+          MockInteractions.focus(menu);
+
+          // Wait for async focus
+          Polymer.Base.async(function() {
+            // Key press 'i'
+            MockInteractions.keyDownOn(menu, 73);
+
+            Polymer.Base.async(function() {
+              var focusedItem = Polymer.dom(menu).node.focusedItem;
+              assert.equal(focusedItem, menu.items[0], 'menu.items[0] is still focused');
+              done();
+            });
+          });
+
         });
 
         test('focusing non-item content does not auto-focus an item', function(done) {

@@ -145,6 +145,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </template>
   </test-fixture>
 
+  <test-fixture id="EmptyDropdown">
+    <template>
+      <iron-dropdown></iron-dropdown>
+    </template>
+  </test-fixture>
+
   <script>
     function elementIsVisible(element) {
       var contentRect = element.getBoundingClientRect();
@@ -233,6 +239,78 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             });
           });
         });
+
+        suite('when dropdown is empty', function() {
+          test('keeps the sizingTarget default value', function() {
+            dropdown = fixture('EmptyDropdown');
+            expect(dropdown.sizingTarget).to.be.equal(dropdown);
+          });
+        });
+
+        suite('correct animationConfig setup', function() {
+          test('as objects', function() {
+            dropdown.openAnimationConfig = {
+              name: 'open-animation'
+            };
+            dropdown.closeAnimationConfig = {
+              name: 'close-animation'
+            };
+
+            dropdown.opened = true;
+
+            assert.deepEqual(dropdown.openAnimationConfig, {
+              name: 'open-animation',
+              node: content
+            }, 'open animation ok');
+
+            assert.deepEqual(dropdown.closeAnimationConfig, {
+              name: 'close-animation',
+              node: content
+            }, 'close animation ok');
+
+            assert.deepEqual(dropdown.animationConfig, {
+              open: dropdown.openAnimationConfig,
+              close: dropdown.closeAnimationConfig
+            }, 'animationConfig ok');
+          });
+
+          test('as arrays', function() {
+            dropdown.openAnimationConfig = [{
+              name: 'open-animation-1'
+            }, {
+              name: 'open-animation-2'
+            }];
+            dropdown.closeAnimationConfig = [{
+              name: 'close-animation-1'
+            }, {
+              name: 'close-animation-2'
+            }];
+
+            dropdown.opened = true;
+
+            assert.deepEqual(dropdown.openAnimationConfig, [{
+              name: 'open-animation-1',
+              node: content
+            }, {
+              name: 'open-animation-2',
+              node: content
+            }], 'open animation ok');
+
+            assert.deepEqual(dropdown.closeAnimationConfig, [{
+              name: 'close-animation-1',
+              node: content
+            }, {
+              name: 'close-animation-2',
+              node: content
+            }], 'close animation ok');
+
+            assert.deepEqual(dropdown.animationConfig, {
+              open: dropdown.openAnimationConfig,
+              close: dropdown.closeAnimationConfig
+            }, 'animationConfig ok');
+          });
+        });
+
       });
 
       suite('locking scroll', function() {

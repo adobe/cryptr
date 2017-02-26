@@ -1,0 +1,10 @@
+{
+  "name": "cryptr",
+  "author": "Jacob Crowther <crowther@adobe.com>",
+  "version": "0.0.1",
+  "description": "A GUI for Vault",
+  "repository": {
+    "url": "https://github.com/jcrowthe/cryptr.git"
+  },
+  "license": "MIT"
+}

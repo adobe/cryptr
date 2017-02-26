@@ -103,7 +103,9 @@ method is called on the element.
 
           /**
            * An animation config. If provided, this will be used to animate the
-           * opening of the dropdown.
+           * opening of the dropdown. Pass an Array for multiple animations.
+           * See `neon-animation` documentation for more animation configuration
+           * details.
            */
           openAnimationConfig: {
             type: Object
@@ -111,7 +113,9 @@ method is called on the element.
 
           /**
            * An animation config. If provided, this will be used to animate the
-           * closing of the dropdown.
+           * closing of the dropdown. Pass an Array for multiple animations.
+           * See `neon-animation` documentation for more animation configuration
+           * details.
            */
           closeAnimationConfig: {
             type: Object
@@ -191,7 +195,7 @@ method is called on the element.
 
         attached: function () {
           if (!this.sizingTarget || this.sizingTarget === this) {
-            this.sizingTarget = this.containedElement;
+            this.sizingTarget = this.containedElement || this;
           }
         },
 
@@ -309,9 +313,11 @@ method is called on the element.
          * to configure specific parts of the opening and closing animations.
          */
         _updateAnimationConfig: function() {
-          var animations = (this.openAnimationConfig || []).concat(this.closeAnimationConfig || []);
+          // Update the animation node to be the containedElement.
+          var animationNode = this.containedElement;
+          var animations = [].concat(this.openAnimationConfig || []).concat(this.closeAnimationConfig || []);
           for (var i = 0; i < animations.length; i++) {
-            animations[i].node = this.containedElement;
+            animations[i].node = animationNode;
           }
           this.animationConfig = {
             open: this.openAnimationConfig,

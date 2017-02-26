@@ -4,16 +4,16 @@
 <style is="custom-style">
 	:root {
 
-		--iron-overlay-backdrop-background-color: #39547F;
+		--iron-overlay-backdrop-background-color: #333;
 		--iron-overlay-backdrop-opacity: 1;
 
-		--accent-color: #1972FF;
+		--accent-color: #4496ff;
 		--primary-text-color: #212121;
 		--primary-background-color: #ffffff;
 		--secondary-text-color: #737373;
 		--disabled-text-color: #9b9b9b;
 		--divider-color: #dbdbdb;
-		--primary-color: #1972FF;
+		--primary-color: #4496ff;
 		--light-primary-color: #c5cae9;
 		--dark-primary-color: #303f9f;
 		--light-accent-color: #ff80ab;
@@ -76,6 +76,13 @@
 		border-bottom: none;
 	}
 
+	#deleted {
+		right: 10px;
+		left: auto !important;
+		background-color: var(--accent-color);
+		min-width: 95px;
+	}
+
 	.menu-name {
 		color: white;
 	}
@@ -127,6 +134,7 @@
 	#mainToolbar {
 		background-color: white;
 		color: black;
+		-webkit-app-region: drag;
 	}
 
 	#mainToolbar.tall .app-name {

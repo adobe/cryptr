@@ -14,22 +14,27 @@
 
 <body unresolved>
 	<template is="dom-bind" id="app">
-		<login-form status="{{status}}" username="{{u}}" url="{{url}}"></login-form>
-		<login-status timer="{{timer}}" status="{{status}}" url="{{url}}"></login-status>
-		<request-data status="{{status}}" response="{{response}}" url="{{url}}"></request-data>
+		<login-form status="{{status}}" username="{{u}}" url="{{url}}" header="{{header}}" login-response="{{loginResponse}}" page="{{loginPage}}"></login-form>
+		<login-status status="{{status}}" url="{{url}}" header="{{header}}"></login-status>
+		<secrets-init status="{{status}}" header="{{header}}" login-response="{{loginResponse}}" secrets="{{secrets}}" access="{{access}}"></secrets-init>
 
-		<paper-drawer-panel id="paperDrawerPanel" drawer-width="170px">
+		<paper-drawer-panel id="paperDrawerPanel" drawer-width="{{drawerWidth}}">
 			<!-- Drawer Area -->
 			<paper-scroll-header-panel drawer fixed>
-				<paper-toolbar id="drawerToolbar">
-					<span class="menu-name noselect" style="padding:0 16px">Cryptr</span>
+				<paper-toolbar id="drawerToolbar" style="-webkit-app-region: drag; padding-top: 15px;">
+					<iron-image id="logo" src="images/cryptr-internal.png" preload sizing="cover"></iron-image>
+					<span class="menu-name noselect">Cryptr</span>
 				</paper-toolbar>
 
-				<span id="drawerMenuText" class="noselect">Home</span>
-				<paper-menu attr-for-selected="data-route" selected="[[route]]">
+				<span id="drawerMenuText" class="noselect">HOME</span>
+				<paper-menu attr-for-selected="data-route" selected="{{route}}">
 					<a data-route="home" href="{{baseUrl}}" class="noselect">
 						<iron-icon icon="dashboard"></iron-icon>
 						<span>Dashboard</span>
+					</a>
+					<a data-route="create" href="{{baseUrl}}create" class="noselect">
+						<iron-icon icon="dashboard"></iron-icon>
+						<span>Create</span>
 					</a>
 					<template is="dom-if" if="{{query}}">
 						<a data-route="search" href="{{baseUrl}}search" class="noselect">
@@ -37,50 +42,31 @@
 							<span>Search</span>
 						</a>
 					</template>
-
-					<span id="drawerMenuText" class="noselect">Folders</span>
-					<a data-route="all" href="{{baseUrl}}all" class="noselect">
-						<iron-icon icon="folder-open"></iron-icon>
-						<span>All</span>
-					</a>
-
-					<template is="dom-repeat" items="{{response.folders}}">
-						<a data-route="folder{{index}}" href="{{baseUrl}}folder/{{index}}" class="noselect">
-							<iron-icon icon="folder-open"></iron-icon>
-							<span>{{item}}</span>
-						</a>
-					</template>
 				</paper-menu>
+
+				<span id="drawerMenuText" class="noselect">SECRETS</span>
+				<folder-structure secrets="[[secrets]]" route="{{route}}" base-url="{{baseUrl}}" base-folder="secret" indent="20"></folder-structure>
+
+				<div style="height: 40px; width: {{drawerWidth}};"></div>  <!--Spacer-->
+
+				<div class="bottom-corner" style="color: #737373; background-color: #262B33; width: {{drawerWidth}};">
+					<paper-icon-button icon="settings"></paper-icon-button>
+				</div>
 			</paper-scroll-header-panel>
 
 			<!-- Main Area -->
 			<paper-scroll-header-panel main id="headerPanelMain" fixed>
 				<!-- Topbar -->
 				<paper-toolbar id="mainToolbar">
-					<!-- For future developments -->
-					<!-- <refresh-keys></refresh-keys> -->
-
 					<search-box query="{{query}}"></search-box>
 					<span class="space"></span>
-
-
+					<refresh-data></refresh-data>
 					<user-info username="{{u}}" url="{{url}}"></user-info>
-					<!-- <paper-icon-button icon="search"></paper-icon-button> -->
-
-					<!-- Application name -->
-					<div class="middle middle-container">
-						<div class="app-name"></div>
-					</div>
-
-					<!-- Application sub title -->
-					<div class="bottom bottom-container">
-						<div class="bottom-title"></div>
-					</div>
 				</paper-toolbar>
 
 				<!-- Main Content -->
 				<div class="content" style="height: 100%">
-					<iron-pages attr-for-selected="data-route" selected="{{pageroute}}" style="height: 100%">
+					<iron-pages attr-for-selected="data-route" selected="{{route}}" style="height: 100%">
 						<section data-route="home">
 							<paper-material elevation="1">
 								<h2 class="page-title">Dashboard</h2>
@@ -88,15 +74,30 @@
 							</paper-material>
 						</section>
 
-						<section data-route="all" style="height: 100%">
-							<salt-data route="{{route}}" response="{{response}}" query="{{query}}" url="{{url}}" prev-password="{{prevPassword}}"></salt-data>
+						<section data-route="create">
+							<paper-material elevation="1">
+								<h2 class="page-title">Create</h2>
+								<create-secret header="{{header}}"></create-secret>
+							</paper-material>
 						</section>
 
+						<template is="dom-repeat" items="{{secrets}}" filter="filterFolders">
+							<section data-route="{{item.type}}/{{item.location}}" style="height: 100%">
+								<secret-folder secrets={{secrets}} header="{{header}}" route="{{route}}" location="{{item.location}}"></secret-folder>
+							</section>
+						</template>
+
+						<template is="dom-repeat" items="{{secrets}}" filter="filterSecrets">
+							<section data-route="{{item.type}}/{{item.location}}" style="height: 100%">
+								<secret-item secrets={{secrets}} header="{{header}}" route="{{route}}" location="{{item.location}}"></secret-item>
+							</section>
+						</template>
 					</iron-pages>
 				</div>
-			</paper-header-panel>
-		</paper-scroll-drawer-panel>
+			</paper-scroll-header-panel>
+		</paper-drawer-panel>
 
+		<paper-toast id="deleted" duration="1500" text="Deleted"></paper-toast>
 		<paper-toast id="toast">
 			<span class="toast-hide-button" role="button" tabindex="0" onclick="app.$.toast.hide()">Ok</span>
 		</paper-toast>
@@ -104,19 +105,30 @@
 	</template>
 
 	<script src="scripts/app.js"></script>
+	<script src="scripts/hcltojson.js"></script>
 	<script>
 		const clipboard = require('electron').clipboard;
 		const ipcRenderer = require('electron').ipcRenderer;
 		app.url = 'start';
-		ipcRenderer.on('url', function(event, arg) { app.url = arg; });
+		app.drawerWidth = '220px';
+		ipcRenderer.on('url', function(event, arg) {
+			app.url = arg;
+		});
 		ipcRenderer.on('user', function(event, arg) {
 			app.u = arg;
 			// Set cursor autofocus for login/password fields
-			if (app.u == '') document.getElementById('sub1').autofocus = true;
-			else document.getElementById('sub2').autofocus = true;
+			if (app.u == '') document.getElementById('userfield').autofocus = true;
+			else document.getElementById('passfield').autofocus = true;
 		});
 		ipcRenderer.on('prevpass', function(event, arg) { app.prevPassword = arg; });
+		ipcRenderer.on('loginpage', function(event, arg) { app.loginPage = arg; });
 		ipcRenderer.send('initialized', 'ping');
+		app.filterFolders = function(item) {
+			return item.type == 'folder';
+		};
+		app.filterSecrets = function(item) {
+			return item.type == 'secret';
+		};
 	</script>
 </body>
 </html>

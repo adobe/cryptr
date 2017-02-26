@@ -66,6 +66,10 @@ as you would a regular DOM element:
 <dom-module id="marked-element">
   <template>
     <style>
+      :host {
+        display: block;
+      }
+
       /* Thanks IE 10. */
       .hidden {
         display: none !important;
@@ -102,6 +106,16 @@ as you would a regular DOM element:
         observer: 'render',
         type: Boolean,
         value: false
+      },
+      /**
+       * Function used to customize a renderer based on the [API specified in the Marked
+       * library](https://github.com/chjj/marked#overriding-renderer-methods).
+       * It takes one argument: a marked renderer object, which is mutated by the function.
+       */
+      renderer: {
+        observer: 'render',
+        type: Function,
+        value: null
       },
       /**
        * Sanitize the output. Ignore any HTML that has been input.
@@ -203,7 +217,12 @@ as you would a regular DOM element:
         Polymer.dom(this._outputElement).innerHTML = '';
         return;
       }
+      var renderer = new marked.Renderer();
+      if (this.renderer) {
+        this.renderer(renderer);
+      }
       var opts = {
+        renderer: renderer,
         highlight: this._highlight.bind(this),
         sanitize: this.sanitize,
         pedantic: this.pedantic,

@@ -419,13 +419,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         Polymer.dom.flush();
 
         var item = list._physicalItems[0];
-
-        if (item.setActive) {
-          item.setActive();
-        } else {
-          item.focus();
-        }
-
+        item.focus();
         MockInteractions.tap(item);
         assert.isNotNull(list.selectedItem);
       });

@@ -1,0 +1,256 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  <title>vaadin-grid – Other</title>
+
+  <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+
+  <link rel="import" href="common.html">
+
+  <style type="text/css">
+    .userdetailswrapper {
+      padding: 10px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .userdetails {
+      padding: 10px;
+      width: 100%;
+      box-sizing: border-box;
+      -webkit-box-shadow: 0px 0px 15px -3px rgba(0,0,0,0.75);
+      -moz-box-shadow: 0px 0px 15px -3px rgba(0,0,0,0.75);
+      box-shadow: 0px 0px 15px -3px rgba(0,0,0,0.75);
+    }
+
+    .userdetails img {
+      margin-right: 10px;
+    }
+
+    .userdetails small {
+      color: #AAA;
+      font-weight: 100;
+      padding-bottom: 2px;
+    }
+
+    .userdetails div {
+      text-transform: capitalize;
+    }
+  </style>
+</head>
+
+<body unresolved>
+
+  <div class="vertical-section-container centered">
+
+    <demo-navigation class="vertical-section"></demo-navigation>
+
+    <section>
+      <h3>Scrolling</h3>
+      <demo-snippet>
+        <template>
+
+          <button class="demo-button" id="scrollToStart">scrollToStart()</button>
+          <button class="demo-button" id="scrollToEnd">scrollToEnd()</button>
+          <button class="demo-button" id="scrollToRow">scrollToRow(100)</button>
+
+          <vaadin-grid id="grid-scrolling">
+            <table>
+              <colgroup>
+                <col>
+                <col>
+                <col>
+                <col>
+              </colgroup>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Name</th>
+                  <th>Surname</th>
+                  <th>Activity</th>
+                </tr>
+              </thead>
+            </table>
+          </vaadin-grid>
+
+          <script>
+            var grid = document.getElementById('grid-scrolling');
+            grid.items = window.employees;
+
+            // Wait until grid has been enterelly rendered
+            grid.then(function() {
+              // Scroll to a specific row.
+              grid.scrollToRow(70);
+            });
+
+            grid.columns[0].renderer = function(cell) {
+              cell.element.innerHTML = cell.row.index;
+            };
+
+            document.getElementById('scrollToStart').addEventListener('click', function() {
+              grid.scrollToStart();
+            });
+            document.getElementById('scrollToEnd').addEventListener('click', function() {
+              grid.scrollToEnd();
+            });
+            document.getElementById('scrollToRow').addEventListener('click', function() {
+              grid.scrollToRow(100);
+            });
+          </script>
+        </template>
+      </demo-snippet>
+    </section>
+
+    <section>
+      <h3>Row details</h3>
+      <demo-snippet>
+        <template>
+          <x-grid-details></x-grid-details>
+
+          <dom-module id="x-grid-details">
+            <template>
+
+              <div id="details" class="userdetails" style="display: -webkit-flex; display: flex; height: 170px;">
+                <img src="[[user.picture.large]]" style="height: 100px; width: 100px;" />
+                <div class="usercolumn">
+                  <small>Name</small>
+                  <div class="userdata">[[user.name.first]]</div>
+                  <small>Surname</small>
+                  <div class="userdata">[[user.name.last]]</div>
+                  <small>Title</small>
+                  <div class="userdata">Designer</div>
+                  <small>Hire date</small>
+                  <div class="userdata">10th August 2015</div>
+                </div>
+                <div class="usercolumn">
+                  <small>City</small>
+                  <div class="userdata">[[user.location.city]]</div>
+                  <small>Street</small>
+                  <div class="userdata">[[user.location.street]]</div>
+                  <small>Phone</small>
+                  <div class="userdata">[[user.phone]]</div>
+                  <div style="display: -webkit-flex; display: flex;">
+                    <button class="demo-button">MESSAGE</button>
+                    <button class="demo-button whitebutton">EDIT</button>
+                  </div>
+                </div>
+              </div>
+
+              <vaadin-grid id="grid">
+                <table>
+                  <colgroup>
+                    <col name="user.name.first">
+                    <col name="user.name.last">
+                    <col name="user.email" flex>
+                  </colgroup>
+                </table>
+              </vaadin-grid>
+
+            </template>
+            <script>
+              Polymer({
+                is: 'x-grid-details',
+
+                ready: function() {
+                  var grid = this.$.grid;
+                  var details = this.$.details;
+
+                  // Remofe details from dom until used
+                  details.parentNode.removeChild(details);
+
+                  grid.size = 1000;
+                  grid.items = function(params, callback) {
+                    var url = 'https://randomuser.me/api?index=' + params.index + '&results=' + params.count;
+                    getJSON(url, function(data) {
+                      callback(data.results);
+                    });
+                  };
+
+                  grid.rowDetailsGenerator = function(rowIndex) {
+                    grid.getItem(rowIndex, function(error, item) {
+                      if (!error) {
+                        this.user = item.user;
+                      }
+                    }.bind(this));
+
+                    // We reuse the element
+                    return details;
+                  }.bind(this);
+
+                  grid.addEventListener('selected-items-changed', function() {
+                    grid.setRowDetailsVisible(this._opened || 0, false);
+                    var selected = grid.selection.selected();
+                    if (selected.length == 1) {
+                      grid.setRowDetailsVisible(selected[0], true);
+                      this._opened = selected[0];
+                    }
+                  }.bind(this));
+                }
+
+              });
+            </script>
+          </dom-module>
+        </template>
+      </demo-snippet>
+    </section>
+
+    <section>
+      <h3>Polymer Integration (Light DOM data source)</h3>
+      <demo-snippet>
+        <template>
+          <div>
+            <template is="dom-bind" id="my-template">
+              <vaadin-grid>
+                <table>
+                  <colgroup>
+                    <col width="64">
+                    <col width="100">
+                    <col>
+                    <col>
+                    <col>
+                  </colgroup>
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th></th>
+                      <th>First Name</th>
+                      <th>Last Name</th>
+                      <th>Email</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <template is="dom-repeat" items="[[users]]">
+                      <tr>
+                        <td>[[index]]</td>
+                        <td>
+                          <img src="[[item.user.picture.thumbnail]]" style="width: 24px"></img>
+                        </td>
+                        <td>[[item.user.name.first]]</td>
+                        <td>[[item.user.name.last]]</td>
+                        <td>[[item.user.email]]</td>
+                      </tr>
+                    </template>
+                  </tbody>
+                </table>
+              </vaadin-grid>
+            </template>
+          </div>
+          <script>
+            var template = document.getElementById('my-template');
+
+            getJSON('https://randomuser.me/api?results=25', function(data) {
+              template.users = data.results;
+            });
+          </script>
+        </template>
+      </demo-snippet>
+    </section>
+
+  </div>
+</body>
+</html>

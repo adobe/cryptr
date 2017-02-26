@@ -23,14 +23,22 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   <link rel="import" href="../paper-radio-button.html">
 
   <style is="custom-style">
-    paper-radio-button.large {
-      --paper-radio-button-size: 48px;
+    paper-radio-button.tiny {
+      --paper-radio-button-size: 5px;
     }
     paper-radio-button.medium {
-      --paper-radio-button-size: 24px;
+      --paper-radio-button-size: 37px;
     }
-    paper-radio-button.small {
-      --paper-radio-button-size: 12px;
+    paper-radio-button.giant {
+      --paper-radio-button-size: 50px;
+    }
+    paper-radio-button.enormous {
+      --paper-radio-button-size: 71px;
+    }
+
+    paper-radio-button.custom-ink-size {
+      --paper-radio-button-size: 25px;
+      --paper-radio-button-ink-size: 30px;
     }
   </style>
 </head>
@@ -55,9 +63,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
   <test-fixture id="WithDifferentSizes">
     <template>
-      <paper-radio-button class="small" checked></paper-radio-button>
-      <paper-radio-button class="medium" checked></paper-radio-button>
-      <paper-radio-button class="large" checked></paper-radio-button>
+      <paper-radio-button class="tiny"></paper-radio-button>
+      <paper-radio-button></paper-radio-button>
+      <paper-radio-button class="medium"></paper-radio-button>
+      <paper-radio-button class="giant"></paper-radio-button>
+      <paper-radio-button class="enormous"></paper-radio-button>
+    </template>
+  </test-fixture>
+
+  <test-fixture id="CustomInkSize">
+    <template>
+      <paper-radio-button class="custom-ink-size"></paper-radio-button>
     </template>
   </test-fixture>
 
@@ -117,6 +133,45 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         assert.isTrue(small.width < medium.width);
         assert.isTrue(medium.width < large.width);
         assert.isTrue(large.width < 72);
+      });
+    });
+
+    suite('ink size', function() {
+      var radioButtons;
+
+      setup(function() {
+        radioButtons = fixture('WithDifferentSizes');
+      });
+
+      test('`--paper-radio-button-ink-size` sets the ink size', function() {
+        var radioButton = fixture('CustomInkSize');
+        assert.equal(radioButton.getComputedStyleValue('--calculated-paper-radio-button-size').trim(), '25px');
+        assert.equal(radioButton.getComputedStyleValue('--calculated-paper-radio-button-ink-size').trim(), '30px');
+      });
+
+      test('ink sizes are near (3 * radio button size) by default', function() {
+        radioButtons.forEach(function(radioButton) {
+          var size = parseFloat(radioButton.getComputedStyleValue('--calculated-paper-radio-button-size'), 10);
+          var inkSize = parseFloat(radioButton.getComputedStyleValue('--calculated-paper-radio-button-ink-size'), 10);
+          assert.approximately(inkSize / size, 3, 0.1);
+        });
+      });
+
+      test('ink sizes are integers', function() {
+        radioButtons.forEach(function(radioButton) {
+          var unparsedInkSize = radioButton.getComputedStyleValue('--calculated-paper-radio-button-ink-size');
+          var floatInkSize = parseFloat(unparsedInkSize, 10);
+          var intInkSize = parseInt(unparsedInkSize, 10);
+          assert.equal(floatInkSize, intInkSize);
+        });
+      });
+
+      test('ink size parity matches radio button size parity (centers are aligned)', function() {
+        radioButtons.forEach(function(radioButton) {
+          var size = parseInt(radioButton.getComputedStyleValue('--calculated-paper-radio-button-size'), 10);
+          var inkSize = parseInt(radioButton.getComputedStyleValue('--calculated-paper-radio-button-ink-size'), 10);
+          assert.equal(size % 2, inkSize % 2);
+        });
       });
     });
 
