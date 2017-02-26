@@ -1,0 +1,26 @@
+<dom-module id="refresh-data">
+	<template>
+        <paper-icon-button icon="refresh" on-click="_refreshKeys"></paper-icon-button>
+	</template>
+
+	<script>
+		(function() {
+			'use strict';
+			Polymer({
+				is: 'refresh-data',
+                _refreshKeys: function() {
+					// Clear all data
+					app.response = {};
+					app.data = {};
+					app.access = {};
+					app.query = '';
+					app.secrets = [];
+
+					// Start secrets-init process again
+					app.status = '';
+					app.status = 'watch';
+                }
+			});
+		})();
+	</script>
+</dom-module>

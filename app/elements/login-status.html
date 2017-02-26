@@ -55,17 +55,19 @@
 				},
 				_success: function() {
 					if (this.response.status == 'success') {
+						clearInterval(this.timer);
 						this.status = 'watch';
 					}
 				},
 				_error: function() {
 					this.status = 'none';
 					app.response = {};
-					app.initialResponse = [];
+					app.loginResponse = {};
 					app.header = {};
 					app.data = {};
 					app.access = {};
 					app.query = '';
+					app.secrets = [];
 					clearInterval(this.timer);
 				}
 			});

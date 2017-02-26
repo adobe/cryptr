@@ -77,7 +77,7 @@
 			last-error={{loginError}}
 			on-response="_success"
 			on-error="_error"
-			timeout="5000">
+			timeout="30000">
 		</iron-ajax>
 
 		<iron-ajax id="testReq"
@@ -183,8 +183,8 @@
 						type: Object,
 						notify: true
 					},
-					initialResponse: {
-						type: Array,
+					loginResponse: {
+						type: Object,
 						notify: true
 					},
 					page: {
@@ -261,14 +261,14 @@
 					// UserPass / LDAP
 					if (this.loginResponse.auth && this.loginResponse.auth.client_token) {
 						this.header = {"X-Vault-Token": this.loginResponse.auth.client_token };
-						this.initialResponse = this.loginResponse.auth;
+						this.loginResponse = this.loginResponse.auth;
 						this.status = 'watch';
 						this.password = '';
 						this.disabled = false;
 						this.$.modal.close();
 					// Token Auth
 					} else if (this.loginResponse.data) {
-						this.initialResponse = this.loginResponse.data;
+						this.loginResponse = this.loginResponse.data;
 						this.username = 'TOKEN';
 						this.status = 'watch';
 						this.password = '';

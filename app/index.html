@@ -14,9 +14,9 @@
 
 <body unresolved>
 	<template is="dom-bind" id="app">
-		<login-form status="{{status}}" username="{{u}}" url="{{url}}" header="{{header}}" initial-response="{{loginResponse}}" page="{{loginPage}}"></login-form>
+		<login-form status="{{status}}" username="{{u}}" url="{{url}}" header="{{header}}" login-response="{{loginResponse}}" page="{{loginPage}}"></login-form>
 		<login-status status="{{status}}" url="{{url}}" header="{{header}}"></login-status>
-		<secrets-init status="{{status}}" header="{{header}}" login-response="{{loginResponse}}" secrets="{{secrets}}"></secrets-init>
+		<secrets-init status="{{status}}" header="{{header}}" login-response="{{loginResponse}}" secrets="{{secrets}}" access="{{access}}"></secrets-init>
 
 		<paper-drawer-panel id="paperDrawerPanel" drawer-width="{{drawerWidth}}">
 			<!-- Drawer Area -->
@@ -31,6 +31,10 @@
 					<a data-route="home" href="{{baseUrl}}" class="noselect">
 						<iron-icon icon="dashboard"></iron-icon>
 						<span>Dashboard</span>
+					</a>
+					<a data-route="create" href="{{baseUrl}}create" class="noselect">
+						<iron-icon icon="dashboard"></iron-icon>
+						<span>Create</span>
 					</a>
 					<template is="dom-if" if="{{query}}">
 						<a data-route="search" href="{{baseUrl}}search" class="noselect">
@@ -54,11 +58,9 @@
 			<paper-scroll-header-panel main id="headerPanelMain" fixed>
 				<!-- Topbar -->
 				<paper-toolbar id="mainToolbar">
-					<!-- For future developments -->
-					<!-- <refresh-keys></refresh-keys> -->
-
 					<search-box query="{{query}}"></search-box>
 					<span class="space"></span>
+					<refresh-data></refresh-data>
 					<user-info username="{{u}}" url="{{url}}"></user-info>
 				</paper-toolbar>
 
@@ -69,6 +71,13 @@
 							<paper-material elevation="1">
 								<h2 class="page-title">Dashboard</h2>
 								<p>Placeholder for future content. This may include keys nearing the end of their 90 day lifespan and recently modified keys. </p>
+							</paper-material>
+						</section>
+
+						<section data-route="create">
+							<paper-material elevation="1">
+								<h2 class="page-title">Create</h2>
+								<create-secret header="{{header}}"></create-secret>
 							</paper-material>
 						</section>
 

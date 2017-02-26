@@ -228,7 +228,7 @@
 					this.clearVal = true;
                     this.$.done.text = 'Folder Deleted';
                     this.$.done.show();
-					page('#!/all');
+					page('#!/');
     			},
 				watchPrevPassword: function() {
 					ipcRenderer.send('update-prevpass', this.prevPassword);

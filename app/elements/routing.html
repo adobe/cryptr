@@ -20,8 +20,8 @@
 			app.route = 'home';
 		});
 
-		page('/all', function() {
-			app.route = 'all';
+		page('/create', function() {
+			app.route = 'create';
 		});
 
 		page('/folder/*', function(data) {
@@ -41,8 +41,6 @@
 			app.$.toast.show();
 			page.redirect(app.baseUrl);
 		});
-
-		page('#!/all');
 
 		page({
 			hashbang: true
