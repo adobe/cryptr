@@ -1,0 +1,29 @@
+{
+  "name": "granite-file-reader",
+  "authors": [
+    "Horacio Gonzalez <horacio.gonzalez@gmail.com>"
+  ],
+  "description": "A lightweight element to read a file from the filesystem",
+  "keywords": [
+    "web-component",
+    "web-components",
+    "polymer",
+    "lostinbrittany",
+    "file-reader"
+  ],
+  "main": "granite-file-reader.html",
+  "license": "MIT",
+  "homepage": "https://github.com/LostInBrittany/granite-file-reader",
+  "ignore": [],
+  "dependencies": {
+    "polymer": "Polymer/polymer#^1.5.0",
+    "iron-input": "PolymerElements/iron-input#^1.0.10"
+  },
+  "devDependencies": {
+    "iron-component-page": "PolymerElements/iron-component-page#^1.1.6",
+    "iron-demo-helpers": "PolymerElements/iron-demo-helpers#^1.2.3",
+    "paper-styles": "PolymerElements/paper-styles#^1.1.4",
+    "test-fixture": "PolymerElements/test-fixture#^1.1.1",
+    "web-component-tester": "^4.3.0"
+  }
+}

@@ -1,0 +1,158 @@
+<!--
+@license MIT
+Copyright (c) 2016 Horacio "LostInBrittany" Gonzalez
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+-->
+<link rel="import" href="../polymer/polymer.html">
+
+<!--
+`<granite-file-reader>` is lightweight element to read a file from the filesystem
+
+Typical usage:
+
+```html
+<granite-file-reader>
+  <paper-button>
+    Click to read the file
+  </paper-button>
+</granite-file-reader>
+```
+
+@element granite-file-reader
+@blurb A lightweight element to read a file from the filesystem
+@homepage index.html
+@demo demo/index.html
+-->
+<dom-module is="granite-file-reader">
+
+    <template>
+      <style>
+        :host {
+          display: block;
+          cursor: pointer;
+        }
+        [hidden] {
+          display: none;
+        }
+      </style>
+
+      <content></content>
+      <input
+        id="fileInput"
+        on-change="_onChange"
+        type="file"
+        accept="{{accept}}"
+        multiple="[[multiple]]"
+        hidden>
+    </template>
+
+
+
+    <script>
+      Polymer({
+        is: "granite-file-reader",
+
+        /**
+         * Fired when a file has been read
+         *
+         * @event file-read
+         */
+
+        properties: {
+          /**
+           *  The types of files that the browser can read
+           *  Available types are :
+           *  - A file extension starting with the STOP character (U+002E). (E.g.: ".jpg,.png,.doc")
+           *  - A valid MIME type with no extensions
+           *  - audio/* representing sound files HTML5
+           *  - video/* representing video files HTML5
+           *  - image/* representing image files HTML5
+           * See https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input
+           */
+          accept: {
+            type: String,
+            value: null,
+          },
+          /**
+           * How does the browser must read the file
+           * Available types are `text`, `binary`, `ArrayBuffer` and `dataURL`
+           * See https://developer.mozilla.org/en-US/docs/Web/API/FileReader
+           */
+          readAs: {
+            type: String,
+            value: "text"
+          },
+          /**
+           * If it should accept more than one file at a time
+           */
+          multiple: {
+            type: Boolean,
+            value: false
+          }
+        },
+
+        observers: [
+        ],
+        listeners: {
+          // Safari don't get the on-evt on light DOM
+          "tap": "_onTap"
+        },
+        _onTap: function(evt) {
+        //   console.log("[granite-file-reader] _onTap", evt.target.localName);
+        //   console.dir(evt)
+          // if it's the event on the light dom, I launch another on the granite-file-reader
+          // (if I didn't tested it, it would loop...)
+          if (evt.target.localName != "granite-file-reader" && evt.target.id != "fileInput") {
+            // Inspired by https://github.com/winhowes/file-upload/
+            var elem = this.$.fileInput;
+            if (elem && document.createEvent) { // sanity check
+              var evt = document.createEvent('MouseEvents');
+              evt.initEvent('click', true, false);
+            //   console.log("[granite-file-reader] _onTap - dispatch");
+              elem.dispatchEvent(evt);
+            }
+          }
+        },
+        _onChange: function(evt) {
+          if (!this.$.fileInput.files){
+            return;
+          }
+        //   console.debug("[granite-file-reader] _onChange", this.$.fileInput.files);
+
+          var file, i, n = this.$.fileInput.files.length;
+          for (i=0; i<n; i++) {
+            file = this.$.fileInput.files[i];
+            // console.debug("[granite-file-reader] _onChange",file);
+            var reader = new FileReader();
+            var context = this;
+            reader.onload = function(event) {
+              // The file's text will be printed here
+            //   console.debug("[granite-file-reader] _onChange", event.target.result);
+              file.data = event.target.result;
+              context.fire('file-read', file);
+            };
+            switch (this.readAs) {
+              case "binary" :
+                reader.readAsBinaryString(file);
+                break;
+              case "ArrayBuffer" :
+                reader.readAsArrayBuffer(file);
+                break;
+              case "dataURL":
+                reader.readAsDataURL(file);
+                break;
+              case "text":
+              default:
+                reader.readAsText(file);
+            };
+          }
+        },
+      });
+    </script>
+
+</dom-module>
