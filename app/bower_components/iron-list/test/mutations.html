@@ -194,6 +194,41 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
       });
 
+      test('Issue #389: delete some items from the top and scroll back to the top', function(done) {
+        list.items = buildDataSet(64);
+        Polymer.dom.flush();
+        list.scrollToIndex(63);
+
+        for (var i = 0; i < 16; i++ ) {
+          list.shift('items');
+        }
+        Polymer.dom.flush();
+        list.scroll(0, 100);
+        requestAnimationFrame(function() {
+          setTimeout(function() {
+            assert.equal(list.firstVisibleIndex, 5);
+            done();
+          });
+        });
+      });
+
+      test('Issue #389: delete some items from the top and scroll to index', function(done) {
+        list.items = buildDataSet(64);
+        Polymer.dom.flush();
+        list.scrollToIndex(63);
+        for (var i = 0; i < 16; i++ ) {
+          list.shift('items');
+        }
+        Polymer.dom.flush();
+        list.scrollToIndex(1);
+        requestAnimationFrame(function() {
+          setTimeout(function() {
+            assert.equal(list.firstVisibleIndex, 1);
+            done();
+          });
+        });
+      });
+
       test('reassign items', function(done) {
         list.items = buildDataSet(100);
         container.itemHeight = 'auto';

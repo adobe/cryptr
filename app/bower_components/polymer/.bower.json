@@ -1,6 +1,6 @@
 {
   "name": "polymer",
-  "version": "1.8.0",
+  "version": "1.8.1",
   "main": [
     "polymer.html",
     "polymer-mini.html",
@@ -32,14 +32,14 @@
     "iron-component-page": "polymerElements/iron-component-page#^1.1.6"
   },
   "private": true,
-  "homepage": "https://github.com/polymer/polymer",
-  "_release": "1.8.0",
+  "homepage": "https://github.com/Polymer/polymer",
+  "_release": "1.8.1",
   "_resolution": {
     "type": "version",
-    "tag": "v1.8.0",
-    "commit": "3a2c841469c82376dbd76ad06eefd4b892a4ae5a"
+    "tag": "v1.8.1",
+    "commit": "d89302fc3755b04ad4171f431e719a08b5b816f3"
   },
-  "_source": "git://github.com/polymer/polymer.git",
-  "_target": "^1.1.0",
-  "_originalSource": "polymer/polymer"
+  "_source": "https://github.com/Polymer/polymer.git",
+  "_target": "^1.5.0",
+  "_originalSource": "Polymer/polymer"
 }
