@@ -91,13 +91,13 @@ limitations under the License.
 						<section data-route="create">
 							<paper-material elevation="1">
 								<h2 class="page-title">Create</h2>
-								<secret-create header="{{header}}"></secret-create>
+								<secret-create header="{{header}}" create-location="{{createLocation}}"></secret-create>
 							</paper-material>
 						</section>
 
 						<template is="dom-repeat" items="{{secrets}}" filter="filterFolders">
 							<section data-route="{{item.type}}/{{item.location}}" style="height: 100%">
-								<secret-folder secrets={{secrets}} header="{{header}}" route="{{route}}" location="{{item.location}}"></secret-folder>
+								<secret-folder secrets={{secrets}} header="{{header}}" route="{{route}}" location="{{item.location}}" create-location="{{createLocation}}"></secret-folder>
 							</section>
 						</template>
 
