@@ -19,6 +19,8 @@
         "electron-builder": "^13.7.0"
     },
     "build": {
+        "productName":"Cryptr",
+        "copyright": "Copyright © 2017 Adobe",
         "appId": "io.cryptr",
         "mac": {
             "category": "public.app-category.productivity",
