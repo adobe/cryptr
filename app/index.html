@@ -89,10 +89,8 @@ limitations under the License.
 						</section>
 
 						<section data-route="create">
-							<paper-material elevation="1">
-								<h2 class="page-title">Create</h2>
-								<secret-create header="{{header}}" create-location="{{createLocation}}"></secret-create>
-							</paper-material>
+							<h2 class="page-title">Create Secret</h2>
+							<secret-create header="{{header}}" create-location="{{createLocation}}"></secret-create>
 						</section>
 
 						<template is="dom-repeat" items="{{secrets}}" filter="filterFolders">
