@@ -70,10 +70,14 @@ limitations under the License.
 							<span>{{item.name}}</span>
 						</a>
 					<paper-menu class="menu-content">
-						<folder-structure secrets="[[secrets]]" route="{{route}}" base-url="{{baseUrl}}" base-folder="{{item.location}}" indent="{{spacing}}"></folder-structure>
+						<folder-structure secrets="[[secrets]]" route="{{route}}" base-url="{{baseUrl}}" base-folder="{{item.location}}" indent="{{spacing}}" create-location="{{createLocation}}"></folder-structure>
 					</paper-menu>
 				</paper-submenu>
 			</template>
+			<a data-route="create{{indent}}" href="{{baseUrl}}create" class="noselect" create-location="{{createLocation}}" style="padding-left: {{indent}}px" on-tap="_setLocation">
+				<iron-icon icon="add"></iron-icon>
+				<span>New</span>
+			</a>
 			<template is="dom-repeat" items="{{secrets}}" filter="_filterSecrets" sort="_sort">
 				<a data-route="{{item.type}}/{{item.location}}" href="{{baseUrl}}secret/{{item.location}}" class="noselect" style="padding-left: {{indent}}px">
 					<iron-icon icon="communication:vpn-key"></iron-icon>
@@ -96,10 +100,16 @@ limitations under the License.
 				indent: {
 					type: Number,
 					observer: '_watchIndent'
+				},
+				createLocation: {
+					notify: true
 				}
 			},
 			_watchIndent: function(){
 				this.spacing = this.indent + 20;
+			},
+			_setLocation: function() {
+				this.createLocation = this.baseFolder;
 			},
 			_filterFolders: function(item) {
 				if (item.parent == this.baseFolder) return item.type == 'folder';
