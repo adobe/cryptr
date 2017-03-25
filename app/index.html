@@ -28,9 +28,9 @@ limitations under the License.
 
 <body unresolved>
 	<template is="dom-bind" id="app">
-		<login-form status="{{status}}" username="{{u}}" url="{{url}}" header="{{header}}" login-response="{{loginResponse}}" page="{{loginPage}}"></login-form>
+		<login-form status="{{status}}" username="{{u}}" url="{{url}}" header="{{header}}" login-response="{{loginResponse}}" page="{{loginPage}}" loading="{{loading}}"></login-form>
 		<login-status status="{{status}}" url="{{url}}" header="{{header}}"></login-status>
-		<secrets-init status="{{status}}" header="{{header}}" login-response="{{loginResponse}}" secrets="{{secrets}}" access="{{access}}"></secrets-init>
+		<secrets-init status="{{status}}" header="{{header}}" login-response="{{loginResponse}}" secrets="{{secrets}}" access="{{access}}" loading="{{loading}}"></secrets-init>
 
 		<paper-drawer-panel id="paperDrawerPanel" drawer-width="{{drawerWidth}}">
 			<!-- Drawer Area -->
@@ -103,7 +103,7 @@ limitations under the License.
 
 						<template is="dom-repeat" items="{{secrets}}" filter="filterSecrets">
 							<section data-route="{{item.type}}/{{item.location}}" style="height: 100%">
-								<secret-item secrets={{secrets}} header="{{header}}" route="{{route}}" location="{{item.location}}"></secret-item>
+								<secret-item secrets={{secrets}} header="{{header}}" route="{{route}}" location="{{item.location}}" loading="{{loading}}"></secret-item>
 							</section>
 						</template>
 					</iron-pages>
@@ -115,6 +115,8 @@ limitations under the License.
 		<paper-toast id="toast">
 			<span class="toast-hide-button" role="button" tabindex="0" onclick="app.$.toast.hide()">Ok</span>
 		</paper-toast>
+
+		<paper-progress indeterminate class="bottombar" disabled="{{!loading}}"></paper-progress>
 
 	</template>
 

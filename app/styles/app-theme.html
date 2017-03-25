@@ -73,8 +73,19 @@ limitations under the License.
 		}
 	}
 
-	/* General styles */
+	.bottombar {
+		position: fixed;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		width: 100vw;
+	}
 
+	paper-progress.bottombar {
+		--paper-progress-container-color: rgba(#ffffff, 0);
+	}
+
+	/* General styles */
 	body {
 		@apply(--layout-fullbleed);
 		@apply(--layout-vertical);

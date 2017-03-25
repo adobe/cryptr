@@ -44,9 +44,6 @@ limitations under the License.
 			paper-dialog > *:nth-child(2) {
 				margin-top: 60px;
 			}
-			paper-progress.blue {
-				--paper-progress-active-color: #03A9F4;
-			}
 			.flex-horizontal {
 				@apply(--layout-horizontal);
 			}
@@ -77,6 +74,16 @@ limitations under the License.
 				top: -122px;
 				-webkit-transform: translateX(-50%);
 				transform: translateX(-50%);
+			}
+			.bottombar {
+				position: fixed;
+				left: 0;
+				right: 0;
+				bottom: 0;
+				width: 100vw;
+			}
+			paper-progress.bottombar {
+				--paper-progress-container-color: rgba(#ffffff, 0);
 			}
 		</style>
 
@@ -136,9 +143,9 @@ limitations under the License.
 				</div>
 			</iron-pages>
 			<div class="buttons">
-				<paper-button on-tap="_login" autofocus disabled="{{disabled}}">Login</paper-button>
+				<paper-button on-tap="_login" autofocus disabled="{{loading}}">Login</paper-button>
 			</div>
-			<paper-progress style="padding-left:10px" class="blue" indeterminate disabled="{{!disabled}}"></paper-progress>
+			<paper-progress class="bottombar" indeterminate disabled="{{!loading}}"></paper-progress>
 		</paper-dialog>
 
 		<paper-toast id="errortoast" class="fit-bottom" duration="5000" text""></paper-toast>
@@ -184,7 +191,7 @@ limitations under the License.
 						type: String,
 						value: ''
 					},
-					disabled: {
+					loading: {
 						type: Boolean,
 						value: false
 					},
@@ -264,7 +271,7 @@ limitations under the License.
 							this.authURL = this.url + 'v1/auth/userpass/login/' + this.username;
 							this.body = {"password": this.password };
 						}
-						this.disabled = true;
+						this.loading = true;
 						this.$.authenticateReq.generateRequest();
 					} else {
 						this.$.errortoast.text = 'An HTTPS based URL is required.';
@@ -278,7 +285,6 @@ limitations under the License.
 						this.loginResponse = this.loginResponse.auth;
 						this.status = 'watch';
 						this.password = '';
-						this.disabled = false;
 						this.$.modal.close();
 					// Token Auth
 					} else if (this.loginResponse.data) {
@@ -286,12 +292,11 @@ limitations under the License.
 						this.username = 'TOKEN';
 						this.status = 'watch';
 						this.password = '';
-						this.disabled = false;
 						this.$.modal.close();
 					}
 				},
 				_error: function(e) {
-					this.disabled = false;
+					this.loading = false;
 					if (this.loginError.response.errors[0].includes('Invalid Credentials')) this.$.errortoast.text = 'Invalid Credentials';
 					else if (this.loginError.response.errors[0].includes('No Such Object')) this.$.errortoast.text = 'Invalid Username or Password';
 					else if (this.loginError.response.errors[0] == 'invalid username or password') this.$.errortoast.text = 'Invalid Username or Password';
