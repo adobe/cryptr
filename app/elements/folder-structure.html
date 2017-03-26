@@ -67,7 +67,7 @@ limitations under the License.
 				<paper-submenu attr-for-selected="data-route" selected="{{route}}">
 						<a data-route="{{item.type}}/{{item.location}}" href="{{baseUrl}}folder/{{item.location}}" class="noselect menu-trigger" style="padding-left: {{indent}}px">
 							<iron-icon icon="folder-open"></iron-icon>
-							<span>{{item.name}}</span>
+							<span>{{item.parsedname}}</span>
 						</a>
 					<paper-menu class="menu-content">
 						<folder-structure secrets="[[secrets]]" route="{{route}}" base-url="{{baseUrl}}" base-folder="{{item.location}}" indent="{{spacing}}" create-location="{{createLocation}}"></folder-structure>
@@ -81,7 +81,7 @@ limitations under the License.
 			<template is="dom-repeat" items="{{secrets}}" filter="_filterSecrets" sort="_sort">
 				<a data-route="{{item.type}}/{{item.location}}" href="{{baseUrl}}secret/{{item.location}}" class="noselect" style="padding-left: {{indent}}px">
 					<iron-icon icon="communication:vpn-key"></iron-icon>
-					<span>{{item.name}}</span>
+					<span>{{item.parsedname}}</span>
 				</a>
 			</template>
 		</paper-menu>
