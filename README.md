@@ -20,25 +20,24 @@ npm install
 npm run dev
 ```
 
+# Fun Features
 
-## License
+In addition to the feature-set of Vault, Cryptr adds some things that are "nice to have". Some of these include:
+- Secrets can be files
+- Underscores in key names show as whitespace. ie. `secret/My_cool_Secret` shows up in the folder structure as `My cool Secret`
+- Ability to move secrets.
 
+### License
 Apache 2.0 License
 
+### HTTPS
+Cryptr will ONLY access Vault servers enabled with HTTPS. These are your secrets. Keep them secret, keep them safe.
 
-## HTTPS
-
-Cryptr will ONLY access Vault servers enabled with HTTPS.
-These are your secrets. Don't be stupid.
-
-
-## Auth backends
-
+### Auth backends
 Currently LDAP, UserPass and Token auth backends are accepted. Most others are not useful for a GUI, but if you feel otherwise, submit a pull request.
 
 
 # Important Notes about Policies
-
 ## Secret Discovery
 
 Cryptr requires the policies associated with the token to be readable by the token. The purpose for this is to discover what secrets are available to the token. An example ACL for policy found at `sys/policy/allsecrets` would be as follows:
