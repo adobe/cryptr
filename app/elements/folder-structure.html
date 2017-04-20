@@ -16,6 +16,10 @@ limitations under the License.
 <html>
 <dom-module id="folder-structure">
 	<style>
+		.iconsize {
+			min-width: 24px;
+			min-height: 24px;
+		}
 		.noselect {
 			-webkit-user-select: none;
 			-moz-user-select: none;
@@ -64,14 +68,14 @@ limitations under the License.
 	<template>
 		<paper-menu attr-for-selected="data-route" selected="{{route}}" class="menu-content">
 			<a data-route="create{{indent}}" href="{{baseUrl}}create" class="noselect" create-location="{{createLocation}}" style="padding-left: {{indent}}px" on-tap="_setLocation">
-				<iron-icon icon="add"></iron-icon>
-				<span>New</span>
+				<iron-icon class="iconsize" icon="add"></iron-icon>
+				<span style="white-space: nowrap;">New</span>
 			</a>
 			<template is="dom-repeat" items="{{secrets}}" filter="_filterFolders" sort="_sort">
 				<paper-submenu attr-for-selected="data-route" selected="{{route}}">
 						<a data-route="{{item.type}}/{{item.location}}" href="{{baseUrl}}folder/{{item.location}}" class="noselect menu-trigger" style="padding-left: {{indent}}px">
-							<iron-icon icon="folder-open"></iron-icon>
-							<span>{{item.parsedname}}</span>
+							<iron-icon class="iconsize" icon="folder-open"></iron-icon>
+							<span style="white-space: nowrap;">{{item.parsedname}}</span>
 						</a>
 					<paper-menu class="menu-content">
 						<folder-structure secrets="[[secrets]]" route="{{route}}" base-url="{{baseUrl}}" base-folder="{{item.location}}" indent="{{spacing}}" create-location="{{createLocation}}"></folder-structure>
@@ -80,8 +84,8 @@ limitations under the License.
 			</template>
 			<template is="dom-repeat" items="{{secrets}}" filter="_filterSecrets" sort="_sort">
 				<a data-route="{{item.type}}/{{item.location}}" href="{{baseUrl}}secret/{{item.location}}" class="noselect" style="padding-left: {{indent}}px">
-					<iron-icon icon="communication:vpn-key"></iron-icon>
-					<span>{{item.parsedname}}</span>
+					<iron-icon class="iconsize" icon="communication:vpn-key"></iron-icon>
+					<span style="white-space: nowrap;">{{item.parsedname}}</span>
 				</a>
 			</template>
 		</paper-menu>
