@@ -47,7 +47,7 @@ limitations under the License.
                     }
 				},
                 _computeToUpper: function(username) {
-                    return this.username.toUpperCase();
+					return (this.username) ? this.username.toUpperCase() : '';
                 },
                 _logoutUser: function() {
 					// This function simply erases the token from memory, effectively erasing all memory of
