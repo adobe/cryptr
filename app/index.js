@@ -34,13 +34,15 @@ function createWindow() {
 		if (settings.init === undefined || settings.init === null) settings.init = '';
 		if (settings.prevpass === undefined || settings.prevpass === null) settings.prevpass = false;
 		if (settings.loginpage === undefined || settings.loginpage === null) settings.loginpage = 0;
+		if (settings.drawerWidth === undefined || settings.drawerWidth === null) settings.drawerWidth = '220px';
 	}
 	catch(e) {
-		settings.width = 1052;
-		settings.height = 612;
+		settings.width = 800;
+		settings.height = 600;
 		settings.init = '';
 		settings.prevpass = false;
 		settings.loginpage = 0;
+		settings.drawerWidth = '220px';
 	}
 
 	// Create the browser window.
@@ -117,6 +119,7 @@ ipcMain.on('initialized', function(event, arg) {
 	event.sender.send('user', settings.user);
 	event.sender.send('prevpass', settings.prevpass);
 	event.sender.send('loginpage', settings.loginpage);
+	event.sender.send('drawerWidth', settings.drawerWidth);
 });
 ipcMain.on('update-url', function(event, arg) {
 	settings.init = arg;
@@ -129,4 +132,7 @@ ipcMain.on('update-prevpass', function(event, arg) {
 });
 ipcMain.on('update-loginpage', function(event, arg) {
 	settings.loginpage = arg;
+});
+ipcMain.on('update-drawerWidth', function(event, arg) {
+	settings.drawerWidth = arg;
 });

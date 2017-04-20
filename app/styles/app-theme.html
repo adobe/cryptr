@@ -73,6 +73,40 @@ limitations under the License.
 		}
 	}
 
+	/*Draggable Sidebar*/
+	.dragCenter {
+		height: calc(100vh - 120px);
+		@apply(--layout-horizontal);
+		@apply(--layout-center-center);
+	}
+	.headerPanelMain:after {
+	    content: '';
+	    display: table;
+	    clear: both;
+	}
+	.draggable {
+		color: grey;
+	    min-width: 31px;
+	    min-height: 31px;
+	    left: -5px;
+		z-index: 100;
+	}
+	#drag {
+		width: 6px;
+	    float: right;
+	    cursor: col-resize;
+	}
+	#ghost {
+		background-color: var(--accent-color);
+		cursor: col-resize;
+	    opacity: 0.5;
+	    position: absolute;
+		width: 3px;
+	    z-index: 999;
+	}
+
+
+	/* General styles */
 	.bottombar {
 		position: fixed;
 		left: 0;
@@ -85,7 +119,6 @@ limitations under the License.
 		--paper-progress-container-color: rgba(#ffffff, 0);
 	}
 
-	/* General styles */
 	body {
 		@apply(--layout-fullbleed);
 		@apply(--layout-vertical);

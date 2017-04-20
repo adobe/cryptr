@@ -35,6 +35,9 @@ limitations under the License.
 		<paper-drawer-panel id="paperDrawerPanel" drawer-width="{{drawerWidth}}">
 			<!-- Drawer Area -->
 			<paper-scroll-header-panel drawer fixed>
+				<div id="drag" class="dragCenter">
+					<iron-icon icon="more-vert" class="draggable"></iron-icon>
+				</div>
 				<paper-toolbar id="drawerToolbar" style="-webkit-app-region: drag; padding-top: 15px;">
 					<iron-image id="logo" src="images/cryptr-internal.png" preload sizing="cover"></iron-image>
 					<span class="menu-name noselect">Cryptr</span>
