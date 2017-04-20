@@ -292,7 +292,7 @@ limitations under the License.
 					else if (this.loginError.response.errors[0] == 'Vault is sealed') this.$.errortoast.text = 'This vault is currently sealed';
 					else if (this.loginError.response.errors[0] == 'permission denied') this.$.errortoast.text = 'Permission Denied';
 					else if (this.loginError.response.errors[0] == 'unsupported path') this.$.errortoast.text = 'This auth backend is not supported by the server';
-					else this.$.errortoast.text = 'Unkown Error: Please try again later.';
+					else this.$.errortoast.text = 'Unknown Error: Please try again later.';
 					this.$.errortoast.show();
 				},
 				_testSuccess: function() {
