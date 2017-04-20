@@ -39,8 +39,12 @@ ipcRenderer.on('url', function(event, arg) {
 ipcRenderer.on('user', function(event, arg) {
 	app.u = arg;
 	// Set cursor autofocus for login/password fields
-	if (app.u === '') document.getElementById('userfield').autofocus = true;
-	else document.getElementById('passfield').autofocus = true;
+	if (app.url === '') document.getElementById('urlfield').autofocus = true;
+	else if (app.u === '' && app.loginPage === 0) document.getElementById('userfieldldap').autofocus = true;
+	else if (app.u !== '' && app.loginPage === 0) document.getElementById('passfieldldap').autofocus = true;
+	else if (app.loginPage === 1) document.getElementById('tokenfield').autofocus = true;
+	else if (app.u === '' && app.loginPage === 2) document.getElementById('userfield').autofocus = true;
+	else if (app.u !== '' && app.loginPage === 2) document.getElementById('passfield').autofocus = true;
 });
 ipcRenderer.on('prevpass', function(event, arg) { app.prevPassword = arg; });
 ipcRenderer.on('loginpage', function(event, arg) { app.loginPage = arg; });
