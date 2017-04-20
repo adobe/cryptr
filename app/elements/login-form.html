@@ -30,10 +30,6 @@ limitations under the License.
 			#userfield, #passfield {
 				margin: 0;
 			}
-			#initfield {
-				margin: 0;
-				padding: 0 8px 0 24px;
-			}
 			paper-dialog > iron-pages {
 				margin: 0;
 			}
@@ -49,17 +45,6 @@ limitations under the License.
 			}
 			.flexchild {
 				@apply(--layout-flex);
-			}
-			.checkFail {
-				color: #EF5350;
-				padding: 28px 0px 0px 9px;
-				width: 18px;
-			}
-			.checkPass {
-				color: #4CAF50;
-				display: none;
-				padding: 28px 0px 0px 9px;
-				width: 18px;
 			}
 			#modal {
 				-moz-border-radius: 8px;
@@ -117,12 +102,10 @@ limitations under the License.
 				<paper-tab>Token</paper-tab>
 				<paper-tab>User/Pass</paper-tab>
 			</paper-tabs>
-			<div id="initfield" class="flex-horizontal">
-				<div class="flexchild">
-					<paper-input id="urlfield" value="{{url}}" label="Server URL (HTTPS)"></paper-input>
-				</div>
-				<iron-icon id="checkpass" icon="check-circle" class="checkPass"></iron-icon>
-				<iron-icon id="checkfail" icon="cancel" class="checkFail"></iron-icon>
+			<div class="flexchild" style="margin: 0;">
+				<paper-input id="urlfield" value="{{domain}}" invalid="{{!approvedURL}}" label=" Server URL" error-message="A Vault server is not found at this URL">
+					<div prefix>https:// </div>
+				</paper-input>
 			</div>
 			<iron-pages selected="{{page}}">
 				<div>
@@ -199,6 +182,11 @@ limitations under the License.
 						type: String,
 						notify: true,
 						observer: '_watchURL'
+					},
+					domain: {
+						type: String,
+						notify: true,
+						observer: '_watchDomain'
 					},
 					header: {
 						type: Object,
@@ -308,13 +296,9 @@ limitations under the License.
 					this.$.errortoast.show();
 				},
 				_testSuccess: function() {
-					this.$.checkpass.style.display = 'block';
-					this.$.checkfail.style.display = 'none';
 					this.approvedURL = true;
 				},
 				_testError: function() {
-					this.$.checkpass.style.display = 'none';
-					this.$.checkfail.style.display = 'block';
 					this.approvedURL = false;
 				},
 				_watchStatus: function() {
@@ -336,15 +320,17 @@ limitations under the License.
 								this.$.testReq.generateRequest();
 							}
 						} else {
-							this.$.checkpass.style.display = 'none';
-							this.$.checkfail.style.display = 'block';
 							this.approvedURL = false;
 						}
 						this._persistData();
 					}, 400);
 				},
+				_watchDomain: function() {
+					this.domain = this.domain.toLowerCase().replace('https://', '');
+					this.url = 'https://' + this.domain;
+				},
 				_persistData: function() {
-					ipcRenderer.send('update-url', this.url);
+					ipcRenderer.send('update-domain', this.domain);
 					ipcRenderer.send('update-user', this.username);
 					ipcRenderer.send('update-loginpage', this.page);
 				}

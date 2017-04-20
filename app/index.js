@@ -115,13 +115,13 @@ app.on('activate', function () {
 });
 
 ipcMain.on('initialized', function(event, arg) {
-	event.sender.send('url', settings.init);
+	event.sender.send('domain', settings.init);
 	event.sender.send('prevpass', settings.prevpass);
 	event.sender.send('loginpage', settings.loginpage);
 	event.sender.send('drawerWidth', settings.drawerWidth);
 	event.sender.send('user', settings.user);
 });
-ipcMain.on('update-url', function(event, arg) {
+ipcMain.on('update-domain', function(event, arg) {
 	settings.init = arg;
 });
 ipcMain.on('update-user', function(event, arg) {

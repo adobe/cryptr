@@ -33,13 +33,13 @@ app.closeDrawer = function() {
 // App configs
 app.url = 'start';
 
-ipcRenderer.on('url', function(event, arg) {
-	app.url = arg;
+ipcRenderer.on('domain', function(event, arg) {
+	app.domain = arg;
 });
 ipcRenderer.on('user', function(event, arg) {
 	app.u = arg;
 	// Set cursor autofocus for login/password fields
-	if (app.url === '') document.getElementById('urlfield').autofocus = true;
+	if (app.domain === '') document.getElementById('urlfield').autofocus = true;
 	else if (app.u === '' && app.loginPage === 0) document.getElementById('userfieldldap').autofocus = true;
 	else if (app.u !== '' && app.loginPage === 0) document.getElementById('passfieldldap').autofocus = true;
 	else if (app.loginPage === 1) document.getElementById('tokenfield').autofocus = true;
