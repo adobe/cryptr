@@ -40,30 +40,30 @@ limitations under the License.
 					<span class="menu-name noselect">Cryptr</span>
 				</paper-toolbar>
 
-				<span id="drawerMenuText" class="noselect">HOME</span>
-				<paper-menu attr-for-selected="data-route" selected="{{route}}">
-					<a data-route="home" href="{{baseUrl}}" class="noselect">
-						<iron-icon icon="dashboard"></iron-icon>
-						<span>Dashboard</span>
-					</a>
-					<a data-route="create" href="{{baseUrl}}create" class="noselect">
-						<iron-icon icon="add"></iron-icon>
-						<span>New Secret</span>
-					</a>
-					<template is="dom-if" if="{{query}}">
-						<a data-route="search" href="{{baseUrl}}search" class="noselect">
-							<iron-icon icon="search"></iron-icon>
-							<span>Search</span>
+				<div style="height: calc(100vh - 100px); overflow: scroll;">
+					<span id="drawerMenuText" class="noselect">HOME</span>
+					<paper-menu attr-for-selected="data-route" selected="{{route}}">
+						<a data-route="home" href="{{baseUrl}}" class="noselect">
+							<iron-icon icon="dashboard"></iron-icon>
+							<span>Dashboard</span>
 						</a>
-					</template>
-				</paper-menu>
+						<a data-route="create" href="{{baseUrl}}create" class="noselect">
+							<iron-icon icon="add"></iron-icon>
+							<span>New Secret</span>
+						</a>
+						<template is="dom-if" if="{{query}}">
+							<a data-route="search" href="{{baseUrl}}search" class="noselect">
+								<iron-icon icon="search"></iron-icon>
+								<span>Search</span>
+							</a>
+						</template>
+					</paper-menu>
 
-				<span id="drawerMenuText" class="noselect">SECRETS</span>
-				<folder-structure secrets="[[secrets]]" route="{{route}}" base-url="{{baseUrl}}" base-folder="secret" indent="20" create-location="{{createLocation}}"></folder-structure>
+					<span id="drawerMenuText" class="noselect">SECRETS</span>
+					<folder-structure secrets="[[secrets]]" route="{{route}}" base-url="{{baseUrl}}" base-folder="secret" indent="20" create-location="{{createLocation}}"></folder-structure>
+				</div>
 
-				<div style="height: 40px; width: {{drawerWidth}};"></div>  <!--Spacer-->
-
-				<div class="bottom-corner" style="color: #737373; background-color: #262B33; width: {{drawerWidth}};">
+				<div class="bottom-corner" style="color: #737373;">
 					<paper-icon-button icon="settings"></paper-icon-button>
 				</div>
 			</paper-scroll-header-panel>
