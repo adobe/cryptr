@@ -63,6 +63,10 @@ limitations under the License.
 	</style>
 	<template>
 		<paper-menu attr-for-selected="data-route" selected="{{route}}" class="menu-content">
+			<a data-route="create{{indent}}" href="{{baseUrl}}create" class="noselect" create-location="{{createLocation}}" style="padding-left: {{indent}}px" on-tap="_setLocation">
+				<iron-icon icon="add"></iron-icon>
+				<span>New</span>
+			</a>
 			<template is="dom-repeat" items="{{secrets}}" filter="_filterFolders" sort="_sort">
 				<paper-submenu attr-for-selected="data-route" selected="{{route}}">
 						<a data-route="{{item.type}}/{{item.location}}" href="{{baseUrl}}folder/{{item.location}}" class="noselect menu-trigger" style="padding-left: {{indent}}px">
@@ -74,10 +78,6 @@ limitations under the License.
 					</paper-menu>
 				</paper-submenu>
 			</template>
-			<a data-route="create{{indent}}" href="{{baseUrl}}create" class="noselect" create-location="{{createLocation}}" style="padding-left: {{indent}}px" on-tap="_setLocation">
-				<iron-icon icon="add"></iron-icon>
-				<span>New</span>
-			</a>
 			<template is="dom-repeat" items="{{secrets}}" filter="_filterSecrets" sort="_sort">
 				<a data-route="{{item.type}}/{{item.location}}" href="{{baseUrl}}secret/{{item.location}}" class="noselect" style="padding-left: {{indent}}px">
 					<iron-icon icon="communication:vpn-key"></iron-icon>
@@ -102,6 +102,7 @@ limitations under the License.
 					observer: '_watchIndent'
 				},
 				createLocation: {
+					value: '',
 					notify: true
 				}
 			},
@@ -109,7 +110,7 @@ limitations under the License.
 				this.spacing = this.indent + 20;
 			},
 			_setLocation: function() {
-				this.createLocation = this.baseFolder;
+				this.createLocation = this.baseFolder + '/';
 			},
 			_filterFolders: function(item) {
 				if (item.parent == this.baseFolder) return item.type == 'folder';

@@ -79,7 +79,7 @@ limitations under the License.
 				</paper-toolbar>
 
 				<!-- Main Content -->
-				<div class="content" style="height: 100%">
+				<div class="content">
 					<iron-pages attr-for-selected="data-route" selected="{{route}}" style="height: 100%">
 						<section data-route="home">
 							<paper-material elevation="1">
@@ -89,7 +89,6 @@ limitations under the License.
 						</section>
 
 						<section data-route="create">
-							<h2 class="page-title">Create Secret</h2>
 							<secret-create secrets="{{secrets}}" header="{{header}}" create-location="{{createLocation}}"></secret-create>
 						</section>
 
@@ -109,7 +108,8 @@ limitations under the License.
 			</paper-scroll-header-panel>
 		</paper-drawer-panel>
 
-		<paper-toast id="deleted" duration="1500" text="Deleted"></paper-toast>
+		<paper-toast id="deleted" class="toast toastSuccess" duration="1500" text="Deleted"></paper-toast>
+		<paper-toast id="added" class="toast toastSuccess" duration="1500" text="Secret Added"></paper-toast>
 		<paper-toast id="toast">
 			<span class="toast-hide-button" role="button" tabindex="0" onclick="app.$.toast.hide()">Ok</span>
 		</paper-toast>
