@@ -95,7 +95,7 @@ limitations under the License.
 			timeout="5000">
 		</iron-ajax>
 
-		<paper-dialog id="modal"class="noselect" modal no-cancel-on-esc-key no-cancel-on-outside-click auto-fit-on-attach>
+		<paper-dialog id="modal" class="noselect" entry-animation="scale-up-animation" modal no-cancel-on-esc-key no-cancel-on-outside-click auto-fit-on-attach>
 			<iron-image id="logo" sizing="contain" src="../images/cryptr-internal.png"></iron-image>
 			<paper-tabs selected="{{page}}">
 				<paper-tab>LDAP</paper-tab>
@@ -297,9 +297,11 @@ limitations under the License.
 				},
 				_testSuccess: function() {
 					this.approvedURL = true;
+					document.getElementById('blocker').style.display = 'none';
 				},
 				_testError: function() {
 					this.approvedURL = false;
+					document.getElementById('blocker').style.display = 'none';
 				},
 				_watchStatus: function() {
 					if (this.status == 'none') this.$.modal.open();
@@ -326,7 +328,7 @@ limitations under the License.
 					}, 400);
 				},
 				_watchDomain: function() {
-					this.domain = this.domain.toLowerCase().replace('https://', '');
+					this.domain = (this.domain) ? this.domain.toLowerCase().replace('https://', '') : '';
 					this.url = 'https://' + this.domain;
 				},
 				_persistData: function() {

@@ -16,7 +16,7 @@ limitations under the License.
 const electron = require('electron');
 const ipcMain = require('electron').ipcMain;
 const {Menu} = require('electron');
-const app = electron.app;
+const {app} = require('electron');
 const BrowserWindow = electron.BrowserWindow;
 
 let mainWindow;
@@ -50,8 +50,13 @@ function createWindow() {
 	settings.minHeight = 500;
 	settings.icon = __dirname + '/images/sizes/128x128.png';
 	settings.titleBarStyle = 'hidden';
+	settings.show = false;
+	settings.backgroundColor = '#333';
 	mainWindow = new BrowserWindow(settings);
 	mainWindow.loadURL('file://' + __dirname + '/index.html');
+	mainWindow.once('ready-to-show', () => {
+	    mainWindow.show()
+	})
 
 	// Open the DevTools.
 	if (process.env.CRYPTR_ENV && process.env.CRYPTR_ENV == 'development') mainWindow.webContents.openDevTools();

@@ -10,7 +10,7 @@
     "license": "Apache-2.0",
     "scripts": {
         "postinstall": "install-app-deps",
-        "start": "electron ./app --enable-logging",
+        "start": "electron ./app",
         "dev": "CRYPTR_ENV='development' npm run start",
         "release": "build -mwl --x64 --ia32"
     },
