@@ -25,13 +25,10 @@ const ipcRenderer = require('electron').ipcRenderer;
 })(document);
 
 
-app.closeDrawer = function() {
-	app.$.paperDrawerPanel.closeDrawer();
-};
-
-
 // App configs
 app.url = 'start';
+app.secretRoute = '';
+app.folderRoute = '';
 
 ipcRenderer.on('domain', function(event, arg) {
 	app.domain = arg;

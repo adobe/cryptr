@@ -96,17 +96,13 @@ limitations under the License.
 							<secret-create secrets="{{secrets}}" header="{{header}}" create-location="{{createLocation}}"></secret-create>
 						</section>
 
-						<template is="dom-repeat" items="{{secrets}}" filter="filterFolders">
-							<section data-route="{{item.type}}/{{item.location}}" style="height: 100%">
-								<secret-folder secrets={{secrets}} header="{{header}}" route="{{route}}" location="{{item.location}}" create-location="{{createLocation}}"></secret-folder>
-							</section>
-						</template>
+						<section data-route="folder" style="height: 100%">
+							<secret-folder location="{{folderRoute}}" create-location="{{createLocation}}"></secret-folder>
+						</section>
 
-						<template is="dom-repeat" items="{{secrets}}" filter="filterSecrets">
-							<section data-route="{{item.type}}/{{item.location}}" style="height: 100%">
-								<secret-item secrets={{secrets}} header="{{header}}" route="{{route}}" location="{{item.location}}" loading="{{loading}}"></secret-item>
-							</section>
-						</template>
+						<section data-route="secret" style="height: 100%">
+							<secret-item secrets={{secrets}} header="{{header}}" location="{{secretRoute}}" loading="{{loading}}"></secret-item>
+						</section>
 					</iron-pages>
 				</div>
 			</paper-scroll-header-panel>

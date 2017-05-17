@@ -16,16 +16,7 @@ limitations under the License.
 <script>
 	window.addEventListener('WebComponentsReady', function() {
 
-		function closeDrawer(ctx, next) {
-			app.closeDrawer();
-			next();
-		}
-
 		// Routes
-		page('*', closeDrawer, function(ctx, next) {
-			next();
-		});
-
 		page('/', function() {
 			app.route = 'home';
 		});
@@ -39,11 +30,13 @@ limitations under the License.
 		});
 
 		page('/folder/*', function(data) {
-			app.route = 'folder/' + data.params[0];
+			app.route = 'folder';
+			app.folderRoute = data.params[0];
 		});
 
 		page('/secret/*', function(data) {
-			app.route = 'secret/' + data.params[0];
+			app.route = 'secret';
+			app.secretRoute = data.params[0];
 		});
 
 		page('/search', function() {
