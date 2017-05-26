@@ -32,7 +32,6 @@ function createWindow() {
 	try {
 		settings = JSON.parse(fs.readFileSync(initPath, 'utf8'));
 		if (settings.init === undefined || settings.init === null) settings.init = '';
-		if (settings.prevpass === undefined || settings.prevpass === null) settings.prevpass = false;
 		if (settings.loginpage === undefined || settings.loginpage === null) settings.loginpage = 0;
 		if (settings.drawerWidth === undefined || settings.drawerWidth === null) settings.drawerWidth = '220px';
 	}
@@ -40,7 +39,6 @@ function createWindow() {
 		settings.width = 800;
 		settings.height = 600;
 		settings.init = '';
-		settings.prevpass = false;
 		settings.loginpage = 0;
 		settings.drawerWidth = '220px';
 	}
@@ -87,11 +85,18 @@ function createWindow() {
 
 	mainWindow.on("close", function() {
 		// Save the current browser window location and size
-		var temp = mainWindow.getBounds();
-		for (var attribute in temp) {
-			settings[attribute] = temp[attribute];
-		}
-		fs.writeFileSync(initPath, JSON.stringify(settings));
+		var oldWindow = mainWindow.getBounds();
+		var newSettings = {
+			x: oldWindow.x,
+			y: oldWindow.y,
+			width: oldWindow.width,
+			height: oldWindow.height,
+			init: settings.init,
+			loginpage: settings.loginpage,
+			drawerWidth: settings.drawerWidth,
+			user: settings.user
+		};
+		fs.writeFileSync(initPath, JSON.stringify(newSettings));
 	});
 
 	// Emitted when the window is closed.
@@ -121,7 +126,6 @@ app.on('activate', function () {
 
 ipcMain.on('initialized', function(event, arg) {
 	event.sender.send('domain', settings.init);
-	event.sender.send('prevpass', settings.prevpass);
 	event.sender.send('loginpage', settings.loginpage);
 	event.sender.send('drawerWidth', settings.drawerWidth);
 	event.sender.send('user', settings.user);
@@ -131,9 +135,6 @@ ipcMain.on('update-domain', function(event, arg) {
 });
 ipcMain.on('update-user', function(event, arg) {
 	settings.user = arg;
-});
-ipcMain.on('update-prevpass', function(event, arg) {
-	settings.prevpass = arg;
 });
 ipcMain.on('update-loginpage', function(event, arg) {
 	settings.loginpage = arg;
