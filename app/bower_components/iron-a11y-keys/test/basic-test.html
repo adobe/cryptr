@@ -112,6 +112,31 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           expect(keysPressedCount).to.be.equal(2);
         });
       });
+
+      suite('event modifier', function() {
+        test('events triggered obey event modifier', function() {
+          var keysPressedCount = 0;
+          var parent = keys.parentNode;
+
+          keys.keys = 'space:keyup enter:keydown';
+
+          keys.addEventListener('keys-pressed', function() {
+            keysPressedCount++;
+          });
+
+          MockInteractions.keyUpOn(parent, 32);
+          expect(keysPressedCount).to.be.equal(1);
+
+          MockInteractions.keyDownOn(parent, 32);
+          expect(keysPressedCount).to.be.equal(1);
+
+          MockInteractions.keyDownOn(parent, 13);
+          expect(keysPressedCount).to.be.equal(2);
+
+          MockInteractions.keyUpOn(parent, 13);
+          expect(keysPressedCount).to.be.equal(2);
+        });
+      });
     });
   </script>
 

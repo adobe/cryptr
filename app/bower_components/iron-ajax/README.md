@@ -17,7 +17,7 @@ thing! https://github.com/PolymerLabs/tedium/issues
 _[Demo and API docs](https://elements.polymer-project.org/elements/iron-ajax)_
 
 
-##&lt;iron-ajax&gt;
+## &lt;iron-ajax&gt;
 
 The `iron-ajax` element exposes network request functionality.
 
@@ -43,7 +43,7 @@ element.
 
 
 
-##&lt;iron-request&gt;
+## &lt;iron-request&gt;
 
 iron-request can be used to perform XMLHttpRequests.
 

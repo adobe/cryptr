@@ -1,6 +1,6 @@
 [![Build status](https://travis-ci.org/PolymerElements/paper-slider.svg?branch=master)](https://travis-ci.org/PolymerElements/paper-slider)
 
-##&lt;paper-slider&gt;
+## &lt;paper-slider&gt;
 
 Material design: [Sliders](https://www.google.com/design/spec/components/sliders.html)
 

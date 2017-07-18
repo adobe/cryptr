@@ -176,6 +176,21 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         });
       });
 
+      test('tracking', function(done) {
+        var sliderWidth = slider.$.sliderBar.getBoundingClientRect().width;
+        slider.min = 0;
+        slider.max = 2;
+        slider.step = 1;
+        slider.value = 0;
+
+        MockInteractions.track(slider.$.sliderBar, sliderWidth * 0.9, 0);
+
+        flush(function() {
+          assert.equal(slider.value, slider.max);
+          done();
+        });
+      });
+
       test('value should notify', function(done) {
         var targetValue = 10;
 
@@ -233,6 +248,45 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         });
       });
 
+      test('min greater than max', function(done) {
+        slider.min = 101;
+        flush(function() {
+          assert.equal(slider.markers.length, 0);
+          done();
+        });
+      });
+
+      test('min is NaN', function(done) {
+        slider.min = NaN;
+        flush(function() {
+          assert.equal(slider.markers.length, 0);
+          done();
+        });
+      });
+
+      test('min is Infinity', function(done) {
+        slider.min = Infinity;
+        flush(function() {
+          assert.equal(slider.markers.length, 0);
+          done();
+        });
+      });
+
+      test('max is NaN', function(done) {
+        slider.max = NaN;
+        flush(function() {
+          assert.equal(slider.markers.length, 0);
+          done();
+        });
+      });
+
+      test('max is Infinity', function(done) {
+        slider.max = Infinity;
+        flush(function() {
+          assert.equal(slider.markers.length, 0);
+          done();
+        });
+      });
     });
 
   </script>

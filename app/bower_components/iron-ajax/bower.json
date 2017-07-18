@@ -1,6 +1,6 @@
 {
   "name": "iron-ajax",
-  "version": "1.4.3",
+  "version": "1.4.4",
   "description": "Makes it easy to make ajax calls and parse the response",
   "private": true,
   "authors": [

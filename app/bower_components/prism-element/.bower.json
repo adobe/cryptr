@@ -38,7 +38,7 @@
     "tag": "v1.2.0",
     "commit": "20485d411f8823986bf14dd62d9df6b4a938c9d0"
   },
-  "_source": "git://github.com/PolymerElements/prism-element.git",
-  "_target": "^1.1.0",
+  "_source": "https://github.com/PolymerElements/prism-element.git",
+  "_target": "^1.0.2",
   "_originalSource": "PolymerElements/prism-element"
 }

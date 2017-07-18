@@ -82,6 +82,22 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         assert.isTrue(up.defaultPrevented);
       });
 
+      test('slider increments on right key', function() {
+        var oldValue = slider.value;
+        var up = MockInteractions.keyboardEventFor('keydown', 39);
+        slider.dispatchEvent(up);
+        assert.equal(oldValue + slider.step, slider.value);
+        assert.isTrue(up.defaultPrevented);
+      });
+
+      test('slider decrements on left key', function() {
+        var oldValue = slider.value;
+        var down = MockInteractions.keyboardEventFor('keydown', 37);
+        slider.dispatchEvent(down);
+        assert.equal(oldValue - slider.step, slider.value);
+        assert.isTrue(down.defaultPrevented);
+      });
+
       test('slider decrements on down key"', function() {
         var oldValue = slider.value;
         var down = MockInteractions.keyboardEventFor('keydown', 40);

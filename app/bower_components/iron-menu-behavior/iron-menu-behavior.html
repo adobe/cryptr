@@ -41,14 +41,21 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
        */
       attrForItemTitle: {
         type: String
-      }
+      },
+
+      disabled: {
+        type: Boolean,
+        value: false,
+        observer: '_disabledChanged',
+      },
     },
 
     _SEARCH_RESET_TIMEOUT_MS: 1000,
 
+    _previousTabIndex: 0,
+
     hostAttributes: {
       'role': 'menu',
-      'tabindex': '0'
     },
 
     observers: [
@@ -237,7 +244,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
      */
     _focusedItemChanged: function(focusedItem, old) {
       old && old.setAttribute('tabindex', '-1');
-      if (focusedItem) {
+      if (focusedItem && !focusedItem.hasAttribute('disabled') && !this.disabled) {
         focusedItem.setAttribute('tabindex', '0');
         focusedItem.focus();
       }
@@ -361,6 +368,19 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     _activateHandler: function(event) {
       Polymer.IronSelectableBehavior._activateHandler.call(this, event);
       event.stopPropagation();
+    },
+
+    /**
+     * Updates this element's tab index when it's enabled/disabled.
+     * @param {boolean} disabled
+     */
+    _disabledChanged: function(disabled) {
+      if (disabled) {
+        this._previousTabIndex = this.hasAttribute('tabindex') ? this.tabIndex : 0;
+        this.removeAttribute('tabindex');  // No tabindex means not tab-able or select-able.
+      } else if (!this.hasAttribute('tabindex')) {
+        this.setAttribute('tabindex', this._previousTabIndex);
+      }
     }
   };
 

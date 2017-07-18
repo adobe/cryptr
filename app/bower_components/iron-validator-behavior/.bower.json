@@ -1,6 +1,6 @@
 {
   "name": "iron-validator-behavior",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Implements a input validator",
   "authors": "The Polymer Authors",
   "keywords": [
@@ -9,9 +9,7 @@
     "iron",
     "behavior"
   ],
-  "main": [
-    "iron-validator-behavior.html"
-  ],
+  "main": "iron-validator-behavior.html",
   "private": true,
   "repository": {
     "type": "git",
@@ -25,19 +23,19 @@
     "polymer": "Polymer/polymer#^1.0.0"
   },
   "devDependencies": {
+    "paper-styles": "PolymerElements/paper-styles#^1.0.4",
     "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",
-    "paper-styles": "PolymerElements/paper-styles#^1.0.0",
     "test-fixture": "PolymerElements/test-fixture#^1.0.0",
-    "web-component-tester": "*",
+    "web-component-tester": "^4.0.0",
     "webcomponentsjs": "webcomponents/webcomponentsjs#^0.7.0"
   },
-  "_release": "1.0.1",
+  "_release": "1.0.2",
   "_resolution": {
     "type": "version",
-    "tag": "v1.0.1",
-    "commit": "fd9c609472c0c0b64657488d1d33dfc2365dea44"
+    "tag": "v1.0.2",
+    "commit": "3beb402462b98fa9fe76edcdd0bc0f14d2fa73fb"
   },
-  "_source": "git://github.com/PolymerElements/iron-validator-behavior.git",
+  "_source": "https://github.com/PolymerElements/iron-validator-behavior.git",
   "_target": "^1.0.0",
   "_originalSource": "PolymerElements/iron-validator-behavior"
 }

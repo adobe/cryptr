@@ -151,6 +151,20 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       });
     });
 
+    test('delete a grid item when the last row should only have one item and scroll to bottom', function(done) {
+      list.items = buildDataSet(64);
+      Polymer.dom.flush();
+      list.shift('items');
+      Polymer.dom.flush();
+      list.scroll(0, 10000000);
+      requestAnimationFrame(function() {
+        setTimeout(function() {
+          assert.equal(list.lastVisibleIndex, list.items.length - 1);
+          done();
+        });
+      });
+    });
+
     test('Columns per row (#381)', function(done) {
       container.data = buildDataSet(1000);
       container.itemSize = 33.3;

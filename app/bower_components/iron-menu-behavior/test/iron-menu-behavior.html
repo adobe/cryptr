@@ -120,6 +120,24 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       </template>
     </test-fixture>
 
+    <test-fixture id="disabled-group-and-options">
+      <template>
+        <test-menu disabled>
+          <div disabled>one</div>
+          <div disabled>two</div>
+        </test-menu>
+      </template>
+    </test-fixture>
+
+    <test-fixture id="nonzero-tabindex">
+      <template>
+        <test-menu tabindex="32">
+          <div>One</div>
+          <div>Two</div>
+        </test-menu>
+      </template>
+    </test-fixture>
+
     <test-fixture id="countries">
       <template>
         <test-menu>
@@ -511,6 +529,46 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             assert.equal(Polymer.dom(document).activeElement, menu);
             done();
           });
+        });
+
+        test('A disabled menu should not be focusable', function(done) {
+          var menu = fixture('disabled-group-and-options');
+          menu.focus();
+          Polymer.Base.async(function() {
+            assert.notEqual(Polymer.dom(document).activeElement, menu);
+            assert.notEqual(Polymer.dom(document).activeElement, menu.items[0]);
+            assert.notEqual(Polymer.dom(document).activeElement, menu.items[1]);
+            done();
+          });
+        });
+
+        test('A disabled menu will not have a tab index.', function() {
+          var menu = fixture('countries');
+          assert.equal(menu.getAttribute('tabindex'), '0');
+          menu.disabled = true;
+          assert.equal(menu.getAttribute('tabindex'), null);
+          menu.disabled = false;
+          assert.equal(menu.getAttribute('tabindex'), '0');
+        });
+
+        test('Updated tab index of disabled element should remain.', function() {
+          var menu = fixture('countries');
+          assert.equal(menu.getAttribute('tabindex'), '0');
+          menu.disabled = true;
+          assert.equal(menu.getAttribute('tabindex'), null);
+          menu.setAttribute('tabindex', 15);
+          assert.equal(menu.getAttribute('tabindex'), '15');
+          menu.disabled = false;
+          assert.equal(menu.getAttribute('tabindex'), '15');
+        });
+
+        test('A disabled menu will regain its non-zero tab index when re-enabled.', function() {
+          var menu = fixture('nonzero-tabindex');
+          assert.equal(menu.getAttribute('tabindex'), '32');
+          menu.disabled = true;
+          assert.equal(menu.getAttribute('tabindex'), null);
+          menu.disabled = false;
+          assert.equal(menu.getAttribute('tabindex'), '32');
         });
 
         test('`tabIndex` properties of all items are updated when items change', function(done) {

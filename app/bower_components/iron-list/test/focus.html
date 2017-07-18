@@ -43,7 +43,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       container.data = buildDataSet(100);
 
       flush(function() {
-        console.log(getFirstItemFromList(list));
         assert.notEqual(getFirstItemFromList(list).tabIndex, -1);
         done();
       });
@@ -62,7 +61,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           onScrollEnd: function() {
             list.items = [];
             flush(function() {
-              done(); 
+              done();
             });
           }
         });
@@ -82,7 +81,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           onScrollEnd: function() {
             list.splice('items', 0, list.items.length);
             flush(function() {
-              done(); 
+              done();
             });
           }
         });
@@ -102,6 +101,30 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         });
         // trigger the scroll event
         list._scrollTop = 1000;
+      });
+    });
+
+    test('Issue #411', function(done) {
+      list.items = buildDataSet(100);
+
+      Polymer.dom.flush();
+
+      list.scroll(0, getFirstItemFromList(list).offsetHeight * list._physicalCount);
+     
+      requestAnimationFrame(function() {
+        setTimeout(function() {
+          var lastOffscreenFocusedItem = list._offscreenFocusedItem;
+          var firstItem = getFirstItemFromList(list);
+          MockInteractions.focus(firstItem.parentNode);
+
+          Polymer.dom.flush();
+
+          assert.equal(firstItem, getFirstItemFromList(list),
+            'Should be the same item after focusing it');
+          assert.isNull(lastOffscreenFocusedItem.parentNode,
+            'Should remove the last offscreen focused item');
+          done();
+        });
       });
     });
 

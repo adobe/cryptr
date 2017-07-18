@@ -17,7 +17,7 @@ thing! https://github.com/PolymerLabs/tedium/issues
 _[Demo and API docs](https://elements.polymer-project.org/elements/iron-component-page)_
 
 
-##&lt;iron-component-page&gt;
+## &lt;iron-component-page&gt;
 
 Loads Polymer element and behavior documentation using
 [Hydrolysis](https://github.com/PolymerLabs/hydrolysis) and renders a complete

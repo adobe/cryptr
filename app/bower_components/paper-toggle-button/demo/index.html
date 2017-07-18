@@ -22,19 +22,21 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <link rel="import" href="../../iron-demo-helpers/demo-snippet.html">
     <link rel="import" href="../../paper-styles/demo-pages.html">
     <link rel="import" href="../paper-toggle-button.html">
-
-    <style is="custom-style" include="demo-pages-shared-styles">
-      .vertical-section-container {
-        max-width: 500px;
-      }
-
-      paper-toggle-button {
-        margin-left: 10px;
-        margin-right: 10px;
-      }
-    </style>
   </head>
   <body unresolved>
+    <custom-style>
+      <style is="custom-style" include="demo-pages-shared-styles">
+        .vertical-section-container {
+          max-width: 500px;
+        }
+
+        paper-toggle-button {
+          margin-left: 10px;
+          margin-right: 10px;
+        }
+      </style>
+    </custom-style>
+
     <div class="vertical-section-container centered">
       <h3>Toggle buttons can be checked and disabled</h3>
       <demo-snippet class="centered-demo">
@@ -56,24 +58,26 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <h3>Toggle buttons can be styled using custom properties</h3>
       <demo-snippet class="centered-demo">
         <template>
-          <style is="custom-style">
-            paper-toggle-button.green {
-              --paper-toggle-button-checked-bar-color:  var(--paper-green-500);
-              --paper-toggle-button-checked-button-color:  var(--paper-green-500);
-              --paper-toggle-button-checked-ink-color: var(--paper-green-500);
-              --paper-toggle-button-unchecked-bar-color:  var(--paper-teal-500);
-              --paper-toggle-button-unchecked-button-color:  var(--paper-teal-500);
-              --paper-toggle-button-unchecked-ink-color: var(--paper-teal-500);
-            }
-            paper-toggle-button.pink {
-              --paper-toggle-button-checked-bar-color:  var(--paper-pink-500);
-              --paper-toggle-button-checked-button-color:  var(--paper-pink-500);
-              --paper-toggle-button-checked-ink-color: var(--paper-pink-500);
-              --paper-toggle-button-unchecked-bar-color:  var(--paper-indigo-900);
-              --paper-toggle-button-unchecked-button-color:  var(--paper-indigo-900);
-              --paper-toggle-button-unchecked-ink-color: var(--paper-indigo-900);
-            }
-          </style>
+          <custom-style>
+            <style is="custom-style">
+              paper-toggle-button.green {
+                --paper-toggle-button-checked-bar-color:  var(--paper-green-500);
+                --paper-toggle-button-checked-button-color:  var(--paper-green-500);
+                --paper-toggle-button-checked-ink-color: var(--paper-green-500);
+                --paper-toggle-button-unchecked-bar-color:  var(--paper-teal-500);
+                --paper-toggle-button-unchecked-button-color:  var(--paper-teal-500);
+                --paper-toggle-button-unchecked-ink-color: var(--paper-teal-500);
+              }
+              paper-toggle-button.pink {
+                --paper-toggle-button-checked-bar-color:  var(--paper-pink-500);
+                --paper-toggle-button-checked-button-color:  var(--paper-pink-500);
+                --paper-toggle-button-checked-ink-color: var(--paper-pink-500);
+                --paper-toggle-button-unchecked-bar-color:  var(--paper-indigo-900);
+                --paper-toggle-button-unchecked-button-color:  var(--paper-indigo-900);
+                --paper-toggle-button-unchecked-ink-color: var(--paper-indigo-900);
+              }
+            </style>
+          </custom-style>
 
           <paper-toggle-button class="green">Toggle</paper-toggle-button>
           <paper-toggle-button checked class="pink">Toggle</paper-toggle-button>

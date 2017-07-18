@@ -1,6 +1,6 @@
 [![Build status](https://travis-ci.org/PolymerElements/paper-toggle-button.svg?branch=master)](https://travis-ci.org/PolymerElements/paper-toggle-button)
 
-##&lt;paper-toggle-button&gt;
+## &lt;paper-toggle-button&gt;
 
 Material design: [Switch](https://www.google.com/design/spec/components/selection-controls.html#selection-controls-switch)
 

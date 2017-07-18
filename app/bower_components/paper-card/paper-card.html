@@ -238,8 +238,12 @@ Custom property | Description | Default
       },
 
       _headingChanged: function(heading) {
-        var label = this.getAttribute('aria-label');
-        this.setAttribute('aria-label', heading);
+        var currentHeading = this.getAttribute('heading'),
+            currentLabel = this.getAttribute('aria-label');
+
+        if (typeof currentLabel !== 'string' || currentLabel === currentHeading) {
+          this.setAttribute('aria-label', heading);
+        }
       },
 
       _computeHeadingClass: function(image) {

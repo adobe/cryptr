@@ -13,18 +13,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 (function() {
   "use strict";
   /**
-    `Polymer.IronJsonpLibraryBehavior` loads a jsonp library.
-    Multiple components can request same library, only one copy will load.
-
-    Some libraries require a specific global function be defined.
-    If this is the case, specify the `callbackName` property.
-
-    You should use an HTML Import to load library dependencies
-    when possible instead of using this element.
-
-    @hero hero.svg
-    @demo demo/index.html
-    @polymerBehavior
+   * `Polymer.IronJsonpLibraryBehavior` loads a jsonp library.
+   * Multiple components can request same library, only one copy will load.
+   *
+   * Some libraries require a specific global function be defined.
+   * If this is the case, specify the `callbackName` property.
+   *
+   * You should use an HTML Import to load library dependencies
+   * when possible instead of using this element.
+   *
+   * @hero hero.svg
+   * @demo demo/index.html
+   * @polymerBehavior
    */
   Polymer.IronJsonpLibraryBehavior = {
 
@@ -84,7 +84,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
     _libraryLoadCallback: function(err, result) {
       if (err) {
-        console.warn("Library load failed:", err.message);
+        Polymer.Base._warn("Library load failed:", err.message);
         this._setLibraryErrorMessage(err.message);
       }
       else {

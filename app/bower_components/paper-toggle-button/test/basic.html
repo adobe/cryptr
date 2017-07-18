@@ -40,7 +40,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         });
 
         test('set scroll direction', function(done) {
-          flush(function() {
+          Polymer.RenderStatus.afterNextRender(b1, function() {
             assert.equal(b1.__polymerGesturesTouchAction, 'pan-y');
             done();
           });

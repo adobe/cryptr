@@ -50,11 +50,12 @@ layout means (e.g. the `flex` or `fit` classes).
       flex: 1 1 auto;
     }
   </style>
-
   <app-toolbar>App name</app-toolbar>
   <iron-list items="[[items]]">
     <template>
-      ...
+      <div>
+        ...
+      </div>
     </template>
   </iron-list>
 </template>
@@ -73,7 +74,9 @@ layout means (e.g. the `flex` or `fit` classes).
   </style>
   <iron-list items="[[items]]">
     <template>
-      ...
+      <div>
+        ...
+      </div>
     </template>
   </iron-list>
 </template>
@@ -107,12 +110,17 @@ layout means (e.g. the `flex` or `fit` classes).
     <app-toolbar>App name</app-toolbar>
     <iron-list scroll-target="document" items="[[items]]">
       <template>
-        ...
+        <div>
+          ...
+        </div>
       </template>
     </iron-list>
   </template>
 </body>
 ```
+
+`iron-list` must be given a `<template>` which contains exactly one element. In the examples
+above we used a `<div>`, but you can provide any element (including custom elements).
 
 ### Template model
 
@@ -831,12 +839,13 @@ will only render 20.
       this._lastVisibleIndexVal = null;
 
       // Random access.
-      if (Math.abs(delta) > this._physicalSize) {
+      if (Math.abs(delta) > this._physicalSize && this._physicalSize > 0) {
         delta = delta - this._scrollOffset;
         var idxAdjustment = Math.round(delta / this._physicalAverage) * this._itemsPerRow;
-        this._physicalTop = this._physicalTop + delta;
         this._virtualStart = this._virtualStart + idxAdjustment;
         this._physicalStart = this._physicalStart + idxAdjustment;
+        // Estimate new physical offset.
+        this._physicalTop = Math.floor(this._virtualStart / this._itemsPerRow) * this._physicalAverage;
         this._update();
       } else {
         var reusables = this._getReusables(isScrollingDown);
@@ -1810,17 +1819,28 @@ will only render 20.
       // Get the new physical index for the focused index.
       pidx = this._getPhysicalIndex(fidx);
 
-      if (pidx != null) {
+      var onScreenItem = this._physicalItems[pidx];
+      if (!onScreenItem) {
+        return;
+      }
+      var onScreenInstance = onScreenItem._templateInstance;
+      var offScreenInstance = this._offscreenFocusedItem._templateInstance;
+      // Restores the physical item only when it has the same model
+      // as the offscreen one. Use key for comparison since users can set
+      // a new item via set('items.idx').
+      if (onScreenInstance.__key__ === offScreenInstance.__key__) {
         // Flip the focus backfill.
-        this._focusBackfillItem = this._physicalItems[pidx];
-        this._focusBackfillItem._templateInstance.tabIndex = -1;
+        this._focusBackfillItem = onScreenItem;
+        onScreenInstance.tabIndex = -1;
         // Restore the focused physical item.
         this._physicalItems[pidx] = this._offscreenFocusedItem;
-        // Reset the offscreen focused item.
-        this._offscreenFocusedItem = null;
         // Hide the physical item that backfills.
         this.translate3d(0, HIDDEN_Y, 0, this._focusBackfillItem);
+      } else {
+        this._removeFocusedItem();
+        this._focusBackfillItem = null;
       }
+      this._offscreenFocusedItem = null;
     },
 
     _didFocus: function(e) {
