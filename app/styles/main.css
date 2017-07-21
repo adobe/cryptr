@@ -1,33 +1,32 @@
 body {
-	background: #fafafa;
-	font-family: 'Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-	background-color: #333;
+    background: #fafafa;
+    font-family: 'Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    background-color: #333;
 }
 
-
 #drawerMenuText {
-	font-size: 0.8em;
-	font-weight: 500;
-	margin: 22px 0px 3px 11px;
-	display: block;
-	color: #777;
+    font-size: 0.8em;
+    font-weight: 500;
+    margin: 22px 0px 3px 11px;
+    display: block;
+    color: #777;
 }
 
 .noselect {
-	-webkit-user-select: none;
-	-moz-user-select: none;
-	-ms-user-select: none;
-	user-select: none;
-	-webkit-user-drag: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-user-drag: none;
     -khtml-user-drag: none;
     -moz-user-drag: none;
     -o-user-drag: none;
     user-drag: none;
-	cursor: default;
+    cursor: default;
 }
 
 #topBar {
-	padding: 0px;
+    padding: 0px;
 }
 
 #logo {
@@ -36,17 +35,16 @@ body {
 }
 
 .bottom-corner {
-	position: fixed;
-	left: 0;
-	bottom: 0;
+    position: fixed;
+    left: 0;
+    bottom: 0;
 }
 
-::-webkit-scrollbar
-{
+::-webkit-scrollbar {
     width: 0px;
 }
-::-webkit-scrollbar-track-piece
-{
+
+::-webkit-scrollbar-track-piece {
     background-color: transparent;
     -webkit-border-radius: 6px;
 }

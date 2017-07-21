@@ -54,6 +54,7 @@ limitations under the License.
 					// the token until it expires naturally. An alternative could be to call the revoke-self
 					// endpoint, however this may have unintended consequences.
 					app.header = {};
+					app.route = 'home';
 					document.querySelector('#checkStatus').generateRequest();
                 }
 			});
