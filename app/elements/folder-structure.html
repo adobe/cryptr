@@ -66,29 +66,31 @@ limitations under the License.
 		}
 	</style>
 	<template>
-		<paper-menu attr-for-selected="data-route" selected="{{route}}" class="menu-content">
-			<a data-route="create{{indent}}" href="{{baseUrl}}create" class="noselect" create-location="{{createLocation}}" style="padding-left: {{indent}}px" on-tap="_setLocation">
-				<iron-icon class="iconsize" icon="add"></iron-icon>
-				<span style="white-space: nowrap;">New</span>
-			</a>
-			<template is="dom-repeat" items="{{secrets}}" filter="_filterFolders" sort="_sort">
-				<paper-submenu attr-for-selected="data-route" selected="{{route}}">
-						<a data-route="{{item.type}}/{{item.location}}" href="{{baseUrl}}folder/{{item.location}}" class="noselect menu-trigger" style="padding-left: {{indent}}px">
-							<iron-icon class="iconsize" icon="folder-open"></iron-icon>
-							<span style="white-space: nowrap;">{{item.parsedname}}</span>
-						</a>
-					<paper-menu class="menu-content">
-						<folder-structure secrets="[[secrets]]" route="{{route}}" base-url="{{baseUrl}}" base-folder="{{item.location}}" indent="{{spacing}}" create-location="{{createLocation}}"></folder-structure>
-					</paper-menu>
-				</paper-submenu>
-			</template>
-			<template is="dom-repeat" items="{{secrets}}" filter="_filterSecrets" sort="_sort">
-				<a data-route="{{item.type}}/{{item.location}}" href="{{baseUrl}}secret/{{item.location}}" class="noselect" style="padding-left: {{indent}}px">
-					<iron-icon class="iconsize" icon="communication:vpn-key"></iron-icon>
-					<span style="white-space: nowrap;">{{item.parsedname}}</span>
+		<template is="dom-if" if="{{print}}">
+			<paper-menu attr-for-selected="data-route" selected="{{route}}" class="menu-content">
+				<a data-route="create{{indent}}" href="{{baseUrl}}create" class="noselect" create-location="{{createLocation}}" style="padding-left: {{indent}}px" on-tap="_setLocation">
+					<iron-icon class="iconsize" icon="add"></iron-icon>
+					<span style="white-space: nowrap;">New</span>
 				</a>
-			</template>
-		</paper-menu>
+				<template is="dom-repeat" items="{{secrets}}" filter="_filterFolders" sort="_sort">
+					<paper-submenu attr-for-selected="data-route" selected="{{route}}">
+							<a data-route="{{item.type}}/{{item.location}}" href="{{baseUrl}}folder/{{item.location}}" class="noselect menu-trigger" style="padding-left: {{indent}}px">
+								<iron-icon class="iconsize" icon="folder-open"></iron-icon>
+								<span style="white-space: nowrap;">{{item.parsedname}}</span>
+							</a>
+						<paper-menu class="menu-content">
+							<folder-structure secrets="[[secrets]]" route="{{route}}" folder-route="{{folderRoute}}" base-url="{{baseUrl}}" base-folder="{{item.location}}" indent="{{spacing}}" create-location="{{createLocation}}"></folder-structure>
+						</paper-menu>
+					</paper-submenu>
+				</template>
+				<template is="dom-repeat" items="{{secrets}}" filter="_filterSecrets" sort="_sort">
+					<a data-route="{{item.type}}/{{item.location}}" href="{{baseUrl}}secret/{{item.location}}" class="noselect" style="padding-left: {{indent}}px">
+						<iron-icon class="iconsize" icon="communication:vpn-key"></iron-icon>
+						<span style="white-space: nowrap;">{{item.parsedname}}</span>
+					</a>
+				</template>
+			</paper-menu>
+		</template>
 	</template>
 
 	<script>
@@ -96,6 +98,10 @@ limitations under the License.
 			is: "folder-structure",
 			properties: {
 				route: String,
+				folderRoute: {
+					type: String,
+					observer: '_watchFolderRoute'
+				},
 				baseURL: String,
 				secrets: Array,
 				baseFolder: String,
@@ -108,7 +114,15 @@ limitations under the License.
 				createLocation: {
 					value: '',
 					notify: true
+				},
+				print: {
+					type: Boolean,
+					value: false,
+					notify: true
 				}
+			},
+			_watchFolderRoute: function(){
+				if (this.baseFolder == this.folderRoute) this.print = true;
 			},
 			_watchIndent: function(){
 				this.spacing = this.indent + 20;
