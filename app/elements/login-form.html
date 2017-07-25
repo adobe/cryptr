@@ -277,6 +277,7 @@ limitations under the License.
 						this.loginResponse = this.loginResponse.auth;
 						this.status = 'watch';
 						this.password = '';
+						document.getElementById('blocker').style.display = 'none';
 						this.$.modal.close();
 					// Token Auth
 					} else if (this.loginResponse.data) {
@@ -319,7 +320,6 @@ limitations under the License.
 						this.loading = false;
 					} else {
 						this.approvedURL = true;
-						document.getElementById('blocker').style.display = 'none';
 						this._watchAuthRequests();
 					}
 				},
@@ -329,7 +329,6 @@ limitations under the License.
 					this.approvedURL = false;
 					this.loading = false;
 					this.authRequests = [];
-					document.getElementById('blocker').style.display = 'none';
 				},
 				_watchStatus: function() {
 					if (this.status == 'none') this.$.modal.open();
