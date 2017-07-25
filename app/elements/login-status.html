@@ -27,7 +27,7 @@ limitations under the License.
 			headers="{{header}}"
 			last-response="{{response}}"
 			on-response="_success"
-			on-error="_error">
+			on-error="_logout">
 		</iron-ajax>
 
 	</template>
@@ -73,17 +73,23 @@ limitations under the License.
 						this.status = 'watch';
 					}
 				},
-				_error: function() {
+				_logout: function() {
+					this._clearData();
 					this.status = 'none';
-					app.response = {};
-					app.loginResponse = {};
 					app.header = {};
+					app.loginResponse = {};
+					document.getElementById('blocker').style.display = 'block';
+					clearInterval(this.timer);
+				},
+				_clearData: function() {
 					app.data = {};
 					app.access = {};
 					app.query = '';
 					app.secrets = [];
-					document.getElementById('blocker').style.display = 'block';
-					clearInterval(this.timer);
+					app.secretRoute = '';
+					app.folderRoute = '';
+					app.route = 'home';
+					
 				}
 			});
 		})();

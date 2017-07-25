@@ -30,7 +30,7 @@ limitations under the License.
 	<template is="dom-bind" id="app">
 		<div id="blocker"></div>  <!-- blocker: an element to obscure background-loading content at load time. -->
 		<login-form status="{{status}}" username="{{u}}" domain="{{domain}}" url="{{url}}" header="{{header}}" login-response="{{loginResponse}}" page="{{loginPage}}" loading="{{loading}}"></login-form>
-		<login-status status="{{status}}" url="{{url}}" header="{{header}}"></login-status>
+		<login-status id="login-status" status="{{status}}" url="{{url}}" header="{{header}}"></login-status>
 		<secrets-init status="{{status}}" header="{{header}}" login-response="{{loginResponse}}" secrets="{{secrets}}" access="{{access}}" loading="{{loading}}"></secrets-init>
 
 		<paper-drawer-panel id="paperDrawerPanel" drawer-width="{{drawerWidth}}">
@@ -78,7 +78,6 @@ limitations under the License.
 				<paper-toolbar id="mainToolbar">
 					<search-box query="{{query}}"></search-box>
 					<span class="space"></span>
-					<refresh-data></refresh-data>
 					<user-info username="{{u}}" url="{{url}}"></user-info>
 				</paper-toolbar>
 
@@ -108,9 +107,9 @@ limitations under the License.
 			</paper-scroll-header-panel>
 		</paper-drawer-panel>
 
-		<paper-toast id="deleted" class="toast toastSuccess" duration="1500" text="Deleted"></paper-toast>
-		<paper-toast id="added" class="toast toastSuccess" duration="1500" text="Secret Added"></paper-toast>
-		<paper-toast id="move" class="toast toastSuccess" duration="1500" text="Move Complete"></paper-toast>
+		<paper-toast id="deleted" class="toast toastSuccess fit-bottom" duration="1500" text="Deleted"></paper-toast>
+		<paper-toast id="added" class="toast toastSuccess fit-bottom" duration="1500" text="Secret Added"></paper-toast>
+		<paper-toast id="move" class="toast toastSuccess fit-bottom" duration="1500" text="Move Complete"></paper-toast>
 		<paper-toast id="toast">
 			<span class="toast-hide-button" role="button" tabindex="0" onclick="app.$.toast.hide()">Ok</span>
 		</paper-toast>
