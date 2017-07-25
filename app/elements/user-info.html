@@ -13,20 +13,20 @@ limitations under the License.
 -->
 
 <dom-module id="user-info">
+	<style>
+		.name {
+			padding-right:16px;
+			padding-left: 5px;
+		}
+	</style>
 	<template>
-		<style>
-			.name {
-				padding-right:16px;
-				padding-left: 5px;
-			}
-		</style>
-
+		
         <paper-item style="-webkit-app-region: no-drag;">
+			<paper-icon-button icon="refresh" on-click="_refreshKeys" style="margin-right: 20px"></paper-icon-button>
             <iron-icon icon="account-circle" style="color: #888"></iron-icon>
             <span class="noselect name">{{upperUser}}</span>
-            <paper-button raised on-click="_logoutUser">Logout</paper-button>
+            <paper-button raised on-click="logout">Logout</paper-button>
         </paper-item>
-
 	</template>
 
 	<script>
@@ -49,13 +49,16 @@ limitations under the License.
                 _computeToUpper: function(username) {
 					return (this.username) ? this.username.toUpperCase() : '';
                 },
-                _logoutUser: function() {
-					// This function simply erases the token from memory, effectively erasing all memory of
-					// the token until it expires naturally. An alternative could be to call the revoke-self
-					// endpoint, however this may have unintended consequences.
-					app.header = {};
-					app.route = 'home';
-					document.querySelector('#checkStatus').generateRequest();
+                logout: function() {
+					document.querySelector('login-status')._logout();
+                },
+				_refreshKeys: function() {
+					//Clear all user data, except vault auth token
+					document.querySelector('login-status')._clearData();
+					
+					// Start secrets-init process again
+					app.status = '';
+					app.status = 'watch';
                 }
 			});
 		})();
