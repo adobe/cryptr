@@ -103,7 +103,7 @@ limitations under the License.
 				<paper-tab>User/Pass</paper-tab>
 			</paper-tabs>
 			<div class="flexchild" style="margin: 0;">
-				<paper-input id="urlfield" value="{{domain}}" invalid="{{!approvedURL}}" label=" Server URL" error-message="A Vault server is not found at this URL">
+				<paper-input id="urlfield" value="{{domain}}" invalid="{{!approvedURL}}" label=" Server URL" error-message="A Vault server is not found at this URL" disabled="{{loading}}">
 					<div prefix>https:// </div>
 				</paper-input>
 			</div>
@@ -111,18 +111,18 @@ limitations under the License.
 				<div>
 					<iron-a11y-keys target="[[targetuserldap]]" keys="enter" on-keys-pressed="_login"></iron-a11y-keys>
 					<iron-a11y-keys target="[[targetpassldap]]" keys="enter" on-keys-pressed="_login"></iron-a11y-keys>
-					<paper-input id="userfieldldap" value="{{username}}" label="LDAP Username"></paper-input>
-					<paper-input id="passfieldldap" value="{{password}}" label="LDAP Password" type="password"></paper-input>
+					<paper-input id="userfieldldap" value="{{username}}" label="LDAP Username" disabled="{{loading}}"></paper-input>
+					<paper-input id="passfieldldap" value="{{password}}" label="LDAP Password" type="password" disabled="{{loading}}"></paper-input>
 				</div>
 				<div>
 					<iron-a11y-keys target="[[targettoken]]" keys="enter" on-keys-pressed="_login"></iron-a11y-keys>
-					<paper-input id="tokenfield" value="{{token}}" label="Token"></paper-input>
+					<paper-input id="tokenfield" value="{{token}}" label="Token" disabled="{{loading}}"></paper-input>
 				</div>
 				<div>
 					<iron-a11y-keys target="[[targetuser]]" keys="enter" on-keys-pressed="_login"></iron-a11y-keys>
 					<iron-a11y-keys target="[[targetpass]]" keys="enter" on-keys-pressed="_login"></iron-a11y-keys>
-					<paper-input id="userfield" value="{{username}}" label="Username"></paper-input>
-					<paper-input id="passfield" value="{{password}}" label="Password" type="password"></paper-input>
+					<paper-input id="userfield" value="{{username}}" label="Username" disabled="{{loading}}"></paper-input>
+					<paper-input id="passfield" value="{{password}}" label="Password" type="password" disabled="{{loading}}"></paper-input>
 				</div>
 			</iron-pages>
 			<div class="buttons">
@@ -200,11 +200,15 @@ limitations under the License.
 						type: Number,
 						value: 0,
 						notify: true,
-						observer: '_watchSelected'
+						observer: '_persistData'
 					},
 					authMethod: {
 						type: String,
 						value: 'POST'
+					},
+					authRequests: {
+						type: Array,
+						value: []
 					},
 					approvedURL: {
 						type: Boolean,
@@ -223,17 +227,13 @@ limitations under the License.
 				_login: function() {
 					this.url = this.url.trim();
 					if (this.url.toLowerCase().startsWith('https')) {
-						if (!this.approvedURL) {
-							this.$.errortoast.text = 'No Vault instance found at the this URL';
-							this.$.errortoast.show();
-							return;
-						}
 						if (!(this.url.endsWith('/'))) this.url += '/';
 						// Switch for LDAP, Token, and UserPass auth backends
 						if (this.page == 0) {
 							if (!this.username && !this.password) { //Check fields have content
 								this.$.errortoast.text = 'Username and Password are required';
 								this.$.errortoast.show();
+								this.loading = false;
 								return;
 							}
 							this.authMethod = 'POST';
@@ -243,6 +243,7 @@ limitations under the License.
 							if (!this.token) { //Check field has content
 								this.$.errortoast.text = 'Token is required';
 								this.$.errortoast.show();
+								this.loading = false;
 								return;
 							}
 							this.authMethod = 'GET';
@@ -253,6 +254,7 @@ limitations under the License.
 							if (!this.username && !this.password) { //Check fields have content
 								this.$.errortoast.text = 'Username and Password are required';
 								this.$.errortoast.show();
+								this.loading = false;
 								return;
 							}
 							this.authMethod = 'POST';
@@ -260,13 +262,15 @@ limitations under the License.
 							this.body = {"password": this.password };
 						}
 						this.loading = true;
-						this.$.authenticateReq.generateRequest();
+						this.push('authRequests', this.$.testReq.generateRequest());
 					} else {
 						this.$.errortoast.text = 'An HTTPS based URL is required.';
 						this.$.errortoast.show();
+						this.loading = false;
 					}
 				},
 				_success: function() {
+					this.$.errortoast.close()
 					// UserPass / LDAP
 					if (this.loginResponse.auth && this.loginResponse.auth.client_token) {
 						this.header = {"X-Vault-Token": this.loginResponse.auth.client_token };
@@ -290,35 +294,54 @@ limitations under the License.
 					else if (this.loginError.response.errors[0] == 'invalid username or password') this.$.errortoast.text = 'Invalid Username or Password';
 					else if (this.loginError.response.errors[0] == 'missing client token') this.$.errortoast.text = 'Permission Denied';
 					else if (this.loginError.response.errors[0] == 'Vault is sealed') this.$.errortoast.text = 'This vault is currently sealed';
-					else if (this.loginError.response.errors[0] == 'permission denied') this.$.errortoast.text = 'Permission Denied';
 					else if (this.loginError.response.errors[0] == 'unsupported path') this.$.errortoast.text = 'This auth backend is not supported by the server';
+					else if (this.loginError.response.errors[0] == 'permission denied' && this.page == 1) this.$.errortoast.text = 'Invalid Token';
+					else if (this.loginError.response.errors[0] == 'permission denied') this.$.errortoast.text = 'Permission Denied';
 					else this.$.errortoast.text = 'Unknown Error: Please try again later.';
 					this.$.errortoast.show();
 				},
 				_testSuccess: function() {
-					this.approvedURL = true;
-					document.getElementById('blocker').style.display = 'none';
+					if (!this.testResponse.hasOwnProperty('t') || 
+						!this.testResponse.hasOwnProperty('n') || 
+						!this.testResponse.hasOwnProperty('progress') || 
+						!this.testResponse.hasOwnProperty('version') || 
+						!this.testResponse.hasOwnProperty('cluster_id') || 
+						!this.testResponse.hasOwnProperty('cluster_name')) {
+						this.$.errortoast.text = 'No supported Vault instance found at the this URL';
+						this.$.errortoast.show();
+						this.approvedURL = false;
+						this.loading = false;
+						return;
+					} else if (this.testResponse.sealed) {
+						this.$.errortoast.text = 'Vault is sealed.';
+						this.$.errortoast.show();
+						this.approvedURL = false;
+						this.loading = false;
+					} else {
+						this.approvedURL = true;
+						document.getElementById('blocker').style.display = 'none';
+						this._watchAuthRequests();
+					}
 				},
 				_testError: function() {
+					this.$.errortoast.text = 'No supported Vault instance found at the this URL';
+					this.$.errortoast.show();
 					this.approvedURL = false;
+					this.loading = false;
+					this.authRequests = [];
 					document.getElementById('blocker').style.display = 'none';
 				},
 				_watchStatus: function() {
 					if (this.status == 'none') this.$.modal.open();
 				},
-				_watchSelected: function() {
-					this.password = '';
-					this.token = '';
-					this._persistData();
-				},
 				_watchURL: function() {
 					this.debounce('checkURL', function () {
 						if (this.url.toLowerCase().startsWith('https')) {
 							if (!(this.url.endsWith('/'))) {
-								this.testURL = this.url + '/v1/sys/init';
+								this.testURL = this.url + '/v1/sys/seal-status';
 								this.$.testReq.generateRequest();
 							} else {
-								this.testURL = this.url + 'v1/sys/init';
+								this.testURL = this.url + 'v1/sys/seal-status';
 								this.$.testReq.generateRequest();
 							}
 						} else {
@@ -326,6 +349,12 @@ limitations under the License.
 						}
 						this._persistData();
 					}, 400);
+				},
+				_watchAuthRequests: function() {
+					if (this.authRequests[0]) {
+						this.$.authenticateReq.generateRequest();
+						this.authRequests = [];
+					}
 				},
 				_watchDomain: function() {
 					this.domain = (this.domain) ? this.domain.toLowerCase().replace('https://', '') : '';
