@@ -24,8 +24,8 @@ limitations under the License.
 					color: white;
 				};
 			}
-			#errortoast {
-				background-color: #EF5350;
+			paper-toast.error {
+				background-color: #F44336;
 			}
 			#userfield, #passfield {
 				margin: 0;
@@ -131,7 +131,10 @@ limitations under the License.
 			<paper-progress class="bottombar" indeterminate disabled="{{!loading}}"></paper-progress>
 		</paper-dialog>
 
-		<paper-toast id="errortoast" class="fit-bottom" duration="5000" text""></paper-toast>
+		<paper-toast id="errortoast" class="fit-bottom error" duration="5000">
+			<iron-icon prefix icon="error-outline" style="padding-right: 7px;"></iron-icon>
+			{{errorText}}
+		</paper-toast>
 	</template>
 
 	<script>
@@ -231,7 +234,7 @@ limitations under the License.
 						// Switch for LDAP, Token, and UserPass auth backends
 						if (this.page == 0) {
 							if (!this.username && !this.password) { //Check fields have content
-								this.$.errortoast.text = 'Username and Password are required';
+								this.errorText = 'Username and Password are required';
 								this.$.errortoast.show();
 								this.loading = false;
 								return;
@@ -241,7 +244,7 @@ limitations under the License.
 							this.body = {"password": this.password };
 						} else if (this.page == 1) {
 							if (!this.token) { //Check field has content
-								this.$.errortoast.text = 'Token is required';
+								this.errorText = 'Token is required';
 								this.$.errortoast.show();
 								this.loading = false;
 								return;
@@ -252,7 +255,7 @@ limitations under the License.
 							this.body = '';
 						} else if (this.page == 2) {
 							if (!this.username && !this.password) { //Check fields have content
-								this.$.errortoast.text = 'Username and Password are required';
+								this.errorText = 'Username and Password are required';
 								this.$.errortoast.show();
 								this.loading = false;
 								return;
@@ -264,7 +267,7 @@ limitations under the License.
 						this.loading = true;
 						this.push('authRequests', this.$.testReq.generateRequest());
 					} else {
-						this.$.errortoast.text = 'An HTTPS based URL is required.';
+						this.errorText = 'An HTTPS based URL is required.';
 						this.$.errortoast.show();
 						this.loading = false;
 					}
@@ -290,15 +293,15 @@ limitations under the License.
 				},
 				_error: function(e) {
 					this.loading = false;
-					if (this.loginError.response.errors[0].includes('Invalid Credentials')) this.$.errortoast.text = 'Invalid Credentials';
-					else if (this.loginError.response.errors[0].includes('No Such Object')) this.$.errortoast.text = 'Invalid Username or Password';
-					else if (this.loginError.response.errors[0] == 'invalid username or password') this.$.errortoast.text = 'Invalid Username or Password';
-					else if (this.loginError.response.errors[0] == 'missing client token') this.$.errortoast.text = 'Permission Denied';
-					else if (this.loginError.response.errors[0] == 'Vault is sealed') this.$.errortoast.text = 'This vault is currently sealed';
-					else if (this.loginError.response.errors[0] == 'unsupported path') this.$.errortoast.text = 'This auth backend is not supported by the server';
-					else if (this.loginError.response.errors[0] == 'permission denied' && this.page == 1) this.$.errortoast.text = 'Invalid Token';
-					else if (this.loginError.response.errors[0] == 'permission denied') this.$.errortoast.text = 'Permission Denied';
-					else this.$.errortoast.text = 'Unknown Error: Please try again later.';
+					if (this.loginError.response.errors[0].includes('Invalid Credentials')) this.errorText = 'Invalid Credentials';
+					else if (this.loginError.response.errors[0].includes('No Such Object')) this.errorText = 'Invalid Username or Password';
+					else if (this.loginError.response.errors[0] == 'invalid username or password') this.errorText = 'Invalid Username or Password';
+					else if (this.loginError.response.errors[0] == 'missing client token') this.errorText = 'Permission Denied';
+					else if (this.loginError.response.errors[0] == 'Vault is sealed') this.errorText = 'This vault is currently sealed';
+					else if (this.loginError.response.errors[0] == 'unsupported path') this.errorText = 'This auth backend is not supported by the server';
+					else if (this.loginError.response.errors[0] == 'permission denied' && this.page == 1) this.errorText = 'Invalid Token';
+					else if (this.loginError.response.errors[0] == 'permission denied') this.errorText = 'Permission Denied';
+					else this.errorText = 'Unknown Error: Please try again later.';
 					this.$.errortoast.show();
 				},
 				_testSuccess: function() {
@@ -308,13 +311,13 @@ limitations under the License.
 						!this.testResponse.hasOwnProperty('version') || 
 						!this.testResponse.hasOwnProperty('cluster_id') || 
 						!this.testResponse.hasOwnProperty('cluster_name')) {
-						this.$.errortoast.text = 'No supported Vault instance found at the this URL';
+						this.errorText = 'No supported Vault instance found at the this URL';
 						this.$.errortoast.show();
 						this.approvedURL = false;
 						this.loading = false;
 						return;
 					} else if (this.testResponse.sealed) {
-						this.$.errortoast.text = 'Vault is sealed.';
+						this.errorText = 'Vault is sealed.';
 						this.$.errortoast.show();
 						this.approvedURL = false;
 						this.loading = false;
@@ -324,7 +327,7 @@ limitations under the License.
 					}
 				},
 				_testError: function() {
-					this.$.errortoast.text = 'No supported Vault instance found at the this URL';
+					this.errorText = 'No supported Vault instance found at the this URL';
 					this.$.errortoast.show();
 					this.approvedURL = false;
 					this.loading = false;
