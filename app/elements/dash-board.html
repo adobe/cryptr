@@ -1,0 +1,86 @@
+<!--
+Copyright 2017 Adobe. All rights reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<dom-module id="dash-board">
+	<style>
+		.flex {
+			@apply(--layout-flex);
+		}
+		.center {
+			height: calc(100vh - 64px);
+			@apply(--layout-horizontal);
+			@apply(--layout-center-center);
+		}
+		.vertical {
+			@apply(--layout-vertical);
+		}
+		.shaded {
+			color: rgba(56, 67, 81, 0.65);
+		}
+		#dashboard {
+			color: rgba(56, 67, 81, 0.14);
+			width: 250px;
+			height: 250px;
+		}
+		.rightToast {
+			right: 10px;
+			left: auto !important;
+			min-width: 95px;
+		}
+		.success {
+			background-color: #4CAF50;
+		}
+	</style>
+	<template>
+		<div class="flex">
+			<div class="center">
+				<div class="vertical center">
+					<iron-icon id="dashboard" icon="dashboard"></iron-icon>
+					<div>
+						<div class="shaded">Dashboard</div>
+					</div>
+					<div>
+						<div class="shaded">Coming Soon!</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		
+		<paper-toast id="deleted" class="success fit-bottom" duration="1500">
+			<iron-icon prefix icon="check" style="padding-right: 7px;"></iron-icon>
+			Deleted
+		</paper-toast>
+		<paper-toast id="move" class="success fit-bottom" duration="1500">
+			<iron-icon prefix icon="check" style="padding-right: 7px;"></iron-icon>
+			Move Complete
+		</paper-toast>
+	</template>
+
+	<script>
+		(function() {
+			'use strict';
+			Polymer({
+				is: 'dash-board',
+				properties: {
+					
+				},
+				attached: function() {
+					this.$.deleted.fitInto = headerPanelMain;
+					this.$.move.fitInto = headerPanelMain;
+				},
+			});
+		})();
+	</script>
+</dom-module>

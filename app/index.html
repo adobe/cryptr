@@ -85,10 +85,7 @@ limitations under the License.
 				<div class="content">
 					<iron-pages attr-for-selected="data-route" selected="{{route}}" style="height: 100%">
 						<section data-route="home">
-							<paper-material elevation="1">
-								<h2 class="page-title">Dashboard</h2>
-								<p>Placeholder for future content. This may include keys nearing the end of their 90 day lifespan and recently modified keys. </p>
-							</paper-material>
+							<dash-board></dash-board>
 						</section>
 
 						<section data-route="create">
@@ -107,15 +104,10 @@ limitations under the License.
 			</paper-scroll-header-panel>
 		</paper-drawer-panel>
 
-		<paper-toast id="deleted" class="toast toastSuccess fit-bottom" duration="1500" text="Deleted"></paper-toast>
-		<paper-toast id="added" class="toast toastSuccess fit-bottom" duration="1500" text="Secret Added"></paper-toast>
-		<paper-toast id="move" class="toast toastSuccess fit-bottom" duration="1500" text="Move Complete"></paper-toast>
 		<paper-toast id="toast">
 			<span class="toast-hide-button" role="button" tabindex="0" onclick="app.$.toast.hide()">Ok</span>
 		</paper-toast>
-
 		<paper-progress indeterminate class="bottombar" disabled="{{!loading}}"></paper-progress>
-
 	</template>
 
 	<script src="scripts/app.js"></script>
