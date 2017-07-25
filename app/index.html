@@ -31,7 +31,7 @@ limitations under the License.
 		<div id="blocker"></div>
 		<login-form status="{{status}}" username="{{u}}" domain="{{domain}}" url="{{url}}" header="{{header}}" login-response="{{loginResponse}}" page="{{loginPage}}" loading="{{loading}}"></login-form>
 		<login-status status="{{status}}" url="{{url}}" header="{{header}}"></login-status>
-		<secrets-init status="{{status}}" header="{{header}}" login-response="{{loginResponse}}" secrets="{{secrets}}" access="{{access}}" loading="{{loading}}"></secrets-init>
+		<background-process url="{{url}}" status="{{status}}" header="{{header}}" login-response="{{loginResponse}}" secrets="{{secrets}}" access="{{access}}" loading="{{loading}}"></background-process>
 
 		<paper-drawer-panel id="paperDrawerPanel" drawer-width="{{drawerWidth}}">
 			<!-- Drawer Area -->
@@ -120,6 +120,5 @@ limitations under the License.
 	</template>
 
 	<script src="scripts/app.js"></script>
-	<script src="scripts/hcltojson.js"></script>
 </body>
 </html>

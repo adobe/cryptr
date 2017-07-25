@@ -13,13 +13,10 @@ limitations under the License.
 */
 
 'use strict';
-const electron = require('electron');
-const ipcMain = require('electron').ipcMain;
-const {Menu} = require('electron');
-const {app} = require('electron');
-const BrowserWindow = electron.BrowserWindow;
+const { app, BrowserWindow, ipcMain, Menu } = require('electron');
 
 let mainWindow;
+let backgroundWindow;
 
 var path = require("path");
 var fs = require("fs");
@@ -28,7 +25,7 @@ if (!fs.existsSync(initPath)) fs.mkdirSync(initPath);
 initPath += '/init.json';
 
 var settings = {};
-function createWindow() {
+function createMainWindow() {
 	try {
 		settings = JSON.parse(fs.readFileSync(initPath, 'utf8'));
 		if (settings.init === undefined || settings.init === null) settings.init = '';
@@ -55,9 +52,6 @@ function createWindow() {
 	mainWindow.once('ready-to-show', () => {
 	    mainWindow.show()
 	})
-
-	// Open the DevTools.
-	if (process.env.CRYPTR_ENV && process.env.CRYPTR_ENV == 'development') mainWindow.webContents.openDevTools();
 
 	if (process.platform == 'darwin') {
 		// Menu items for MacOS. Specifically, this enables Copy/Paste while disallowing opening DevTools.
@@ -102,43 +96,75 @@ function createWindow() {
 	// Emitted when the window is closed.
 	mainWindow.on('closed', function() {
 		mainWindow = null;
+		backgroundWindow = null;
 		app.quit();
 	});
+	return mainWindow;
+}
+
+function createBackgroundWindow() {
+	const backgroundWindow = new BrowserWindow();
+	// const backgroundWindow = new BrowserWindow({ show: false });
+	backgroundWindow.loadURL(`file://${__dirname}/background/background.html`);
+	return backgroundWindow;
 }
 
 // This method will be called when Electron has finished initialization and is ready to create browser windows.
-app.on('ready', createWindow);
+app.on('ready', function() {
+	mainWindow = createMainWindow();
+	backgroundWindow = createBackgroundWindow();
+	
+	// Open the DevTools.
+	if (process.env.CRYPTR_ENV && process.env.CRYPTR_ENV == 'development') {
+		mainWindow.webContents.openDevTools();
+		backgroundWindow.webContents.openDevTools();
+	}
+});
 
-// Quit when all windows are closed.
+// On OS X it is common for applications and their menu bar to stay active until the user quits explicitly with Cmd + Q
 app.on('window-all-closed', function () {
-	// On OS X it is common for applications and their menu bar to stay active until the user quits explicitly with Cmd + Q
-	if (process.platform !== 'darwin') {
-		app.quit();
+	if (process.platform !== 'darwin') app.quit();
+});
+
+app.on('activate-with-no-open-windows', () => {
+	if (!mainWindow) {
+		mainWindow = createMainWindow();
+		backgroundWindow = null;
+		backgroundWindow = createBackgroundWindow();
 	}
 });
 
+// On OS X it's common to re-create a window in the app when the dock icon is clicked and there are no other windows open.
 app.on('activate', function () {
-	// On OS X it's common to re-create a window in the app when the dock icon is clicked and there are no other windows open.
-	if (mainWindow === null) {
-		createWindow();
+	if (!mainWindow || !backgroundWindow) {
+		mainWindow = null;
+		backgroundWindow = null;
+		mainWindow = createMainWindow();
+		backgroundWindow = createBackgroundWindow();
 	}
 });
 
-ipcMain.on('initialized', function(event, arg) {
+// Save data back to settings file
+ipcMain.on('initialized', (event, arg) => {
 	event.sender.send('domain', settings.init);
 	event.sender.send('loginpage', settings.loginpage);
 	event.sender.send('drawerWidth', settings.drawerWidth);
 	event.sender.send('user', settings.user);
 });
-ipcMain.on('update-domain', function(event, arg) {
-	settings.init = arg;
-});
-ipcMain.on('update-user', function(event, arg) {
-	settings.user = arg;
-});
-ipcMain.on('update-loginpage', function(event, arg) {
-	settings.loginpage = arg;
-});
-ipcMain.on('update-drawerWidth', function(event, arg) {
-	settings.drawerWidth = arg;
-});
+ipcMain.on('update-domain', (event, arg) => settings.init = arg);
+ipcMain.on('update-user', (event, arg) => settings.user = arg);
+ipcMain.on('update-loginpage', (event, arg) => settings.loginpage = arg);
+ipcMain.on('update-drawerWidth', (event, arg) => settings.drawerWidth = arg);
+
+// Communication from backgroundWindow to mainWindow
+ipcMain.on('background-secrets', (event, value) => mainWindow.webContents.send('background-secrets', value));
+ipcMain.on('background-loading', (event, value) => mainWindow.webContents.send('background-loading', value));
+
+// Communication from mainWindow to backgroundWindow
+ipcMain.on('main-status', (event, value) => backgroundWindow.webContents.send('main-status', value));
+ipcMain.on('main-url', (event, value) => backgroundWindow.webContents.send('main-url', value));
+ipcMain.on('main-access', (event, value) => backgroundWindow.webContents.send('main-access', value));
+ipcMain.on('main-secrets', (event, value) => backgroundWindow.webContents.send('main-secrets', value));
+ipcMain.on('main-header', (event, value) => backgroundWindow.webContents.send('main-header', value));
+ipcMain.on('main-loading', (event, value) => backgroundWindow.webContents.send('main-loading', value));
+ipcMain.on('main-loginResponse', (event, value) => backgroundWindow.webContents.send('main-loginResponse', value));

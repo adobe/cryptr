@@ -1,0 +1,93 @@
+<!--
+Copyright 2017 Adobe. All rights reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<dom-module id="background-process">
+	<template>
+	</template>
+
+	<script>
+		(function() {
+			'use strict';
+			Polymer({
+				is: 'background-process',
+				properties: {
+                    status: {
+    					notify: true,
+    					observer: '_watchStatus'
+    				},
+                    url: {
+    					notify: true,
+    					observer: '_watchUrl'
+    				},
+					loading: {
+						notify: true,
+						observer: '_watchLoading'
+					},
+					access: {
+						type: Object,
+						value: {},
+						notify: true,
+						observer: '_watchAccess'
+					},
+					secrets: {
+						type: Array,
+						value: [],
+						notify: true,
+						observer: '_watchSecrets'
+					},
+					header: {
+						type: Object,
+						observer: '_watchHeader'
+					},
+					loginResponse: {
+						type: Array,
+						value: [],
+						observer: '_watchLoginResponse'
+					}
+				},
+				attached: function() {
+					// Listen for updates from backgroundWindow
+					ipcRenderer.on('background-secrets', (event, value) => this.push('secrets', value));
+					ipcRenderer.on('background-loading', (event, value) => this.loading = value);
+				},
+				// For each variable: watch it for changes, and report to background process if change made. Else do nothing.
+                _watchStatus: function() {
+					ipcRenderer.send('main-status', this.status);
+					if (this.status == 'none') {
+						this.access = {};
+						this.secrets = [];
+					}
+				},
+                _watchUrl: function() {
+					ipcRenderer.send('main-url', this.url);
+				},
+				_watchLoading: function(n,o) {
+					if (n != o) ipcRenderer.send('main-loading', this.loading);
+				},
+                _watchAccess: function(n,o) {
+					if (JSON.stringify(n) != JSON.stringify(o)) ipcRenderer.send('main-access', this.access);
+				},
+                _watchSecrets: function(n,o) {
+					if (JSON.stringify(n) != JSON.stringify(o)) ipcRenderer.send('main-secrets', this.secrets);
+				},
+                _watchHeader: function() {
+					ipcRenderer.send('main-header', this.header);
+				},
+				_watchLoginResponse: function() {
+					ipcRenderer.send('main-loginResponse', this.loginResponse);
+				}
+			});
+		})();
+	</script>
+</dom-module>
