@@ -76,6 +76,7 @@ window.addEventListener('WebComponentsReady', function() {
 		document.removeEventListener('mousemove', resize);
         if (dragging) {
 			if (e.pageX < 175) app.drawerWidth = '175px';
+			else if (e.pageX > (window.outerWidth*3/4)) app.drawerWidth = window.outerWidth*3/4 + 'px';
             else app.drawerWidth = e.pageX + 5 + 'px';
 			var child = document.getElementById('ghost');
             document.body.removeChild(child);
@@ -86,5 +87,7 @@ window.addEventListener('WebComponentsReady', function() {
 });
 
 function resize(e) {
-	document.getElementById('ghost').style.left = (e.pageX < 175) ? '175px' : e.pageX + 5 + 'px';
+	if (e.pageX < 175) document.getElementById('ghost').style.left = '175px';
+	else if (e.pageX > window.outerWidth*3/4) document.getElementById('ghost').style.left = window.outerWidth*3/4 + 'px';
+	else document.getElementById('ghost').style.left = e.pageX + 5 + 'px';
 }
