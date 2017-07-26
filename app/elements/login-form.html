@@ -276,20 +276,18 @@ limitations under the License.
 					this.$.errortoast.close()
 					// UserPass / LDAP
 					if (this.loginResponse.auth && this.loginResponse.auth.client_token) {
-						this.header = {"X-Vault-Token": this.loginResponse.auth.client_token };
 						this.loginResponse = this.loginResponse.auth;
-						this.status = 'watch';
-						this.password = '';
-						document.getElementById('blocker').style.display = 'none';
-						this.$.modal.close();
+						this.header = {"X-Vault-Token": this.loginResponse.client_token };
 					// Token Auth
 					} else if (this.loginResponse.data) {
 						this.loginResponse = this.loginResponse.data;
 						this.username = 'TOKEN';
-						this.status = 'watch';
-						this.password = '';
-						this.$.modal.close();
 					}
+					this.status = 'watch';
+					this.password = '';
+					this.token = '';
+					document.getElementById('blocker').style.display = 'none';
+					this.$.modal.close();
 				},
 				_error: function(e) {
 					this.loading = false;
