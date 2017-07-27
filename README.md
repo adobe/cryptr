@@ -33,6 +33,8 @@ Apache 2.0 License
 ### HTTPS
 Cryptr will ONLY access Vault servers enabled with HTTPS. These are your secrets. Keep them secret, keep them safe.
 
+The only exception to this is a dev server running locally at `http://127.0.0.1:<port>`. Cryptr's URL field will automatically change to contain a `http://` prefix when `127.0.0.1:` is input. (Note the colon, which is required for the prefix to change. A port number provided after the colon is also required since a default Vault dev server is started on port 8200)
+
 ### Auth backends
 Currently LDAP, UserPass and Token auth backends are accepted. Most others are not useful for a GUI, but if you feel otherwise, submit a pull request.
 

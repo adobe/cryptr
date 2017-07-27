@@ -104,7 +104,7 @@ limitations under the License.
 			</paper-tabs>
 			<div class="flexchild" style="margin: 0;">
 				<paper-input id="urlfield" value="{{domain}}" invalid="{{!approvedURL}}" label=" Server URL" error-message="A Vault server is not found at this URL" disabled="{{loading}}">
-					<div prefix>https:// </div>
+					<div id="prefix" prefix>https:// </div>
 				</paper-input>
 			</div>
 			<iron-pages selected="{{page}}">
@@ -229,7 +229,7 @@ limitations under the License.
 				},
 				_login: function() {
 					this.url = this.url.trim();
-					if (this.url.toLowerCase().startsWith('https')) {
+					if (this.url.toLowerCase().startsWith('https') || this.url.toLowerCase().startsWith('http://127.0.0.1:')) {
 						if (!(this.url.endsWith('/'))) this.url += '/';
 						// Switch for LDAP, Token, and UserPass auth backends
 						if (this.page == 0) {
@@ -336,7 +336,7 @@ limitations under the License.
 				},
 				_watchURL: function() {
 					this.debounce('checkURL', function () {
-						if (this.url.toLowerCase().startsWith('https')) {
+						if (this.url.toLowerCase().startsWith('https') || this.url.toLowerCase().startsWith('http://127.0.0.1:')) {
 							if (!(this.url.endsWith('/'))) {
 								this.testURL = this.url + '/v1/sys/seal-status';
 								this.$.testReq.generateRequest();
@@ -357,8 +357,14 @@ limitations under the License.
 					}
 				},
 				_watchDomain: function() {
-					this.domain = (this.domain) ? this.domain.toLowerCase().replace('https://', '') : '';
-					this.url = 'https://' + this.domain;
+					this.domain = (this.domain) ? this.domain.toLowerCase().replace('https://', '').replace('http://', '') : '';
+					if (this.domain && this.domain.startsWith('127.0.0.1:')) {
+						this.$.prefix.innerHTML = 'http://'
+						this.url = 'http://' + this.domain;
+					} else {
+						this.$.prefix.innerHTML = 'https://'
+						this.url = 'https://' + this.domain;
+					}
 				},
 				_persistData: function() {
 					ipcRenderer.send('update-domain', this.domain);
