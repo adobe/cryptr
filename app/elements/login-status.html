@@ -17,16 +17,45 @@ limitations under the License.
 <dom-module id="login-status">
 	<template>
 		<style>
-
+			#renewTokenModal {
+				border-radius: 3px;
+			}
+			paper-button {
+				border: 2px solid #4496ff;
+			    padding: 0px;
+			    height: 34px;
+			    margin-top: 7px;
+			    color: #308aff;
+			    font-weight: 500;
+			}
 		</style>
+		
 		<iron-ajax id="checkStatus"
 			url="{{statusURL}}"
 			handle-as="json"
 			headers="{{header}}"
-			last-response="{{response}}"
+			last-response="{{statusResponse}}"
 			on-response="_success"
 			on-error="_logout">
 		</iron-ajax>
+		
+		<iron-ajax id="renewToken"
+			url="{{renewURL}}"
+			method="post"
+			handle-as="json"
+			headers="{{header}}"
+			on-response="_renewSuccess"
+			on-error="_logout">
+		</iron-ajax>
+		
+		<paper-dialog id="renewTokenModal" entry-animation="scale-up-animation" exit-animation="fade-out-animation" no-cancel-on-esc-key no-cancel-on-outside-click with-backdrop>
+			<h2>Logging Out</h2>
+			<p>Your Vault token will expire in {{timeRemaining}} seconds.</p>
+			<div class="buttons">
+				<paper-button dialog-dismiss on-tap="_logout">Logout</paper-button>
+				<paper-button autofocus on-tap="_renewToken">Renew</paper-button>
+			</div>
+		</paper-dialog>
 
 	</template>
 
@@ -50,12 +79,21 @@ limitations under the License.
 						type: String
 					},
 					statusURL: {
-						computed: '_computeURL(url)'
+						computed: '_computeStatusURL(url)'
+					},
+					renewURL: {
+						computed: '_computeRenewURL(url)'
 					},
 					header: Object
 				},
-				_computeURL: function(url) {
+				_renewToken: function() {
+					this.$.renewToken.generateRequest();
+				},
+				_computeStatusURL: function(url) {
 					return this.url + 'v1/auth/token/lookup-self'
+				},
+				_computeRenewURL: function(url) {
+					return this.url + 'v1/auth/token/renew-self'
 				},
 				_watchStatus: function() {
 					if (this.status == 'watch') {
@@ -66,10 +104,11 @@ limitations under the License.
 					}
 				},
 				_success: function() {
-					if (this.response.status == 'success') {
-						clearInterval(this.timer);
-						this.status = 'watch';
-					}
+					this.timeRemaining = this.statusResponse.data.ttl;
+					if (this.timeRemaining < 70) this.$.renewTokenModal.open();
+				},
+				_renewSuccess: function() {
+					this.$.renewTokenModal.close();
 				},
 				_logout: function() {
 					this._clearData();
@@ -78,6 +117,7 @@ limitations under the License.
 					app.loginResponse = {};
 					document.getElementById('blocker').style.display = 'block';
 					clearInterval(this.timer);
+					this.$.renewTokenModal.close();
 				},
 				_clearData: function() {
 					app.data = {};
