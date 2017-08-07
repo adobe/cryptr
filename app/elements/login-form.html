@@ -106,9 +106,26 @@ limitations under the License.
 				<paper-tab>User/Pass</paper-tab>
 			</paper-tabs>
 			<div class="flexchild" style="margin: 0;">
-				<paper-input id="urlfield" value="{{domain}}" invalid="{{!approvedURL}}" label=" Server URL" error-message="A Vault server is not found at this URL" disabled="{{loading}}">
-					<div id="prefix" prefix>https:// </div>
-				</paper-input>
+				<paper-dropdown-menu label="URL" value="{{url}}" horizontal-align="left" style="width: 100%;">
+					<div slot="dropdown-content" class="dropdown-content">
+						<paper-listbox slot="dropdown-content" class="dropdown-content" selected="0">
+							<template is="dom-repeat" items="{{urls}}">
+								<paper-item item-value="{{item}}">
+									{{item}}
+									<span style="flex: 1;"></span>
+									<paper-icon-button on-tap="_clearItem" icon="clear"></paper-icon-button>
+								</paper-item>
+							</template>
+						</paper-listbox>
+						<paper-item on-tap="_stop" style="border-top: 1px solid #DDD;">
+							<paper-input label="New URL" id="newURL" value="{{newURL}}" always-float-label>
+								<div id="urlPrefix" prefix>https://</div>
+								<paper-icon-button suffix on-tap="_addURL" icon="add" alt="add" title="add"></paper-icon-button>
+							</paper-input>
+							<iron-a11y-keys target="[[targetNewURL]]" keys="enter" on-keys-pressed="_addURL"></iron-a11y-keys>
+						</paper-item>
+					</div>
+				</paper-dropdown-menu>
 			</div>
 			<iron-pages selected="{{page}}">
 				<div>
@@ -137,6 +154,10 @@ limitations under the License.
 		<paper-toast id="errortoast" class="fit-bottom error" duration="5000">
 			<iron-icon prefix icon="error-outline" style="padding-right: 7px;"></iron-icon>
 			{{errorText}}
+		</paper-toast>
+		<paper-toast id="warningtoast" class="fit-bottom" duration="0">
+			<iron-icon prefix icon="error-outline" style="padding-right: 7px;"></iron-icon>
+			An HTTPS based URL is required.
 		</paper-toast>
 	</template>
 
@@ -167,6 +188,9 @@ limitations under the License.
 					targettoken: {
 						value: function() { return this.$.tokenfield; }
 					},
+					targetnewurl: {
+						value: function() { return this.$.newURL; }
+					},
 					username: {
 						type: String,
 						value: '',
@@ -184,15 +208,20 @@ limitations under the License.
 						type: Boolean,
 						value: false
 					},
+					urls: {
+						type: Array,
+						notify: true,
+						value: []
+					},
 					url: {
 						type: String,
 						notify: true,
 						observer: '_watchURL'
 					},
-					domain: {
+					newURL: {
 						type: String,
-						notify: true,
-						observer: '_watchDomain'
+						value: '',
+						observer: '_watchNewURL'
 					},
 					header: {
 						type: Object,
@@ -231,9 +260,7 @@ limitations under the License.
 					return this.url + 'v1/auth/ldap/login/' + u
 				},
 				_login: function() {
-					this.url = this.url.trim();
 					if (this.url.toLowerCase().startsWith('https') || this.url.toLowerCase().startsWith('http://127.0.0.1:')) {
-						if (!(this.url.endsWith('/'))) this.url += '/';
 						// Switch for LDAP, Token, and UserPass auth backends
 						if (this.page == 0) {
 							if (!this.username && !this.password) { //Check fields have content
@@ -306,7 +333,8 @@ limitations under the License.
 					this.$.errortoast.show();
 				},
 				_testSuccess: function() {
-					if (!this.testResponse.hasOwnProperty('t') || 
+					if (this.testResponse == null ||
+						!this.testResponse.hasOwnProperty('t') || 
 						!this.testResponse.hasOwnProperty('n') || 
 						!this.testResponse.hasOwnProperty('progress') || 
 						!this.testResponse.hasOwnProperty('version') || 
@@ -317,12 +345,13 @@ limitations under the License.
 						this.approvedURL = false;
 						this.loading = false;
 						return;
-					} else if (this.testResponse.sealed) {
+					} else if (this.testResponse != null && this.testResponse.sealed) {
 						this.errorText = 'Vault is sealed.';
 						this.$.errortoast.show();
 						this.approvedURL = false;
 						this.loading = false;
 					} else {
+						this.$.errortoast.hide();
 						this.approvedURL = true;
 						this._watchAuthRequests();
 					}
@@ -338,20 +367,41 @@ limitations under the License.
 					if (this.status == 'none') this.$.modal.open();
 				},
 				_watchURL: function() {
+					if (!(this.url.endsWith('/'))) this.url += '/';
+					if (this.url.toLowerCase().startsWith('http://localhost:')) this.url = this.url.replace('http://localhost:' ,'http://127.0.0.1:');
 					this.debounce('checkURL', function () {
-						if (this.url.toLowerCase().startsWith('https') || this.url.toLowerCase().startsWith('http://127.0.0.1:')) {
-							if (!(this.url.endsWith('/'))) {
-								this.testURL = this.url + '/v1/sys/seal-status';
-								this.$.testReq.generateRequest();
-							} else {
-								this.testURL = this.url + 'v1/sys/seal-status';
-								this.$.testReq.generateRequest();
-							}
+						if (this.url.toLowerCase().startsWith('https://') || this.url.toLowerCase().startsWith('http://127.0.0.1:')) {
+							this.$.warningtoast.close();
+							this.testURL = this.url + 'v1/sys/seal-status';
+							this.$.testReq.generateRequest();
 						} else {
-							this.approvedURL = false;
+							this.$.warningtoast.show();
 						}
 						this._persistData();
 					}, 400);
+				},
+				_watchNewURL: function() {
+					if (this.newURL == '') return;
+					if (this.newURL.toLowerCase().startsWith('localhost:')) this.newURL = this.newURL.replace('localhost:' ,'127.0.0.1:');
+					if (this.newURL.toLowerCase().startsWith('127.0.0.1:')) this.$.urlPrefix.innerText = 'http://';
+					else this.$.urlPrefix.innerText = 'https://';
+				},
+				_addURL: function() {
+					if (this.newURL == '') return;
+					var url = (this.newURL.toLowerCase().startsWith('127.0.0.1:')) ? 'http://' + this.newURL : 'https://' + this.newURL;
+					if (!url.endsWith('/')) url += '/';
+					if (!this.urls) this.urls = [];
+					this.push('urls', url);
+					this.newURL = '';
+					this.$.urlPrefix.innerText = 'https://';
+					this._persistData();
+				},
+				_clearItem: function(e) {
+					event.stopPropagation();
+					this.splice('urls', e.model.index, 1);
+				},
+				_stop: function(event) {
+					event.stopPropagation();
 				},
 				_watchAuthRequests: function() {
 					if (this.authRequests[0]) {
@@ -359,18 +409,8 @@ limitations under the License.
 						this.authRequests = [];
 					}
 				},
-				_watchDomain: function() {
-					this.domain = (this.domain) ? this.domain.toLowerCase().replace('https://', '').replace('http://', '') : '';
-					if (this.domain && this.domain.startsWith('127.0.0.1:')) {
-						this.$.prefix.innerHTML = 'http://'
-						this.url = 'http://' + this.domain;
-					} else {
-						this.$.prefix.innerHTML = 'https://'
-						this.url = 'https://' + this.domain;
-					}
-				},
 				_persistData: function() {
-					ipcRenderer.send('update-domain', this.domain);
+					ipcRenderer.send('update-urls', this.urls);
 					ipcRenderer.send('update-user', this.username);
 					ipcRenderer.send('update-loginpage', this.page);
 				}

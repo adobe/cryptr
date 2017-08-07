@@ -29,7 +29,7 @@ limitations under the License.
 <body unresolved>
 	<template is="dom-bind" id="app">
 		<div id="blocker"></div>  <!-- blocker: an element to obscure background-loading content at load time. -->
-		<login-form status="{{status}}" username="{{u}}" domain="{{domain}}" url="{{url}}" header="{{header}}" login-response="{{loginResponse}}" page="{{loginPage}}" loading="{{loading}}"></login-form>
+		<login-form status="{{status}}" username="{{u}}" url="{{url}}" urls="{{urls}}" header="{{header}}" login-response="{{loginResponse}}" page="{{loginPage}}" loading="{{loading}}"></login-form>
 		<login-status id="login-status" status="{{status}}" url="{{url}}" header="{{header}}"></login-status>
 		<secrets-init status="{{status}}" header="{{header}}" login-response="{{loginResponse}}" secrets="{{secrets}}" access="{{access}}" loading="{{loading}}"></secrets-init>
 

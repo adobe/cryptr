@@ -30,9 +30,7 @@ app.url = 'start';
 app.secretRoute = '';
 app.folderRoute = '';
 
-ipcRenderer.on('domain', function(event, arg) {
-	app.domain = arg;
-});
+ipcRenderer.on('urls', function(event, arg) { app.urls = arg; });
 ipcRenderer.on('user', function(event, arg) {
 	app.u = arg;
 	// Set cursor autofocus for login/password fields

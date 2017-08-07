@@ -31,16 +31,15 @@ var settings = {};
 function createWindow() {
 	try {
 		settings = JSON.parse(fs.readFileSync(initPath, 'utf8'));
-		if (settings.init === undefined || settings.init === null) settings.init = '';
 		if (settings.loginpage === undefined || settings.loginpage === null) settings.loginpage = 0;
 		if (settings.drawerWidth === undefined || settings.drawerWidth === null) settings.drawerWidth = '220px';
 	}
 	catch(e) {
 		settings.width = 800;
 		settings.height = 600;
-		settings.init = '';
 		settings.loginpage = 0;
 		settings.drawerWidth = '220px';
+		settings.urls = [];
 	}
 
 	// Create the browser window.
@@ -91,10 +90,10 @@ function createWindow() {
 			y: oldWindow.y,
 			width: oldWindow.width,
 			height: oldWindow.height,
-			init: settings.init,
 			loginpage: settings.loginpage,
 			drawerWidth: settings.drawerWidth,
-			user: settings.user
+			user: settings.user,
+			urls: settings.urls
 		};
 		fs.writeFileSync(initPath, JSON.stringify(newSettings));
 	});
@@ -125,13 +124,10 @@ app.on('activate', function () {
 });
 
 ipcMain.on('initialized', function(event, arg) {
-	event.sender.send('domain', settings.init);
 	event.sender.send('loginpage', settings.loginpage);
 	event.sender.send('drawerWidth', settings.drawerWidth);
 	event.sender.send('user', settings.user);
-});
-ipcMain.on('update-domain', function(event, arg) {
-	settings.init = arg;
+	event.sender.send('urls', settings.urls);
 });
 ipcMain.on('update-user', function(event, arg) {
 	settings.user = arg;
@@ -141,4 +137,7 @@ ipcMain.on('update-loginpage', function(event, arg) {
 });
 ipcMain.on('update-drawerWidth', function(event, arg) {
 	settings.drawerWidth = arg;
+});
+ipcMain.on('update-urls', function(event, arg) {
+	settings.urls = arg;
 });
