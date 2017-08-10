@@ -11,24 +11,29 @@
     "scripts": {
         "postinstall": "install-app-deps",
         "start": "electron ./app",
-        "dev": "CRYPTR_ENV='development' npm run start",
+        "dev": "cross-env CRYPTR_ENV='development' npm run start",
         "release": "build -mwl --x64 --ia32"
     },
     "devDependencies": {
+        "cross-env": "^5.0.5",
         "electron": "^1.4.15",
         "electron-builder": "^13.7.0"
     },
     "build": {
-        "productName":"Cryptr",
+        "productName": "Cryptr",
         "copyright": "Copyright © 2017 Adobe",
         "appId": "io.cryptr",
         "mac": {
             "category": "public.app-category.productivity",
-            "publish": ["github"]
+            "publish": [
+                "github"
+            ]
         },
         "win": {
             "iconUrl": "https://github.com/jcrowthe/cryptr/blob/vault-integration/app/images/cryptr-internal.png",
-            "publish": ["github"]
+            "publish": [
+                "github"
+            ]
         }
     }
 }
