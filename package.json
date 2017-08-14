@@ -12,12 +12,18 @@
         "postinstall": "install-app-deps",
         "start": "electron ./app",
         "dev": "cross-env CRYPTR_ENV='development' npm run start",
+        "test": "./node_modules/mocha/bin/mocha",
         "release": "build -mwl --x64 --ia32"
     },
     "devDependencies": {
+        "chai": "^3.5.0",
+        "chai-as-promised": "^5.3.0",
         "cross-env": "^5.0.5",
         "electron": "^1.4.15",
-        "electron-builder": "^13.7.0"
+        "electron-builder": "^13.7.0",
+        "electron-prebuilt": "^1.4.13",
+        "mocha": "^2.5.3",
+        "spectron": "^3.7.2"
     },
     "build": {
         "productName": "Cryptr",
