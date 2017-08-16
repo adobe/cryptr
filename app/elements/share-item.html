@@ -1,0 +1,306 @@
+<!--
+Copyright 2017 Adobe. All rights reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<dom-module id="share-item">
+	<template>
+		<style>
+			:host {
+				--paper-tabs-selection-bar-color: var(--accent-color);
+				--paper-tab-ink: var(--accent-color);
+				--paper-tabs-selection-bar: {
+					border-bottom: 4px solid #ccd7dc;
+				};
+				--paper-item-focused-before: {
+					opacity: 0;
+				};
+			}
+			.flex {
+				@apply(--layout-flex);
+			}
+			.center {
+				height: calc(100vh - 68px);
+				@apply(--layout-vertical);
+				@apply(--layout-center-center);
+			}
+			.horizontal {
+				@apply(--layout-horizontal);
+			}
+			.justified {
+				@apply(--layout-center-justified);
+			}
+			#topbar-input {
+				--paper-input-container-input-color: white;
+				--paper-input-container-focus-color: white;
+				--paper-input-container-color: white;
+			}
+			#topbar {
+				background-color: #607D8B;
+				width: 100%; 
+				height: auto;
+				color: white;
+			}
+			.output {
+				background-color: #eee;
+				border-radius: 3px;
+				margin-bottom: 20px;
+				width: 346px;
+				font-family: monospace;
+				font-size: 16px;
+				cursor: pointer;
+			}
+			paper-toast.error {
+				background-color: var(--accent-color);
+				background-color: #F44336;
+			}
+			paper-toast.copy {
+				right: 10px;
+				left: auto !important;
+				background-color: var(--accent-color);
+				min-width: 95px;
+			}
+			paper-button {
+				border: 2px solid #4496ff;
+			    height: 34px;
+			    margin-top: 7px;
+			    color: #308aff;
+			    font-weight: 500;
+			}
+			paper-button.dim {
+				border: 2px solid #c7e0ff;
+			    color: #81b7fb;
+			}
+			paper-button[disabled] {
+				color: #8db9ff !important;
+				background: transparent;
+				border: 2px solid #76abff !important;
+				font-weight: 700
+			}
+			#line {
+				border-bottom: 1px solid #cad2d6;
+				width: 275px;
+			}
+			.pad {
+				margin-bottom: 50px;
+			}
+			#done {
+				color: #4CAF50;
+				width: 250px;
+				height: 250px;
+			}
+			.dropdown {
+				--paper-input-container-input-color: white;
+				width: 100px;
+			}
+		</style>
+		
+		<iron-ajax id="wrapSecret"
+			url="{{wrapURL}}"
+			handle-as="json"
+			method="post"
+			body="{{wrapBody}}"
+			content-type="application/json"
+			headers="{{wrapHeader}}"
+			on-error="_wrapError"
+			on-response="_wrapSuccess"
+			last-response="{{wrapResponse}}">
+		</iron-ajax>
+		
+		<div class="flex noselect">
+			<iron-pages selected="{{page}}">
+				<section>
+					<div id="topbar">
+						<div class="horizontal justified">
+							<h2 style="white-space: pre; margin-bottom: 0;">Share</h2>
+						</div>
+						<div class="horizontal justified">
+							<paper-item style="padding: 0px 5px;">Expires in:</paper-item>
+							<paper-item style="padding: 0px 5px;">
+								<paper-input id="topbar-input" value="{{wrapTime}}" allowed-pattern="[0-9]+" no-label-float style="width: 50px; text-align: center;"></paper-input>
+							</paper-item>
+							<paper-item style="padding: 0px 5px;">
+								<paper-dropdown-menu class="dropdown" no-label-float>
+									<paper-listbox class="dropdown-content" selected="{{timeType}}">
+										<paper-item>Second(s)</paper-item>
+										<paper-item>Minute(s)</paper-item>
+										<paper-item>Hour(s)</paper-item>
+										<paper-item>Day(s)</paper-item>
+									</paper-listbox>
+								</paper-dropdown-menu>
+							</paper-item>
+						</div>
+						<div class="horizontal justified">
+							<paper-item style="min-height: 0px; height: 40px;">Type: </paper-item>
+							<paper-item style="min-height: 0px; height: 40px;">
+								<paper-tabs selected="{{selected}}">
+									<paper-tab style="width: 75px">Key/Value</paper-tab>
+									<paper-tab style="width: 75px">File</paper-tab>
+									<paper-tab style="width: 75px">Text</paper-tab>
+								</paper-tabs>
+							</paper-item>
+						</div>
+					</div>
+					<div class="horizontal justified" style="padding-top:15px;">
+						<secret-display data="{{data}}" selected="{{selected}}" create-mode></secret-display>
+					</div>
+					<div class="horizontal justified" style="margin-bottom: 15px;">
+						<div id="line"></div>
+					</div>
+					<div class="horizontal pad justified">
+						<paper-button on-tap="_wrap">Share</paper-button>
+					</div>
+				</section>
+				<section>
+					<div class="center">
+						<div class="horizontal justified">
+							<iron-icon id="done" icon="check-circle"></iron-icon>
+						</div>
+						<div class="horizontal justified">
+							<paper-item class="output" on-tap="_copyToken">
+								{{outputToken}}
+							</paper-item>
+						</div>
+						<div class="horizontal justified">
+							<paper-button on-tap="_copyToken">Copy Token</paper-button>
+						</div>
+						<div class="horizontal justified" style="margin-bottom: 15px; margin-top: 20px;">
+							<div id="line"></div>
+						</div>
+						<div class="horizontal justified" style="color: #81b7fb;">
+							<paper-item>Advanced Methods:</paper-item>
+							<paper-button class="dim" on-tap="_copyCurl" style="text-transform: none;">cURL</paper-button>
+							<paper-button class="dim" on-tap="_copyHttpie" style="text-transform: none;">HTTPie</paper-button>
+						</div>
+						<div class="horizontal justified" style="margin-bottom: 60px; margin-top: 15px;">
+							<div id="line"></div>
+						</div>
+						<div class="horizontal justified">
+							<paper-button on-tap="_done">
+								<iron-icon icon="arrow-back" style="padding-top: 2px; padding-right: 4px;"></iron-icon>
+								Done
+							</paper-button>
+						</div>
+					</div>
+				</section>
+			</iron-pages>
+		</div>
+
+		<paper-toast id="copied" class="copy" duration="1500" text="Copied"></paper-toast>
+		<paper-toast id="error" class="error fit-bottom" duration="5000">
+			<iron-icon prefix icon="error-outline" style="padding-right: 7px;"></iron-icon>
+			{{errorText}}
+		</paper-toast>
+	</template>
+
+	<script>
+		(function() {
+			'use strict';
+			Polymer({
+				is: 'share-item',
+				properties: {
+					header: {
+						type: Object
+					},
+					url: {
+						type: String,
+						observer: '_watchURL'
+					},
+					selected: {
+						type: Number,
+						value: 0,
+						observer: '_setDefaultValue'
+					},
+					wrapTime: {
+						type: Number,
+						value: 60
+					},
+					errorText: {
+						type: String,
+						value: ''
+					},
+					page: {
+						type: Number,
+						value: 0
+					},
+					loading: {
+						notify: true
+					},
+					timeType: {
+						type: Number,
+						value: 1
+					}
+				},
+				// ========== Setup ==========
+				attached: function() {
+					this.$.error.fitInto = headerPanelMain;
+				},
+				_watchURL: function() {
+					this.wrapURL = this.url + 'v1/sys/wrapping/wrap'
+					this.unwrapURL = this.url + 'v1/sys/wrapping/unwrap'
+				},
+				_setDefaultValue: function() {
+					if (this.selected == 0) this.data = {'':''};
+					else if (this.selected == 2) this.data = {type: 'text', value: ''};
+				},
+				// ========== Wrap ==========
+				_wrap: function() {
+					this.loading = true;
+					this.wrapBody = this.data;
+					var ttl = 3600;
+					if (this.timeType == 0) ttl = this.wrapTime;
+					else if (this.timeType == 1) ttl = this.wrapTime * 60;
+					else if (this.timeType == 2) ttl = this.wrapTime * 3600;
+					else if (this.timeType == 3) ttl = this.wrapTime * 86400;
+					this.wrapHeader = { 'X-Vault-Wrap-TTL': ttl.toString(), 'X-Vault-Token': this.header['X-Vault-Token'], "X-Cryptr-Version": require('electron').remote.app.getVersion()};
+					this.$.wrapSecret.generateRequest();
+				},
+				_wrapSuccess: function() {
+					this.loading = false;
+					this.data = {'':''};
+					this.wrapValue = '';
+					this.wrapHeader = {};
+					this.page = 1;
+					this.outputToken = this.wrapResponse.wrap_info.token;
+					this.curl = "curl  -X POST -d '' -H 'X-Vault-Token: " + this.outputToken + "' " + this.unwrapURL
+					this.httpie = "http POST " + this.unwrapURL + " X-Vault-Token:" + this.outputToken;
+				},
+				_wrapError: function(e) {
+					this.loading = false;
+					if (e.target.lastError.response.errors[0] == "permission denied") {
+						this.errorText = "Permission Denied";
+						this.$.error.show();
+					} else {
+						this.errorText = "An unknown error occurred.";
+						this.$.error.show();
+					}
+					this.wrapValue = '';
+					this.wrapHeader = {};
+				},
+				_done: function() {
+					this.page = 0;
+					this.outputToken = '';
+					this.curl = '';
+					this.httpie = '';
+					this.loading = false;
+				},
+				_copy: function(data) {
+					clipboard.writeText(data);
+					this.$.copied.show();
+				},
+				_copyToken: function() { this._copy(this.outputToken); },
+				_copyCurl: function() { this._copy(this.curl); },
+				_copyHttpie: function() { this._copy(this.httpie); }
+			});
+		})();
+	</script>
+</dom-module>

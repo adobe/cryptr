@@ -169,7 +169,7 @@ item has bolded text. Please see the `<paper-menu>` docs for which attributes
       _openedChanged: function(opened, oldOpened) {
         if (opened) {
           this.__trigger && this.__trigger.classList.add('iron-selected');
-          this.__content && this.__content.focus();
+        //   this.__content && this.__content.focus();
           this.fire('paper-submenu-open');
         } else if (oldOpened != null) {
           this.__trigger && this.__trigger.classList.remove('iron-selected');

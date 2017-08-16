@@ -51,16 +51,28 @@ limitations under the License.
 							<iron-icon icon="dashboard"></iron-icon>
 							<span>Dashboard</span>
 						</a>
-						<a data-route="create" href="{{baseUrl}}create" class="noselect">
-							<iron-icon icon="add"></iron-icon>
-							<span>New Secret</span>
-						</a>
+						<paper-submenu attr-for-selected="data-route" selected="{{route}}">
+							<a data-route="share" href="{{baseUrl}}share" class="noselect menu-trigger">
+								<iron-icon icon="social:share"></iron-icon>
+								<span>Share</span>
+							</a>
+							<paper-menu class="menu-content" selected="1" style="padding: 0">
+								<a data-route="retrieve" href="{{baseUrl}}retrieve" class="noselect" style="padding-left: 40px">
+									<iron-icon icon="get-app" style="margin-right: 10px;"></iron-icon>
+									<span>Retrieve</span>
+								</a>
+							</paper-menu>
+						</paper-submenu>
 						<template is="dom-if" if="{{query}}">
 							<a data-route="search" href="{{baseUrl}}search" class="noselect">
 								<iron-icon icon="search"></iron-icon>
 								<span>Search</span>
 							</a>
 						</template>
+						<a data-route="create" href="{{baseUrl}}create" class="noselect">
+							<iron-icon icon="add"></iron-icon>
+							<span>New Secret</span>
+						</a>
 					</paper-menu>
 
 					<span id="drawerMenuText" class="noselect">SECRETS</span>
@@ -88,6 +100,14 @@ limitations under the License.
 							<dash-board></dash-board>
 						</section>
 
+						<section data-route="share">
+							<share-item header="{{header}}" url="{{url}}" loading="{{loading}}"></share-item>
+						</section>
+						
+						<section data-route="retrieve">
+							<share-retrieve header="{{header}}" url="{{url}}" loading="{{loading}}"></share-retrieve>
+						</section>
+						
 						<section data-route="folder" style="height: 100%">
 							<secret-folder location="{{folderRoute}}" create-location="{{createLocation}}"></secret-folder>
 						</section>
