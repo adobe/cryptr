@@ -92,6 +92,7 @@ limitations under the License.
 		<iron-ajax id="testReq"
 			url="{{testURL}}"
 			handle-as="json"
+			headers="{{testHeader}}"
 			last-response="{{testResponse}}"
 			on-response="_testSuccess"
 			on-error="_testError"
@@ -227,6 +228,10 @@ limitations under the License.
 						type: Object,
 						notify: true
 					},
+					testHeader: {
+						type: Object,
+						value: { "X-Cryptr-Version": require('electron').remote.app.getVersion() }
+					},
 					loginResponse: {
 						type: Object,
 						notify: true
@@ -281,7 +286,7 @@ limitations under the License.
 							}
 							this.authMethod = 'GET';
 							this.authURL = this.url + 'v1/auth/token/lookup-self';
-							this.header = {"X-Vault-Token": this.token };
+							this.header = {"X-Vault-Token": this.token, "X-Cryptr-Version": require('electron').remote.app.getVersion() };
 							this.body = '';
 						} else if (this.page == 2) {
 							if (!this.username && !this.password) { //Check fields have content
@@ -307,7 +312,7 @@ limitations under the License.
 					// UserPass / LDAP
 					if (this.loginResponse.auth && this.loginResponse.auth.client_token) {
 						this.loginResponse = this.loginResponse.auth;
-						this.header = {"X-Vault-Token": this.loginResponse.client_token };
+						this.header = {"X-Vault-Token": this.loginResponse.client_token, "X-Cryptr-Version": require('electron').remote.app.getVersion() };
 					// Token Auth
 					} else if (this.loginResponse.data) {
 						this.loginResponse = this.loginResponse.data;
