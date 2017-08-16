@@ -126,7 +126,7 @@ limitations under the License.
 						<div class="horizontal justified">
 							<paper-item style="padding: 0px 5px;">Expires in:</paper-item>
 							<paper-item style="padding: 0px 5px;">
-								<paper-input id="topbar-input" value="{{wrapTime}}" allowed-pattern="[0-9]+" no-label-float style="width: 50px; text-align: center;"></paper-input>
+								<paper-input id="topbar-input" value="{{wrapTime}}" allowed-pattern="[1-9]([0-9]+)?" no-label-float style="width: 50px; text-align: center;"></paper-input>
 							</paper-item>
 							<paper-item style="padding: 0px 5px;">
 								<paper-dropdown-menu class="dropdown" no-label-float>
@@ -222,7 +222,7 @@ limitations under the License.
 					},
 					wrapTime: {
 						type: Number,
-						value: 60
+						value: 10
 					},
 					errorText: {
 						type: String,
@@ -254,15 +254,20 @@ limitations under the License.
 				},
 				// ========== Wrap ==========
 				_wrap: function() {
-					this.loading = true;
-					this.wrapBody = this.data;
-					var ttl = 3600;
-					if (this.timeType == 0) ttl = this.wrapTime;
-					else if (this.timeType == 1) ttl = this.wrapTime * 60;
-					else if (this.timeType == 2) ttl = this.wrapTime * 3600;
-					else if (this.timeType == 3) ttl = this.wrapTime * 86400;
-					this.wrapHeader = { 'X-Vault-Wrap-TTL': ttl.toString(), 'X-Vault-Token': this.header['X-Vault-Token'], "X-Cryptr-Version": require('electron').remote.app.getVersion()};
-					this.$.wrapSecret.generateRequest();
+					if (this.wrapTime == '') {
+						this.errorText = "Shared secrets must have an expiration!";
+						this.$.error.show();
+					} else {
+						this.loading = true;
+						this.wrapBody = this.data;
+						var ttl = 3600;
+						if (this.timeType == 0) ttl = this.wrapTime;
+						else if (this.timeType == 1) ttl = this.wrapTime * 60;
+						else if (this.timeType == 2) ttl = this.wrapTime * 3600;
+						else if (this.timeType == 3) ttl = this.wrapTime * 86400;
+						this.wrapHeader = { 'X-Vault-Wrap-TTL': ttl.toString(), 'X-Vault-Token': this.header['X-Vault-Token'], "X-Cryptr-Version": require('electron').remote.app.getVersion()};
+						this.$.wrapSecret.generateRequest();
+					}
 				},
 				_wrapSuccess: function() {
 					this.loading = false;
