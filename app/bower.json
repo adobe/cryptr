@@ -21,7 +21,8 @@
     "neon-elements": "^1.0.0",
     "page": "^1.7.1",
     "juicy-jsoneditor": "^1.1.1",
-    "paper-toggle-button": "^2.0.0"
+    "paper-toggle-button": "^2.0.0",
+    "font-roboto-local": "PolymerElements/font-roboto-local#^1.0.1"
   },
   "resolutions": {
     "paper-toggle-button": "^2.0.0"
