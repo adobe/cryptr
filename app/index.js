@@ -43,8 +43,8 @@ function createWindow() {
 	}
 
 	// Create the browser window.
-	settings.minWidth = 500;
-	settings.minHeight = 500;
+	settings.minWidth = 880;
+	settings.minHeight = 600;
 	settings.icon = __dirname + '/images/sizes/128x128.png';
 	settings.titleBarStyle = 'hidden';
 	settings.show = false;
