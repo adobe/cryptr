@@ -10,8 +10,10 @@ Using Cryptr, a user may easily interact with their Vault instance's API, readin
 Current release can be [downloaded here](https://github.com/jcrowthe/cryptr/releases).
 Cryptr supports Windows, Linux and Mac OS. It has been tested on Windows 10, Ubuntu 16.04 Desktop, and macOS 10.12 Sierra.
 
+For *Linux*, use the `.AppImage` files. They are self-contained binaries that run on every major linux distro. Just make it executable and run it. [AppImage information here!](https://appimage.org/)
 
 ## Building from Source
+You only need to do this if you want to contribute code, or run Cryptr in developer mode. (For Linux binaries, see above).
 
 ```
 git clone https://github.com/jcrowthe/cryptr.git
@@ -79,9 +81,9 @@ path "secret/*" {
 }
 ```
 
-But this is _not_ recommended for multiple reasons (the above being one obvious reason). Noted [here](https://www.vaultproject.io/docs/concepts/policies.html#list), `list` command outputs are not filtered by policy. This means all secrets found at `secret/*` will be listed, regardless if the token has rights to use any of them.
+But this is _not_ recommended for multiple reasons (the above being one obvious reason). Noted [here](https://www.vaultproject.io/docs/concepts/policies.html#list), `list` command outputs are not filtered by policy. This means all secrets found at `secret/*` will be listed, regardless if the token has rights to create/read/update/delete any of them.
 
-As such, the recommended procedure for using wildcards in policies is to not use prefixes and suffixes in the path. ie:
+As such, the recommended procedure for using wildcards in policies is to not use suffixes in the path. ie:
 
 ```
 #GOOD
@@ -89,14 +91,11 @@ path "secret/myteam/*" {
   policy = "write"
 }
 
-#BAD
+#CURRENTLY UNSUPPORTED
 path "secret/group*" {
   policy = "write"
 }
 
-#BAD
-path "secret/*group" {
-  policy = "write"
-}
-
 ```
+
+Cryptr currently only supports wildcard characters at the folder level (ie. `secret/*`), and not as glob characters (ie. `secret/group*`).
