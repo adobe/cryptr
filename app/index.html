@@ -115,6 +115,10 @@ limitations under the License.
 						<section data-route="secret" style="height: 100%">
 							<secret-item secrets={{secrets}} header="{{header}}" location="{{secretRoute}}" loading="{{loading}}" style="background: rgba(56, 67, 81, 0.05);"></secret-item>
 						</section>
+						
+						<section data-route="search" style="height: 100%">
+							<search-page secrets="{{secrets}}" query="{{query}}"></search-page>
+						</section>
 					</iron-pages>
 				</div>
 			</paper-scroll-header-panel>
