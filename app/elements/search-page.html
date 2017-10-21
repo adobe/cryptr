@@ -33,23 +33,59 @@ limitations under the License.
             width: 250px;
             height: 250px;
         }
+        .pad {
+            padding: 20px 16px;
+            @apply --layout-flex;
+            @apply --layout-vertical);
+            border: 1px solid #ddd;
+        }
+        .pad:hover {
+            background-color: var(--accent-color);
+        }
+        #list {
+            max-width: 800px;
+            margin: auto;
+            margin-top: 60px;
+            margin-bottom: 60px;
+            border-bottom: 1px solid #ddd;
+        }
+        .item {
+            @apply --layout-horizontal;
+            padding: 10px;
+            background-color: white;
+            border: 1px solid #ddd;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+        .primary {
+            font-size: 16px;
+            font-weight: bold;
+        }
+        a {
+            text-decoration: none;
+			color: black;
+        }
     </style>
     
 	<template>
-        <div class="flex noselect">
-			<div class="center">
-				<div class="vertical center">
-					<iron-icon id="search" icon="search"></iron-icon>
-					<div>
-						<div class="shaded">Search Coming Soon!</div>
-					</div>
-				</div>
-			</div>
-		</div>
-        <!-- <template is="dom-repeat" items="{{results}}">
-            {{item.location}}
-            <br />
-        </template> -->
+        <div id="list">
+            <div style="float: right">
+                <paper-checkbox checked="{{fuzzy}}" on-tap="_showResults">
+                    Fuzzy Search
+                    <paper-tooltip position="top" animation-delay="0" style="width: 175px;">Approximate string matching. <br />Ex: "ysph" would match "symphony"</paper-tooltip>
+                </paper-checkbox>
+            </div>
+            
+            <h2 style="margin-top: 0px;">Secrets</h2>
+            <template is="dom-repeat" items="[[results]]" filter="_filterFolders">
+                <a href="secret/[[item.location]]">
+                    <div class="pad">
+                        <div class="primary">[[item.parsedname]]</div>
+                        <div class="shortText">[[item.location]]</div>
+                    </div>
+                </a>
+            </template>
+        </div>
 	</template>
 
 	<script>
@@ -67,15 +103,37 @@ limitations under the License.
                     results: {
                         type: Array,
                         value: []
+                    },
+                    fuzzy: {
+                        type: Boolean,
+                        value: true
                     }
 				},
                 _showResults: function() {
-                    // this.results = [];
-                    // for (var i = 0; i < this.secrets.length; i++) {
-                    //     console.log(this.secrets[i]);
-                    //     if (this.secrets[i].location.includes(this.query.toLowerCase())) this.push('results', this.secrets[i]);
-                    // }
-                }
+                    if (this.fuzzy) {
+                        var options = {
+                            shouldSort: true,
+                            threshold: 0.6,
+                            location: 0,
+                            distance: 100,
+                            maxPatternLength: 100,
+                            minMatchCharLength: 1,
+                            tokenize: true,
+                            matchAllTokens: true,
+                            keys: [ "location" ]
+                        };
+                        var fuse = new Fuse(this.secrets, options); // "list" is the item array
+                        this.results = fuse.search(this.query.replace(' ', '_'));
+                    } else {
+                        this.results = [];
+                        for (var i = 0; i < this.secrets.length; i++) {
+                            if (this.secrets[i].location.includes(this.query.toLowerCase().replace(' ', '_'))) this.push('results', this.secrets[i]);
+                        }
+                    }
+                },
+                _filterFolders: function(item) {
+    				return item.type != 'folder';
+    			},
 			});
 		})();
 	</script>
