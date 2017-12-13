@@ -40,7 +40,8 @@ function createWindow() {
 		'backgroundColor': '#333',
 		'webPreferences': {
 			'nodeIntegration': false,
-			'sandbox': true
+			'sandbox': true,
+			'disableBlinkFeatures': 'Auxclick'
 		}
 	});
 	
