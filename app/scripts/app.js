@@ -12,39 +12,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-// Setup Electron process integration
-const ipcRenderer = require('electron').ipcRenderer;
-
-
-// Initialize
-(function(document) {
-	'use strict';
-	var app = document.querySelector('#app');
-	app.baseUrl = '/';
-})(document);
-
-
 // App configs
+var app = document.querySelector('#app');
+app.baseUrl = '/';
 app.url = 'start';
 app.secretRoute = '';
 app.folderRoute = '';
-
-ipcRenderer.on('urls', function(event, arg) { app.urls = arg; });
-ipcRenderer.on('user', function(event, arg) {
-	app.u = arg;
-	// Set cursor autofocus for login/password fields
-	if (app.domain === '') document.getElementById('urlfield').autofocus = true;
-	else if (app.u === '' && app.loginPage === 0) document.getElementById('userfieldldap').autofocus = true;
-	else if (app.u !== '' && app.loginPage === 0) document.getElementById('passfieldldap').autofocus = true;
-	else if (app.loginPage === 1) document.getElementById('tokenfield').autofocus = true;
-	else if (app.u === '' && app.loginPage === 2) document.getElementById('userfield').autofocus = true;
-	else if (app.u !== '' && app.loginPage === 2) document.getElementById('passfield').autofocus = true;
-});
-ipcRenderer.on('prevpass', function(event, arg) { app.prevPassword = arg; });
-ipcRenderer.on('loginpage', function(event, arg) { app.loginPage = arg; });
-ipcRenderer.on('drawerWidth', function(event, arg) { app.drawerWidth = arg; });
-ipcRenderer.send('initialized', 'ping');
-
+app.cryptrVersion = "0.2.0";
 
 // Index filtering and sorting
 app.filterFolders = function(item) {
@@ -78,7 +52,6 @@ window.addEventListener('WebComponentsReady', function() {
 			var child = document.getElementById('ghost');
             document.body.removeChild(child);
             dragging = false;
-			ipcRenderer.send('update-drawerWidth', app.drawerWidth);
         }
     });
 });

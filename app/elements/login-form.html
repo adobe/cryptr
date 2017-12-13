@@ -152,6 +152,10 @@ limitations under the License.
 			<paper-progress class="bottombar" indeterminate disabled="{{!loading}}"></paper-progress>
 		</paper-dialog>
 
+		<app-localstorage-document key="page" data="{{page}}"></app-localstorage-document>
+		<app-localstorage-document key="urls" data="{{urls}}"></app-localstorage-document>
+		<app-localstorage-document key="username" data="{{username}}"></app-localstorage-document>
+		
 		<paper-toast id="errortoast" class="fit-bottom error" duration="5000">
 			<iron-icon prefix icon="error-outline" style="padding-right: 7px;"></iron-icon>
 			{{errorText}}
@@ -195,8 +199,7 @@ limitations under the License.
 					username: {
 						type: String,
 						value: '',
-						notify: true,
-						observer: '_persistData'
+						notify: true
 					},
 					body: Object,
 					password: String,
@@ -230,7 +233,7 @@ limitations under the License.
 					},
 					testHeader: {
 						type: Object,
-						value: { "X-Cryptr-Version": require('electron').remote.app.getVersion() }
+						value: function() { return { "X-Cryptr-Version": app.cryptrVersion } }
 					},
 					loginResponse: {
 						type: Object,
@@ -240,7 +243,7 @@ limitations under the License.
 						type: Number,
 						value: 0,
 						notify: true,
-						observer: '_persistData'
+						observer: '_autofocus'
 					},
 					authMethod: {
 						type: String,
@@ -257,6 +260,13 @@ limitations under the License.
 				},
 				attached: function() {
 					this.status = 'none';
+				},
+				_autofocus: function() {
+					// Set cursor autofocus for login/password fields
+					// TODO: autofocus on username field first if unset
+					if (this.page === 1) this.$.tokenfield.autofocus = true;
+					else if (this.page === 0) this.$.passfieldldap.autofocus = true;
+					else if (this.page === 2) this.$.passfield.autofocus = true;
 				},
 				_computeBody: function(p) {
 					return {"password": p };
@@ -286,7 +296,7 @@ limitations under the License.
 							}
 							this.authMethod = 'GET';
 							this.authURL = this.url + 'v1/auth/token/lookup-self';
-							this.header = {"X-Vault-Token": this.token, "X-Cryptr-Version": require('electron').remote.app.getVersion() };
+							this.header = {"X-Vault-Token": this.token, "X-Cryptr-Version": app.cryptrVersion };
 							this.body = '';
 						} else if (this.page == 2) {
 							if (!this.username && !this.password) { //Check fields have content
@@ -312,7 +322,7 @@ limitations under the License.
 					// UserPass / LDAP
 					if (this.loginResponse.auth && this.loginResponse.auth.client_token) {
 						this.loginResponse = this.loginResponse.auth;
-						this.header = {"X-Vault-Token": this.loginResponse.client_token, "X-Cryptr-Version": require('electron').remote.app.getVersion() };
+						this.header = {"X-Vault-Token": this.loginResponse.client_token, "X-Cryptr-Version": app.cryptrVersion };
 					// Token Auth
 					} else if (this.loginResponse.data) {
 						this.loginResponse = this.loginResponse.data;
@@ -382,7 +392,6 @@ limitations under the License.
 						} else {
 							this.$.warningtoast.show();
 						}
-						this._persistData();
 					}, 400);
 				},
 				_watchNewURL: function() {
@@ -399,7 +408,6 @@ limitations under the License.
 					this.push('urls', url);
 					this.newURL = '';
 					this.$.urlPrefix.innerText = 'https://';
-					this._persistData();
 				},
 				_clearItem: function(e) {
 					event.stopPropagation();
@@ -413,11 +421,6 @@ limitations under the License.
 						this.$.authenticateReq.generateRequest();
 						this.authRequests = [];
 					}
-				},
-				_persistData: function() {
-					ipcRenderer.send('update-urls', this.urls);
-					ipcRenderer.send('update-user', this.username);
-					ipcRenderer.send('update-loginpage', this.page);
 				}
 			});
 		})();

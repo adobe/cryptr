@@ -31,7 +31,7 @@ limitations under the License.
 <body unresolved>
 	<template is="dom-bind" id="app">
 		<div id="blocker"></div>  <!-- blocker: an element to obscure background-loading content at load time. -->
-		<login-form status="{{status}}" username="{{u}}" url="{{url}}" urls="{{urls}}" header="{{header}}" login-response="{{loginResponse}}" page="{{loginPage}}" loading="{{loading}}"></login-form>
+		<login-form status="{{status}}" username="{{u}}" url="{{url}}" header="{{header}}" login-response="{{loginResponse}}" loading="{{loading}}"></login-form>
 		<login-status id="login-status" status="{{status}}" url="{{url}}" header="{{header}}"></login-status>
 		<secrets-init status="{{status}}" header="{{header}}" login-response="{{loginResponse}}" secrets="{{secrets}}" access="{{access}}" loading="{{loading}}"></secrets-init>
 
@@ -92,7 +92,7 @@ limitations under the License.
 				<paper-toolbar id="mainToolbar">
 					<search-box query="{{query}}"></search-box>
 					<span class="space"></span>
-					<user-info username="{{u}}" url="{{url}}"></user-info>
+					<user-info username="{{u}}" url="{{url}}" drawer-width="{{drawerWidth}}"></user-info>
 				</paper-toolbar>
 
 				<!-- Main Content -->
@@ -126,6 +126,8 @@ limitations under the License.
 			</paper-scroll-header-panel>
 		</paper-drawer-panel>
 
+		<app-localstorage-document key="drawerWidth" data="{{drawerWidth}}"></app-localstorage-document>
+		
 		<paper-toast id="toast">
 			<span class="toast-hide-button" role="button" tabindex="0" onclick="app.$.toast.hide()">Ok</span>
 		</paper-toast>

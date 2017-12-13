@@ -41,5 +41,8 @@
                 "github"
             ]
         }
+    },
+    "dependencies": {
+        "electron-window-state": "^4.1.1"
     }
 }

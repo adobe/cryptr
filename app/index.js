@@ -14,52 +14,47 @@ limitations under the License.
 
 'use strict';
 const electron = require('electron');
-const ipcMain = require('electron').ipcMain;
 const {Menu} = require('electron');
 const {app} = require('electron');
+const windowStateKeeper = require('electron-window-state');
 const BrowserWindow = electron.BrowserWindow;
 
 let mainWindow;
 
-var path = require("path");
-var fs = require("fs");
-var initPath = path.join(app.getPath('appData'), "Cryptr");
-if (!fs.existsSync(initPath)) fs.mkdirSync(initPath);
-initPath += '/init.json';
-
-var settings = {};
 function createWindow() {
-	try {
-		settings = JSON.parse(fs.readFileSync(initPath, 'utf8'));
-		if (settings.loginpage === undefined || settings.loginpage === null) settings.loginpage = 0;
-		if (settings.drawerWidth === undefined || settings.drawerWidth === null) settings.drawerWidth = '220px';
-	}
-	catch(e) {
-		settings.width = 800;
-		settings.height = 600;
-		settings.loginpage = 0;
-		settings.drawerWidth = '220px';
-		settings.urls = [];
-	}
-
-	// Create the browser window.
-	settings.minWidth = 880;
-	settings.minHeight = 600;
-	settings.icon = __dirname + '/images/sizes/128x128.png';
-	settings.titleBarStyle = 'hidden';
-	settings.show = false;
-	settings.backgroundColor = '#333';
-	mainWindow = new BrowserWindow(settings);
+	let mainWindowState = windowStateKeeper({
+		defaultWidth: 880,
+		defaultHeight: 600
+	});
+	
+	mainWindow = new BrowserWindow({
+		'x': mainWindowState.x,
+		'y': mainWindowState.y,
+		'width': mainWindowState.width,
+		'height': mainWindowState.height,
+		'minWidth': 880,
+		'minHeight': 600,
+		'icon': __dirname + '/images/sizes/128x128.png',
+		'titleBarStyle': 'hidden',
+		'show': false,
+		'backgroundColor': '#333',
+		'webPreferences': {
+			'nodeIntegration': false,
+			'sandbox': true
+		}
+	});
+	
+	mainWindowState.manage(mainWindow);
 	mainWindow.loadURL('file://' + __dirname + '/index.html');
 	mainWindow.once('ready-to-show', () => {
 	    mainWindow.show()
-	})
+	});
 
 	// Open the DevTools.
 	if (process.env.CRYPTR_ENV && process.env.CRYPTR_ENV == 'development') mainWindow.webContents.openDevTools();
 
+	// Menu items for MacOS. Specifically, this enables Copy/Paste while disallowing opening DevTools.
 	if (process.platform == 'darwin') {
-		// Menu items for MacOS. Specifically, this enables Copy/Paste while disallowing opening DevTools.
 		var template = [{
 	        label: "Cryptr",
 	        submenu: [
@@ -80,23 +75,6 @@ function createWindow() {
 	    ];
 	    Menu.setApplicationMenu(Menu.buildFromTemplate(template));
 	}
-
-
-	mainWindow.on("close", function() {
-		// Save the current browser window location and size
-		var oldWindow = mainWindow.getBounds();
-		var newSettings = {
-			x: oldWindow.x,
-			y: oldWindow.y,
-			width: oldWindow.width,
-			height: oldWindow.height,
-			loginpage: settings.loginpage,
-			drawerWidth: settings.drawerWidth,
-			user: settings.user,
-			urls: settings.urls
-		};
-		fs.writeFileSync(initPath, JSON.stringify(newSettings));
-	});
 
 	// Emitted when the window is closed.
 	mainWindow.on('closed', function() {
@@ -125,23 +103,4 @@ app.on('activate', function () {
 	if (mainWindow === null) {
 		createWindow();
 	}
-});
-
-ipcMain.on('initialized', function(event, arg) {
-	event.sender.send('loginpage', settings.loginpage);
-	event.sender.send('drawerWidth', settings.drawerWidth);
-	event.sender.send('user', settings.user);
-	event.sender.send('urls', settings.urls);
-});
-ipcMain.on('update-user', function(event, arg) {
-	settings.user = arg;
-});
-ipcMain.on('update-loginpage', function(event, arg) {
-	settings.loginpage = arg;
-});
-ipcMain.on('update-drawerWidth', function(event, arg) {
-	settings.drawerWidth = arg;
-});
-ipcMain.on('update-urls', function(event, arg) {
-	settings.urls = arg;
 });

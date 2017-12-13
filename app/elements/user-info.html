@@ -44,7 +44,12 @@ limitations under the License.
                     upperUser: {
                         type: String,
                         computed: '_computeToUpper(username)'
-                    }
+                    },
+					drawerWidth: {
+						type: String,
+						value: '220px',
+						notify: true
+					}
 				},
                 _computeToUpper: function(username) {
 					return (this.username) ? this.username.toUpperCase() : '';
