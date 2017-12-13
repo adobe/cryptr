@@ -103,6 +103,10 @@ function createWindow() {
 		mainWindow = null;
 		app.quit();
 	});
+	
+	mainWindow.webContents.on('will-navigate', function(e){
+	  e.preventDefault();
+	});
 }
 
 // This method will be called when Electron has finished initialization and is ready to create browser windows.
