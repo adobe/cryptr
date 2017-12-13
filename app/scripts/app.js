@@ -13,7 +13,6 @@ limitations under the License.
 */
 
 // Setup Electron process integration
-const clipboard = require('electron').clipboard;
 const ipcRenderer = require('electron').ipcRenderer;
 
 
