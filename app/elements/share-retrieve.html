@@ -189,7 +189,7 @@ limitations under the License.
 				// ========== Unwrap ==========
 				_unwrap: function() {
 					if (this.token != '') {
-						this.unwrapHeader = { 'X-Vault-Token': this.token, "X-Cryptr-Version": require('electron').remote.app.getVersion()};
+						this.unwrapHeader = { 'X-Vault-Token': this.token, "X-Cryptr-Version": app.cryptrVersion};
 						this.unwrapBody = { "token": this.token}
 						this.loading = true;
 						this.$.unwrapSecret.generateRequest();

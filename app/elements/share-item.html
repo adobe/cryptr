@@ -265,13 +265,13 @@ limitations under the License.
 						else if (this.timeType == 1) ttl = this.wrapTime * 60;
 						else if (this.timeType == 2) ttl = this.wrapTime * 3600;
 						else if (this.timeType == 3) ttl = this.wrapTime * 86400;
-						this.wrapHeader = { 'X-Vault-Wrap-TTL': ttl.toString(), 'X-Vault-Token': this.header['X-Vault-Token'], "X-Cryptr-Version": require('electron').remote.app.getVersion()};
+						this.wrapHeader = { 'X-Vault-Wrap-TTL': ttl.toString(), 'X-Vault-Token': this.header['X-Vault-Token'], "X-Cryptr-Version": app.cryptrVersion};
 						this.$.wrapSecret.generateRequest();
 					}
 				},
 				_wrapSuccess: function() {
+					this._setDefaultValue();
 					this.loading = false;
-					this.data = {'':''};
 					this.wrapValue = '';
 					this.wrapHeader = {};
 					this.page = 1;
