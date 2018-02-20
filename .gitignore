@@ -4,3 +4,4 @@ node_debug.log
 **.DS_Store
 /build
 /release
+app/bower_components
