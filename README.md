@@ -1,14 +1,14 @@
 # Cryptr
 Cryptr is a GUI for [Hashicorp's Vault](https://www.vaultproject.io/).
 
-Using Cryptr, a user may easily interact with their Vault instance's API, reading, creating, and modifying secrets with ease.
+Using Cryptr, a user may easily interact with their Vault instance's API: reading, creating, and modifying secrets with ease.
 
 ![alt text](app/images/cryptr-demo.png "Cryptr")
 
 ## Download Binaries
 
-Current release can be [downloaded here](https://github.com/jcrowthe/cryptr/releases).
-Cryptr supports Windows, Linux and Mac OS. It has been tested on Windows 10, Ubuntu 16.04 Desktop, and macOS 10.12 Sierra.
+Current release can be [downloaded here](https://github.com/adobe/cryptr/releases).
+Cryptr supports Windows, Linux and Mac OS. It has been tested on Windows 10, Ubuntu 17.04 Desktop, and macOS 10.13 High Sierra.
 
 For *Linux*, use the `.AppImage` files. They are self-contained binaries that run on every major linux distro. Just make it executable and run it. [AppImage information here!](https://appimage.org/)
 
@@ -22,20 +22,20 @@ npm install
 npm run dev
 ```
 
-# Fun Features
+## Unique Features
 
-In addition to the feature-set of Vault, Cryptr adds some things that are "nice to have". Some of these include:
+In addition to the default feature-set of Vault, Cryptr adds some things that are "nice to have". Some of these include:
 - Secrets can be files
 - Underscores in key names show as whitespace. ie. `secret/My_cool_Secret` shows up in the folder structure as `My cool Secret`
 - Ability to move secrets.
 
-### License
+## License
 Apache 2.0 License
 
-### HTTPS
+## HTTPS
 Cryptr will ONLY access Vault servers enabled with HTTPS. These are your secrets. Keep them secret, keep them safe.
 
-The only exception to this is a dev server running locally at `http://127.0.0.1:<port>`. Cryptr's URL field will automatically change to contain a `http://` prefix when `127.0.0.1:` is input. (Note the colon, which is required for the prefix to change. A port number provided after the colon is also required since a default Vault dev server is started on port 8200)
+The only exception to this is a dev server running locally at `http://127.0.0.1:<port>`. Cryptr's URL field will automatically change to contain a `http://` prefix when `127.0.0.1:` is input. (Note the colon, which is required for the prefix to change. A port number provided after the colon is also required. For reference, a default Vault dev server is started on port 8200)
 
 ### Auth backends
 Currently LDAP, UserPass and Token auth backends are accepted. Most others are not useful for a GUI, but if you feel otherwise, submit a pull request.
@@ -44,7 +44,7 @@ Currently LDAP, UserPass and Token auth backends are accepted. Most others are n
 # Important Notes about Policies
 ## Secret Discovery
 
-Cryptr requires the policies associated with the token to be readable by the token. The purpose for this is to discover what secrets are available to the token. An example ACL for policy found at `sys/policy/allsecrets` would be as follows:
+Cryptr requires that policies associated with a token to be readable by that token. The purpose for this is to discover what secrets are available to the token. An example ACL for a policy found at `sys/policy/demo` would be as follows:
 
 
 ```
@@ -52,50 +52,13 @@ path "secret/mysecrets/*" {
   policy = "write"
 }
 
-path "sys/policy/allsecrets" {
+path "sys/policy/demo" {
     policy = "read"
 }
 ```
 
-Only the permission to `read` is advised. **NOTE: This policy addition is _critical_ to discovering available secrets.** Without this, there is no programatic way for Cryptr to know what secrets it should show the user. (Also, for that matter, there is no way for a human using the CLI to discover secrets either except for blinding attempting to `list` potential folders) As such, it is **highly** recommended to do this for all policies. All policies without this ability must, and will, be ignored by Cryptr.
+Only the permission to `read` is advised for the policy. **NOTE: This policy addition is _critical_ to discovering available secrets.** Without this, there is no programatic way for Cryptr to know what secrets it can query to show the user. (Also, for that matter, there is no way for a human using the CLI to discover secrets, except for blindly attempting to `list` potential folders). As such, it is **highly** recommended to do this for all policies. All policies without this ability must necessarily be ignored by Cryptr.
 
-## Wildcards and Secret Discovery
+### Globs and Secret Discovery
 
-Wildcards in path names are supported. However, there is a caveat that is best described with an example. Take the following policy as an example, understanding it being the only policy applied in this example:
-
-```
-path "secret/myteam*" {
-  policy = "write"
-}
-```
-
-With this policy, a user may create secrets such as `secret/myteam-keys` or `secret/myteam/certs`. This is absolutely accepted in Vault, however without an additional policy, neither Cryptr nor a human being on the CLI will be able to *discover* any of these secrets. This is because there is no containing folder upon which to execute a `list` command. The natural next step, then, would be to make an addition to the policy, as follows:
-
-```
-path "secret/myteam*" {
-  policy = "write"
-}
-
-path "secret/*" {
-  policy = "list"
-}
-```
-
-But this is _not_ recommended for multiple reasons (the above being one obvious reason). Noted [here](https://www.vaultproject.io/docs/concepts/policies.html#list), `list` command outputs are not filtered by policy. This means all secrets found at `secret/*` will be listed, regardless if the token has rights to create/read/update/delete any of them.
-
-As such, the recommended procedure for using wildcards in policies is to not use suffixes in the path. ie:
-
-```
-#GOOD
-path "secret/myteam/*" {
-  policy = "write"
-}
-
-#CURRENTLY UNSUPPORTED
-path "secret/group*" {
-  policy = "write"
-}
-
-```
-
-Cryptr currently only supports wildcard characters at the folder level (ie. `secret/*`), and not as glob characters (ie. `secret/group*`).
+Cryptr currently only supports glob characters at the folder level (ie. `secret/*`), and not as a suffix (ie. `secret/group*`). This is due to the lack of any ability to list based on a prefix. As noted [here](https://www.vaultproject.io/docs/concepts/policies.html#list), `list` command outputs are not filtered by policy. You are welcome to add `list` permissions on the containing folder, but know that this is not recommended.
