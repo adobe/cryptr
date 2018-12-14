@@ -33,7 +33,7 @@ limitations under the License.
 		<div id="blocker"></div>  <!-- blocker: an element to obscure background-loading content at load time. -->
 		<login-form status="{{status}}" username="{{u}}" url="{{url}}" header="{{header}}" login-response="{{loginResponse}}" loading="{{loading}}"></login-form>
 		<login-status id="login-status" status="{{status}}" url="{{url}}" header="{{header}}"></login-status>
-		<secrets-init status="{{status}}" header="{{header}}" login-response="{{loginResponse}}" secrets="{{secrets}}" access="{{access}}" loading="{{loading}}"></secrets-init>
+		<secrets-init status="{{status}}" header="{{header}}" login-response="{{loginResponse}}" secrets="{{secrets}}" access="{{access}}" loading="{{loading}}" backends="{{backends}}"></secrets-init>
 
 		<paper-drawer-panel id="paperDrawerPanel" drawer-width="{{drawerWidth}}">
 			<!-- Drawer Area -->
@@ -77,8 +77,12 @@ limitations under the License.
 						</a>
 					</paper-menu>
 
-					<span id="drawerMenuText" class="noselect">SECRETS</span>
-					<folder-structure secrets="[[secrets]]" route="{{route}}" folder-route="{{folderRoute}}" base-url="{{baseUrl}}" base-folder="secret" indent="20" create-location="{{createLocation}}" print></folder-structure>
+					<!-- List of backends -->
+					<template is="dom-repeat" items="{{backends}}">
+						<span id="drawerMenuText" class="noselect" style="text-transform: uppercase;">{{item}}</span>
+						<folder-structure secrets="[[secrets]]" route="{{route}}" folder-route="{{folderRoute}}" base-url="{{baseUrl}}" base-folder="{{item}}" indent="20" create-location="{{createLocation}}" print></folder-structure>
+					</template>
+
 				</div>
 
 				<!-- <div class="bottom-corner" style="color: #737373;">
