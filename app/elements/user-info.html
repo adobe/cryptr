@@ -60,6 +60,7 @@ limitations under the License.
 				_refreshKeys: function() {
 					//Clear all user data, except vault auth token
 					document.querySelector('login-status')._clearData();
+					document.querySelector('login-form')._listMounts();
 					
 					// Start secrets-init process again
 					app.status = '';

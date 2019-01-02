@@ -98,6 +98,15 @@ limitations under the License.
 			on-error="_testError"
 			timeout="5000">
 		</iron-ajax>
+		
+		<iron-ajax id="listMounts"
+			url="{{listMountsURL}}"
+			handle-as="json"
+			headers="{{header}}"
+			last-response="{{listMountResponse}}"
+			on-error="_listMountError"
+			on-response="_listMountSuccess">
+		</iron-ajax>
 
 		<paper-dialog id="modal" class="noselect" entry-animation="scale-up-animation" modal no-cancel-on-esc-key no-cancel-on-outside-click auto-fit-on-attach>
 			<iron-image id="logo" sizing="contain" src="../images/cryptr-internal.png"></iron-image>
@@ -204,6 +213,12 @@ limitations under the License.
 					body: Object,
 					password: String,
 					authURL: String,
+					listMountsURL: String,
+					backends: {
+						type: Array,
+						value: [],
+						notify: true
+					},
 					token: {
 						type: String,
 						value: ''
@@ -326,9 +341,9 @@ limitations under the License.
 					// Token Auth
 					} else if (this.loginResponse.data) {
 						this.loginResponse = this.loginResponse.data;
-						this.username = 'TOKEN';
 					}
-					this.status = 'watch';
+					this._listMounts();
+					
 					this.password = '';
 					this.token = '';
 					document.getElementById('blocker').style.display = 'none';
@@ -347,14 +362,42 @@ limitations under the License.
 					else this.errorText = 'Unknown Error: Please try again later.';
 					this.$.errortoast.show();
 				},
+				_listMounts: function() {
+					this.backends = [];
+					// Request the accessible mounts to determine what mounts should be printed
+					this.listMountsURL = this.url + 'v1/sys/internal/ui/mounts'
+					this.$.listMounts.generateRequest();
+					
+				},
+				_listMountError: function(e) {
+					// Vault version is older than 0.10.0. Show all available mounts.
+					this.push('backends', {name: '', type: '1', base: ''});
+				},
+				_listMountSuccess: function(e) {
+					this.status = 'watch';
+					var secretBackends = this.listMountResponse.data.secret;
+					for (var i in secretBackends) {
+						if (secretBackends[i].type && ['kv', 'generic'].includes(secretBackends[i].type)) {
+							var backend = {
+								name: i.slice(0, -1),
+								base: i.slice(0, -1),
+								type: '1'
+							}
+							if (secretBackends[i].options != null && secretBackends[i].options.version) {
+								backend['type'] = secretBackends[i].options.version;
+								if (backend.type === '2') backend['base'] = backend.name + '/data'
+							}
+							this.push('backends', backend);
+						}
+					}
+				},
 				_testSuccess: function() {
 					if (this.testResponse == null ||
 						!this.testResponse.hasOwnProperty('t') || 
 						!this.testResponse.hasOwnProperty('n') || 
 						!this.testResponse.hasOwnProperty('progress') || 
 						!this.testResponse.hasOwnProperty('version') || 
-						!this.testResponse.hasOwnProperty('cluster_id') || 
-						!this.testResponse.hasOwnProperty('cluster_name')) {
+						!this.testResponse.hasOwnProperty('sealed')) {
 						this.errorText = 'No supported Vault instance found at the this URL';
 						this.$.errortoast.show();
 						this.approvedURL = false;

@@ -31,7 +31,7 @@ limitations under the License.
 <body unresolved>
 	<template is="dom-bind" id="app">
 		<div id="blocker"></div>  <!-- blocker: an element to obscure background-loading content at load time. -->
-		<login-form status="{{status}}" username="{{u}}" url="{{url}}" header="{{header}}" login-response="{{loginResponse}}" loading="{{loading}}"></login-form>
+		<login-form status="{{status}}" username="{{u}}" url="{{url}}" header="{{header}}" login-response="{{loginResponse}}" loading="{{loading}}" backends="{{backends}}"></login-form>
 		<login-status id="login-status" status="{{status}}" url="{{url}}" header="{{header}}"></login-status>
 		<secrets-init status="{{status}}" header="{{header}}" login-response="{{loginResponse}}" secrets="{{secrets}}" access="{{access}}" loading="{{loading}}" backends="{{backends}}"></secrets-init>
 
@@ -79,8 +79,8 @@ limitations under the License.
 
 					<!-- List of backends -->
 					<template is="dom-repeat" items="{{backends}}">
-						<span id="drawerMenuText" class="noselect" style="text-transform: uppercase;">{{item}}</span>
-						<folder-structure secrets="[[secrets]]" route="{{route}}" folder-route="{{folderRoute}}" base-url="{{baseUrl}}" base-folder="{{item}}" indent="20" create-location="{{createLocation}}" print></folder-structure>
+						<span id="drawerMenuText" class="noselect" style="text-transform: uppercase;">{{item.name}}</span>
+						<folder-structure secrets="[[secrets]]" route="{{route}}" folder-route="{{folderRoute}}" base-url="{{baseUrl}}" base-folder="{{item.base}}" indent="20" create-location="{{createLocation}}" print></folder-structure>
 					</template>
 
 				</div>
@@ -119,7 +119,7 @@ limitations under the License.
 						</section>
 
 						<section data-route="secret" style="height: 100%">
-							<secret-item secrets={{secrets}} header="{{header}}" location="{{secretRoute}}" new-location="{{createLocation}}" loading="{{loading}}" style="background: rgba(56, 67, 81, 0.05);"></secret-item>
+							<secret-item secrets={{secrets}} header="{{header}}" location="{{secretRoute}}" new-location="{{createLocation}}" loading="{{loading}}" style="background: rgba(56, 67, 81, 0.05);" backends="{{backends}}"></secret-item>
 						</section>
 						
 						<section data-route="search" style="height: 100%">
