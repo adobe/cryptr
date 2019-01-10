@@ -1,10 +1,13 @@
 {
   "name": "cryptr",
   "author": "Jacob Crowther <crowther@adobe.com>",
-  "version": "0.2.0",
+  "version": "0.3.0-alpha",
   "description": "A GUI for Vault",
   "repository": {
     "url": "https://github.com/jcrowthe/cryptr.git"
   },
-  "license": "Apache-2.0"
+  "license": "Apache-2.0",
+  "dependencies": {
+    "electron-window-state": "^5.0.3"
+  }
 }
