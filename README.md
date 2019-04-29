@@ -12,6 +12,14 @@ Cryptr supports Windows, Linux and Mac OS. It has been tested on Windows 10, Ubu
 
 For *Linux*, use the `.AppImage` files. They are self-contained binaries that run on every major linux distro. Just make it executable and run it. [AppImage information here!](https://appimage.org/)
 
+## Install using Homebrew
+
+Cryptr can be installed via Homebrew where Cryptr is available as a cask. Just type
+
+```
+brew cask install cryptr
+```
+
 ## Building from Source
 You only need to do this if you want to contribute code, or run Cryptr in developer mode. (For Linux binaries, see above).
 
