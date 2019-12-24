@@ -33,7 +33,7 @@ limitations under the License.
 		<div id="blocker"></div>  <!-- blocker: an element to obscure background-loading content at load time. -->
 		<login-form status="{{status}}" username="{{u}}" url="{{url}}" header="{{header}}" login-response="{{loginResponse}}" loading="{{loading}}" backends="{{backends}}"></login-form>
 		<login-status id="login-status" status="{{status}}" url="{{url}}" header="{{header}}"></login-status>
-		<secrets-init status="{{status}}" header="{{header}}" login-response="{{loginResponse}}" secrets="{{secrets}}" access="{{access}}" loading="{{loading}}" backends="{{backends}}"></secrets-init>
+		<secrets-init status="{{status}}" header="{{header}}" deferred-requests="{{deferredRequests}}" completed-requests="{{completedRequests}}" folder-route="{{folderRoute}}" login-response="{{loginResponse}}" secrets="{{secrets}}" access="{{access}}" loading="{{loading}}" backends="{{backends}}" index-all-secrets="{{indexAllSecrets}}"></secrets-init>
 
 		<paper-drawer-panel id="paperDrawerPanel" drawer-width="{{drawerWidth}}">
 			<!-- Drawer Area -->
@@ -123,7 +123,7 @@ limitations under the License.
 						</section>
 						
 						<section data-route="search" style="height: 100%">
-							<search-page secrets="{{secrets}}" query="{{query}}"></search-page>
+							<search-page secrets="{{secrets}}" query="{{query}}" index-all-secrets="{{indexAllSecrets}}"></search-page>
 						</section>
 					</iron-pages>
 				</div>
