@@ -129,7 +129,6 @@ limitations under the License.
 						</paper-listbox>
 						<paper-item on-tap="_stop" style="border-top: 1px solid #DDD;">
 							<paper-input label="New URL" id="newURL" value="{{newURL}}" always-float-label>
-								<div id="urlPrefix" prefix>https://</div>
 								<paper-icon-button suffix on-tap="_addURL" icon="add" alt="add" title="add"></paper-icon-button>
 							</paper-input>
 							<iron-a11y-keys target="[[targetNewURL]]" keys="enter" on-keys-pressed="_addURL"></iron-a11y-keys>
@@ -171,7 +170,7 @@ limitations under the License.
 		</paper-toast>
 		<paper-toast id="warningtoast" class="fit-bottom" duration="0">
 			<iron-icon prefix icon="error-outline" style="padding-right: 7px;"></iron-icon>
-			An HTTPS based URL is required.
+			Caution! Connecting to Vault over unencrypted HTTP may expose secrets!
 		</paper-toast>
 	</template>
 
@@ -239,8 +238,7 @@ limitations under the License.
 					},
 					newURL: {
 						type: String,
-						value: '',
-						observer: '_watchNewURL'
+						value: ''
 					},
 					header: {
 						type: Object,
@@ -290,7 +288,6 @@ limitations under the License.
 					return this.url + 'v1/auth/ldap/login/' + u
 				},
 				_login: function() {
-					if (this.url.toLowerCase().startsWith('https') || this.url.toLowerCase().startsWith('http://127.0.0.1:')) {
 						// Switch for LDAP, Token, and UserPass auth backends
 						if (this.page == 0) {
 							if (!this.username && !this.password) { //Check fields have content
@@ -326,11 +323,6 @@ limitations under the License.
 						}
 						this.loading = true;
 						this.push('authRequests', this.$.testReq.generateRequest());
-					} else {
-						this.errorText = 'An HTTPS based URL is required.';
-						this.$.errortoast.show();
-						this.loading = false;
-					}
 				},
 				_success: function() {
 					this.$.errortoast.close()
@@ -415,7 +407,7 @@ limitations under the License.
 					}
 				},
 				_testError: function() {
-					this.errorText = 'No supported Vault instance found at the this URL';
+					this.errorText = 'An error occurred while connecting to the provided URL.';
 					this.$.errortoast.show();
 					this.approvedURL = false;
 					this.loading = false;
@@ -426,31 +418,29 @@ limitations under the License.
 				},
 				_watchURL: function() {
 					if (!(this.url.endsWith('/'))) this.url += '/';
-					if (this.url.toLowerCase().startsWith('http://localhost:')) this.url = this.url.replace('http://localhost:' ,'http://127.0.0.1:');
 					this.debounce('checkURL', function () {
-						if (this.url.toLowerCase().startsWith('https://') || this.url.toLowerCase().startsWith('http://127.0.0.1:')) {
+						if (this.url.toLowerCase().startsWith('https://') ||
+								this.url.toLowerCase().startsWith('http://127.0.0.1:') ||
+								this.url.toLowerCase().startsWith('http://localhost:')) {
 							this.$.warningtoast.close();
-							this.testURL = this.url + 'v1/sys/seal-status';
-							this.$.testReq.generateRequest();
 						} else {
 							this.$.warningtoast.show();
 						}
+						this.testURL = this.url + 'v1/sys/seal-status';
+						this.$.testReq.generateRequest();
 					}, 400);
-				},
-				_watchNewURL: function() {
-					if (this.newURL == '') return;
-					if (this.newURL.toLowerCase().startsWith('localhost:')) this.newURL = this.newURL.replace('localhost:' ,'127.0.0.1:');
-					if (this.newURL.toLowerCase().startsWith('127.0.0.1:')) this.$.urlPrefix.innerText = 'http://';
-					else this.$.urlPrefix.innerText = 'https://';
 				},
 				_addURL: function() {
 					if (this.newURL == '') return;
-					var url = (this.newURL.toLowerCase().startsWith('127.0.0.1:')) ? 'http://' + this.newURL : 'https://' + this.newURL;
-					if (!url.endsWith('/')) url += '/';
+					else if (!(this.newURL.toLowerCase().startsWith('http://') || this.newURL.toLowerCase().startsWith('https://'))) {
+						this.errorText = 'URL must start with either "http://" or "https://".';
+						this.$.errortoast.show();
+						return
+					}
+					if (!this.newURL.endsWith('/')) this.newURL += '/';
 					if (!this.urls) this.urls = [];
-					this.push('urls', url);
+					this.push('urls', this.newURL);
 					this.newURL = '';
-					this.$.urlPrefix.innerText = 'https://';
 				},
 				_clearItem: function(e) {
 					event.stopPropagation();
