@@ -13,7 +13,7 @@
         "start": "electron ./app",
         "dev": "cross-env CRYPTR_ENV='development' npm run start",
         "test": "./node_modules/mocha/bin/mocha",
-        "dist": "electron-builder -wl --x64"
+        "dist": "electron-builder -mwl --x64"
     },
     "devDependencies": {
         "chai": "^3.5.0",
