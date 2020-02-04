@@ -1,14 +1,18 @@
 # Cryptr
+
 Cryptr is a GUI for [Hashicorp's Vault](https://www.vaultproject.io/).
 
-Using Cryptr, a user may easily interact with their Vault instance's API: reading, creating, and modifying secrets with ease.
+Using Cryptr, a user may manage secrets in their Vault instance: reading, creating, and modifying secrets with ease.
 
 ![alt text](app/images/cryptr-demo.png "Cryptr")
 
 ## Download Binaries
 
-Current release can be [downloaded here](https://github.com/adobe/cryptr/releases).
-Cryptr supports Windows, Linux and Mac OS. It has been tested on Windows 10, Ubuntu 17.04 Desktop, and macOS 10.13 High Sierra.
+The current release can be [downloaded here](https://github.com/adobe/cryptr/releases).
+
+Cryptr supports Windows, Linux and macOS. It has been tested on Windows 10, Ubuntu 17.04 Desktop, and macOS 10.15 Catalina.
+
+On macOS, you may be warned about untrusted developers when you first attempt to launch Cryptr. To resolve this, open Finder, navigate to Applications, right-click on Cryptr.app and click Open. You can then confirm you want to allow Cryptr to be opened.
 
 For *Linux*, use the `.AppImage` files. They are self-contained binaries that run on every major linux distro. Just make it executable and run it. [AppImage information here!](https://appimage.org/)
 
@@ -21,6 +25,7 @@ brew cask install cryptr
 ```
 
 ## Building from Source
+
 You only need to do this if you want to contribute code, or run Cryptr in developer mode. (For Linux binaries, see above).
 
 ```
@@ -33,23 +38,21 @@ npm run dev
 ## Unique Features
 
 In addition to the default feature-set of Vault, Cryptr adds some things that are "nice to have". Some of these include:
-- Secrets can be files
+
+- Files can be uploaded and downloaded directly to and from the filesystem. This includes both text and binary files.
+- A "share secret" features allows one user to send another user a time-limited self-destructing secret. This can be useful to send a secret to a friend without needing to change the receiving party's access in Vault.
 - Underscores in key names show as whitespace. ie. `secret/My_cool_Secret` shows up in the folder structure as `My cool Secret`
-- Ability to move secrets.
+- Secrets can be easily moved or renamed using a friendly UI.
 
 ## License
 Apache 2.0 License
 
-## HTTPS
-Cryptr will ONLY access Vault servers enabled with HTTPS. These are your secrets. Keep them secret, keep them safe.
-
-The only exception to this is a dev server running locally at `http://127.0.0.1:<port>`. Cryptr's URL field will automatically change to contain a `http://` prefix when `127.0.0.1:` is input. (Note the colon, which is required for the prefix to change. A port number provided after the colon is also required. For reference, a default Vault dev server is started on port 8200)
-
 ### Auth backends
-Currently LDAP, UserPass and Token auth backends are accepted. Most others are not useful for a GUI, but if you feel otherwise, submit a pull request.
 
+Currently LDAP, UserPass and Token auth backends are accepted. Most others are not useful for a GUI, but if you feel otherwise, submit a pull request or open an issue.
 
 # Important Notes about Policies
+
 ## Secret Discovery
 
 Cryptr requires that policies associated with a token to be readable by that token. The purpose for this is to discover what secrets are available to the token. An example ACL for a policy found at `sys/policy/demo` would be as follows:
