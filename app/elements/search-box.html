@@ -41,6 +41,8 @@ limitations under the License.
 	</template>
 
 	<script>
+		// https://github.com/visionmedia/page.js/issues/537#issuecomment-492755878
+		page.configure({window:window})
 		Polymer({
 			is: "search-box",
 			properties: {
