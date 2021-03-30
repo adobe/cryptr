@@ -154,6 +154,9 @@ limitations under the License.
 					<paper-input id="passfield" value="{{password}}" label="Password" type="password" disabled="{{loading}}"></paper-input>
 				</div>
 			</iron-pages>
+			<div class="namespace">
+				<paper-input id="userfieldnamespace" value="{{namespace}}" label="Namespace" disabled="{{loading}}"></paper-input>
+			</div>
 			<div class="buttons">
 				<paper-button on-tap="_login" autofocus disabled="{{loading}}">Login</paper-button>
 			</div>
@@ -163,6 +166,7 @@ limitations under the License.
 		<app-localstorage-document key="page" data="{{page}}"></app-localstorage-document>
 		<app-localstorage-document key="urls" data="{{urls}}"></app-localstorage-document>
 		<app-localstorage-document key="username" data="{{username}}"></app-localstorage-document>
+		<app-localstorage-document key="namespace" data="{{namespace}}"></app-localstorage-document>
 		
 		<paper-toast id="errortoast" class="fit-bottom error" duration="5000">
 			<iron-icon prefix icon="error-outline" style="padding-right: 7px;"></iron-icon>
@@ -269,6 +273,10 @@ limitations under the License.
 					approvedURL: {
 						type: Boolean,
 						value: false
+					},
+					namespace: {
+						type: String,
+						value: '',
 					}
 				},
 				attached: function() {
@@ -299,6 +307,7 @@ limitations under the License.
 							this.authMethod = 'POST';
 							this.authURL = this.url + 'v1/auth/ldap/login/' + this.username;
 							this.body = {"password": this.password };
+							this.header = {"X-Cryptr-Version": app.cryptrVersion, "X-Vault-Namespace": this.namespace};
 						} else if (this.page == 1) {
 							if (!this.token) { //Check field has content
 								this.errorText = 'Token is required';
@@ -308,7 +317,7 @@ limitations under the License.
 							}
 							this.authMethod = 'GET';
 							this.authURL = this.url + 'v1/auth/token/lookup-self';
-							this.header = {"X-Vault-Token": this.token, "X-Cryptr-Version": app.cryptrVersion };
+							this.header = {"X-Vault-Token": this.token, "X-Cryptr-Version": app.cryptrVersion, "X-Vault-Namespace": this.namespace};
 							this.body = '';
 						} else if (this.page == 2) {
 							if (!this.username && !this.password) { //Check fields have content
@@ -319,6 +328,7 @@ limitations under the License.
 							}
 							this.authMethod = 'POST';
 							this.authURL = this.url + 'v1/auth/userpass/login/' + this.username;
+							this.header = {"X-Cryptr-Version": app.cryptrVersion, "X-Vault-Namespace": this.namespace};
 							this.body = {"password": this.password };
 						}
 						this.loading = true;
@@ -329,7 +339,7 @@ limitations under the License.
 					// UserPass / LDAP
 					if (this.loginResponse.auth && this.loginResponse.auth.client_token) {
 						this.loginResponse = this.loginResponse.auth;
-						this.header = {"X-Vault-Token": this.loginResponse.client_token, "X-Cryptr-Version": app.cryptrVersion };
+						this.header = {"X-Vault-Token": this.loginResponse.client_token, "X-Cryptr-Version": app.cryptrVersion, "X-Vault-Namespace": this.namespace};
 					// Token Auth
 					} else if (this.loginResponse.data) {
 						this.loginResponse = this.loginResponse.data;
