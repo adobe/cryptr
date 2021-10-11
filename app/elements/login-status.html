@@ -118,6 +118,7 @@ limitations under the License.
 					document.getElementById('blocker').style.display = 'block';
 					clearInterval(this.timer);
 					this.$.renewTokenModal.close();
+					window.startOIDCServer()
 				},
 				_clearData: function() {
 					app.data = {};
