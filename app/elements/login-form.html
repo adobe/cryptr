@@ -89,6 +89,19 @@ limitations under the License.
 			timeout="30000">
 		</iron-ajax>
 
+		<iron-ajax id="oidcReq"
+			url="{{oidcURL}}"
+			handle-as="json"
+			method="POST"
+			body="{{oidcBody}}"
+			content-type="application/json"
+			last-response="{{oidcResponse}}"
+			last-error={{loginError}}
+			on-response="_oidcSuccess"
+			on-error="_error"
+			timeout="10000">
+		</iron-ajax>
+
 		<iron-ajax id="testReq"
 			url="{{testURL}}"
 			handle-as="json"
@@ -114,6 +127,7 @@ limitations under the License.
 				<paper-tab>LDAP</paper-tab>
 				<paper-tab>Token</paper-tab>
 				<paper-tab>User/Pass</paper-tab>
+				<paper-tab>OIDC</paper-tab>
 			</paper-tabs>
 			<div class="flexchild" style="margin: 0;">
 				<paper-dropdown-menu label="URL" value="{{url}}" horizontal-align="left" style="width: 100%;">
@@ -153,6 +167,10 @@ limitations under the License.
 					<paper-input id="userfield" value="{{username}}" label="Username" disabled="{{loading}}"></paper-input>
 					<paper-input id="passfield" value="{{password}}" label="Password" type="password" disabled="{{loading}}"></paper-input>
 				</div>
+				<div>
+					<iron-a11y-keys target="[[targetrole]]" keys="enter" on-keys-pressed="_login"></iron-a11y-keys>
+					<paper-input id="rolefield" value="{{role}}" label="Role (optional)" disabled="{{loading}}"></paper-input>
+				</div>
 			</iron-pages>
 			<div class="buttons">
 				<paper-button on-tap="_login" autofocus disabled="{{loading}}">Login</paper-button>
@@ -171,6 +189,10 @@ limitations under the License.
 		<paper-toast id="warningtoast" class="fit-bottom" duration="0">
 			<iron-icon prefix icon="error-outline" style="padding-right: 7px;"></iron-icon>
 			Caution! Connecting to Vault over unencrypted HTTP may expose secrets!
+		</paper-toast>
+		<paper-toast id="oidctoast" class="fit-bottom" duration="0">
+			<iron-icon prefix icon="error-outline" style="padding-right: 7px;"></iron-icon>
+			{{oidcErrorText}}
 		</paper-toast>
 	</template>
 
@@ -191,6 +213,9 @@ limitations under the License.
 					},
 					targetpass: {
 						value: function() { return this.$.passfield; }
+					},
+					targetrole: {
+						value: function() { return this.$.rolefield; }
 					},
 					targetuserldap: {
 						value: function() { return this.$.userfieldldap; }
@@ -213,6 +238,10 @@ limitations under the License.
 					password: String,
 					authURL: String,
 					listMountsURL: String,
+					role: {
+						type: String,
+						value: ''
+					},
 					backends: {
 						type: Array,
 						value: [],
@@ -269,17 +298,45 @@ limitations under the License.
 					approvedURL: {
 						type: Boolean,
 						value: false
+					},
+					oidcStarted: {
+						type: Boolean,
+						value: false
 					}
 				},
 				attached: function() {
 					this.status = 'none';
+
+					// OIDC Auth Setup
+					// This uses app/preload.js to safely pass data from Electron's main process,
+					// which is responsible for receiving the callback data from the OIDC provider.
+					window.onOIDCAuthData(function(data) {
+						this._oidcAuth(data);
+					}.bind(this));
+					window.onOIDCAuthError(function(data) {
+						this._oidcAuthError(data);
+					}.bind(this));
+					window.onOIDCAuthStartError(function(data) {
+						this._oidcAuthStartError(data);
+					}.bind(this));
+					window.onOIDCAuthStartSuccess(function(data) {
+						this._oidcAuthStartSuccess(data);
+					}.bind(this));
+					window.startOIDCServer()
 				},
 				_autofocus: function() {
+					// Close OIDC alert on all pages. Open selectively as needed.
+					this.$.oidctoast.close();
+
 					// Set cursor autofocus for login/password fields
 					// TODO: autofocus on username field first if unset
 					if (this.page === 1) this.$.tokenfield.autofocus = true;
 					else if (this.page === 0) this.$.passfieldldap.autofocus = true;
 					else if (this.page === 2) this.$.passfield.autofocus = true;
+					else if (this.page === 3) {
+						this.$.rolefield.autofocus = true;
+						if (!(this.oidcStarted)) this.$.oidctoast.open();
+					}
 				},
 				_computeBody: function(p) {
 					return {"password": p };
@@ -288,7 +345,7 @@ limitations under the License.
 					return this.url + 'v1/auth/ldap/login/' + u
 				},
 				_login: function() {
-						// Switch for LDAP, Token, and UserPass auth backends
+						// Switch for LDAP, Token, UserPass, and OIDC auth backends
 						if (this.page == 0) {
 							if (!this.username && !this.password) { //Check fields have content
 								this.errorText = 'Username and Password are required';
@@ -320,9 +377,22 @@ limitations under the License.
 							this.authMethod = 'POST';
 							this.authURL = this.url + 'v1/auth/userpass/login/' + this.username;
 							this.body = {"password": this.password };
+						} else if (this.page == 3) {
+							if (this.oidcStarted) {
+								this.oidcURL = this.url + 'v1/auth/oidc/oidc/auth_url'
+								this.oidcBody = {"redirect_uri": "http://localhost:8250/oidc/callback", "role": this.role}
+								this.loading = true;
+								this.$.oidcReq.generateRequest();
+							} else {
+								this.errorText = 'OIDC provider unavailable. A local server to catch the OIDC callback could not be started.';
+								this.$.errortoast.show();
+							}
 						}
-						this.loading = true;
-						this.push('authRequests', this.$.testReq.generateRequest());
+
+						if (this.page != 3) { // For OIDC there is a pre-auth step. This is run later.
+							this.loading = true;
+							this.push('authRequests', this.$.testReq.generateRequest());
+						}
 				},
 				_success: function() {
 					this.$.errortoast.close()
@@ -340,18 +410,21 @@ limitations under the License.
 					this.token = '';
 					document.getElementById('blocker').style.display = 'none';
 					this.$.modal.close();
+					window.stopOIDCServer();
+					this.oidcStarted = false;
+					this.$.oidctoast.close();
 				},
 				_error: function(e) {
 					this.loading = false;
 					if (this.loginError.response.errors[0].includes('Invalid Credentials')) this.errorText = 'Invalid Credentials';
 					else if (this.loginError.response.errors[0].includes('No Such Object')) this.errorText = 'Invalid Username or Password';
 					else if (this.loginError.response.errors[0] == 'invalid username or password') this.errorText = 'Invalid Username or Password';
-					else if (this.loginError.response.errors[0] == 'missing client token') this.errorText = 'Permission Denied';
+					else if (this.loginError.response.errors[0] == 'missing client token') this.errorText = 'Permission Denied: missing client token';
 					else if (this.loginError.response.errors[0] == 'Vault is sealed') this.errorText = 'This vault is currently sealed';
 					else if (this.loginError.response.errors[0] == 'unsupported path') this.errorText = 'This auth backend is not supported by the server';
 					else if (this.loginError.response.errors[0] == 'permission denied' && this.page == 1) this.errorText = 'Invalid Token';
 					else if (this.loginError.response.errors[0] == 'permission denied') this.errorText = 'Permission Denied';
-					else this.errorText = 'Unknown Error: Please try again later.';
+					else this.errorText = 'Error from remote server: ' + this.loginError.response.errors[0];
 					this.$.errortoast.show();
 				},
 				_listMounts: function() {
@@ -448,6 +521,37 @@ limitations under the License.
 				},
 				_stop: function(event) {
 					event.stopPropagation();
+				},
+				_oidcSuccess: function() {
+					this.$.errortoast.close()
+					if (this.oidcResponse.data && this.oidcResponse.data.auth_url) {
+						window.openOIDCURL(this.oidcResponse.data.auth_url)
+					} else {
+						this.loading = false;
+						this.errorText = 'Unknown Error. It is possible that "http://localhost:8250/oidc/callback" is not an allowed callback URL in the OIDC configuration.';
+						this.$.errortoast.show();
+					}
+				},
+				_oidcAuth: function(data) {
+					this.authMethod = 'GET';
+					this.authURL = this.url + 'v1/auth/oidc/oidc/callback?code=' + data.code + '&state=' + data.state;
+					this.body = '';
+					this.header = '';
+					this.push('authRequests', this.$.testReq.generateRequest());
+				},
+				_oidcAuthError: function(data) {
+					this.loading = false;
+					this.errorText = 'Error while capturing OIDC auth flow: ' + data;
+					this.$.errortoast.show();
+				},
+				_oidcAuthStartError: function(data) {
+					this.oidcStarted = false;
+					this.oidcErrorText = data;
+					if (this.page === 3) this.$.oidctoast.show();
+				},
+				_oidcAuthStartSuccess: function(data) {
+					this.oidcStarted = true;
+					this.$.oidctoast.close();
 				},
 				_watchAuthRequests: function() {
 					if (this.authRequests[0]) {
