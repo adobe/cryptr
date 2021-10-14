@@ -1,33 +1,34 @@
 const { ipcRenderer } = require('electron')
+const { contextBridge } = require('electron')
 
-window.startOIDCServer = function() {
+contextBridge.exposeInMainWorld('startOIDCServer', function() {
   ipcRenderer.send("start-oidc", "start");
-}
+});
 
-window.stopOIDCServer = function() {
+contextBridge.exposeInMainWorld('stopOIDCServer', function() {
   ipcRenderer.send("stop-oidc", "stop");
-}
+});
 
-window.openOIDCURL = function(url) {
+contextBridge.exposeInMainWorld('openOIDCURL', function(url) {
   ipcRenderer.send("open-oidc-url", url);
-}
+});
 
 
-window.onOIDCAuthData = function(callback) {
+contextBridge.exposeInMainWorld('onOIDCAuthData', function(callback) {
   authData = callback
-}
+});
 
-window.onOIDCAuthError = function(callback) {
+contextBridge.exposeInMainWorld('onOIDCAuthError', function(callback) {
   authError = callback
-}
+});
 
-window.onOIDCAuthStartError = function(callback) {
+contextBridge.exposeInMainWorld('onOIDCAuthStartError', function(callback) {
   authStartError = callback
-}
+});
 
-window.onOIDCAuthStartSuccess = function(callback) {
+contextBridge.exposeInMainWorld('onOIDCAuthStartSuccess', function(callback) {
   authStartSuccess = callback
-}
+});
 
 ipcRenderer.on('oidc-auth-data', (event, arg) => {
   if (authData) authData(arg);

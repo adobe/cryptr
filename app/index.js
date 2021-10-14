@@ -74,7 +74,7 @@ function createWindow() {
 			'nodeIntegration': false,
 			'sandbox': true,
 			'disableBlinkFeatures': 'Auxclick',
-			'contextIsolation': false,
+			'contextIsolation': true,
 			'preload': path.join(__dirname, 'preload.js')
 		}
 	});
@@ -144,7 +144,6 @@ function createWindow() {
 }
 
 function startServer() {
-	console.log(server.listening)
 	if (server.listening != true) {
 		server.listen({
 			host: '127.0.0.1',
