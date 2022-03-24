@@ -18,7 +18,7 @@ app.baseUrl = '/';
 app.url = 'start';
 app.secretRoute = '';
 app.folderRoute = '';
-app.cryptrVersion = "0.2.0";
+app.cryptrVersion = "0.6.0";
 
 // Index filtering and sorting
 app.filterFolders = function(item) {

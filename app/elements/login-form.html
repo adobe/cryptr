@@ -73,6 +73,16 @@ limitations under the License.
 			paper-progress.bottombar {
 				--paper-progress-container-color: rgba(#ffffff, 0);
 			}
+			#collapse {
+				padding: 0em;
+				background-color: #d3d3d36e;
+				margin: 1em;
+				border-radius: 5px;
+			}
+			#optionalCollapsible {
+				margin: 0 2em;
+				padding-bottom: 1em;
+			}
 		</style>
 
 		<iron-ajax id="authenticateReq"
@@ -94,6 +104,7 @@ limitations under the License.
 			handle-as="json"
 			method="POST"
 			body="{{oidcBody}}"
+			headers="{{header}}"
 			content-type="application/json"
 			last-response="{{oidcResponse}}"
 			last-error={{loginError}}
@@ -167,11 +178,22 @@ limitations under the License.
 					<paper-input id="userfield" value="{{username}}" label="Username" disabled="{{loading}}"></paper-input>
 					<paper-input id="passfield" value="{{password}}" label="Password" type="password" disabled="{{loading}}"></paper-input>
 				</div>
-				<div>
-					<iron-a11y-keys target="[[targetrole]]" keys="enter" on-keys-pressed="_login"></iron-a11y-keys>
-					<paper-input id="rolefield" value="{{role}}" label="Role (optional)" disabled="{{loading}}"></paper-input>
-				</div>
 			</iron-pages>
+			<div id="trigger" on-tap="_toggleOptional" style="padding: 0 15px;">
+				<iron-icon icon="{{optionalIcon}}" hidden$="[[noIcons]]"></iron-icon>
+				More Options
+			</div>
+			<iron-collapse id="collapse" opened="{{optionalOpen}}">
+				<div id="optionalCollapsible">
+					<div>
+						<paper-input id="namespacefield" value="{{namespace}}" label="Namespace" disabled="{{loading}}"></paper-input>
+					</div>
+					<template is="dom-if" if="{{roleVisible}}">
+						<iron-a11y-keys target="[[targetrole]]" keys="enter" on-keys-pressed="_login"></iron-a11y-keys>
+						<paper-input id="rolefield" value="{{role}}" label="Role" disabled="{{loading}}"></paper-input>
+					</template>
+				</div>
+			</iron-collapse>
 			<div class="buttons">
 				<paper-button on-tap="_login" autofocus disabled="{{loading}}">Login</paper-button>
 			</div>
@@ -181,6 +203,8 @@ limitations under the License.
 		<app-localstorage-document key="page" data="{{page}}"></app-localstorage-document>
 		<app-localstorage-document key="urls" data="{{urls}}"></app-localstorage-document>
 		<app-localstorage-document key="username" data="{{username}}"></app-localstorage-document>
+		<app-localstorage-document key="namespace" data="{{namespace}}"></app-localstorage-document>
+		<app-localstorage-document key="optionalOpen" data="{{optionalOpen}}"></app-localstorage-document>
 		
 		<paper-toast id="errortoast" class="fit-bottom error" duration="5000">
 			<iron-icon prefix icon="error-outline" style="padding-right: 7px;"></iron-icon>
@@ -242,6 +266,10 @@ limitations under the License.
 						type: String,
 						value: ''
 					},
+					roleVisible: {
+						type: Boolean,
+						value: false
+					},
 					backends: {
 						type: Array,
 						value: [],
@@ -280,6 +308,25 @@ limitations under the License.
 					loginResponse: {
 						type: Object,
 						notify: true
+					},
+					namespace: {
+						type: String,
+						value: '',
+						observer: '_watchNamespace'
+					},
+					namespaceLabel: {
+						type: String,
+						value: 'None',
+						notify: true,
+					},
+					optionalOpen: {
+						type: Boolean,
+						value: false,
+						observer: '_watchOptionalIcon'
+					},
+					optionalIcon: {
+						type: String,
+						value: 'expand-more'
 					},
 					page: {
 						type: Number,
@@ -327,6 +374,7 @@ limitations under the License.
 				_autofocus: function() {
 					// Close OIDC alert on all pages. Open selectively as needed.
 					this.$.oidctoast.close();
+					this.roleVisible = false;
 
 					// Set cursor autofocus for login/password fields
 					// TODO: autofocus on username field first if unset
@@ -334,7 +382,7 @@ limitations under the License.
 					else if (this.page === 0) this.$.passfieldldap.autofocus = true;
 					else if (this.page === 2) this.$.passfield.autofocus = true;
 					else if (this.page === 3) {
-						this.$.rolefield.autofocus = true;
+						this.roleVisible = true;
 						if (!(this.oidcStarted)) this.$.oidctoast.open();
 					}
 				},
@@ -354,6 +402,7 @@ limitations under the License.
 								return;
 							}
 							this.authMethod = 'POST';
+							this.header = {"X-Cryptr-Version": app.cryptrVersion, "X-Vault-Namespace": this.namespace};
 							this.authURL = this.url + 'v1/auth/ldap/login/' + this.username;
 							this.body = {"password": this.password };
 						} else if (this.page == 1) {
@@ -365,7 +414,7 @@ limitations under the License.
 							}
 							this.authMethod = 'GET';
 							this.authURL = this.url + 'v1/auth/token/lookup-self';
-							this.header = {"X-Vault-Token": this.token, "X-Cryptr-Version": app.cryptrVersion };
+							this.header = {"X-Vault-Token": this.token, "X-Cryptr-Version": app.cryptrVersion, "X-Vault-Namespace": this.namespace };
 							this.body = '';
 						} else if (this.page == 2) {
 							if (!this.username && !this.password) { //Check fields have content
@@ -376,11 +425,13 @@ limitations under the License.
 							}
 							this.authMethod = 'POST';
 							this.authURL = this.url + 'v1/auth/userpass/login/' + this.username;
+							this.header = {"X-Cryptr-Version": app.cryptrVersion, "X-Vault-Namespace": this.namespace};
 							this.body = {"password": this.password };
 						} else if (this.page == 3) {
 							if (this.oidcStarted) {
-								this.oidcURL = this.url + 'v1/auth/oidc/oidc/auth_url'
+								this.oidcURL = this.url + 'v1/auth/oidc/oidc/auth_url';
 								this.oidcBody = {"redirect_uri": "http://localhost:8250/oidc/callback", "role": this.role}
+								this.header = {"X-Cryptr-Version": app.cryptrVersion, "X-Vault-Namespace": this.namespace};
 								this.loading = true;
 								this.$.oidcReq.generateRequest();
 							} else {
@@ -399,7 +450,7 @@ limitations under the License.
 					// UserPass / LDAP
 					if (this.loginResponse.auth && this.loginResponse.auth.client_token) {
 						this.loginResponse = this.loginResponse.auth;
-						this.header = {"X-Vault-Token": this.loginResponse.client_token, "X-Cryptr-Version": app.cryptrVersion };
+						this.header = {"X-Vault-Token": this.loginResponse.client_token, "X-Cryptr-Version": app.cryptrVersion, "X-Vault-Namespace": this.namespace };
 					// Token Auth
 					} else if (this.loginResponse.data) {
 						this.loginResponse = this.loginResponse.data;
@@ -536,7 +587,7 @@ limitations under the License.
 					this.authMethod = 'GET';
 					this.authURL = this.url + 'v1/auth/oidc/oidc/callback?code=' + data.code + '&state=' + data.state;
 					this.body = '';
-					this.header = '';
+					this.header = {"X-Cryptr-Version": app.cryptrVersion, "X-Vault-Namespace": this.namespace};
 					this.push('authRequests', this.$.testReq.generateRequest());
 				},
 				_oidcAuthError: function(data) {
@@ -558,6 +609,19 @@ limitations under the License.
 						this.$.authenticateReq.generateRequest();
 						this.authRequests = [];
 					}
+				},
+				_appendNamespace: function() {
+					if (this.namespace != "") return '?namespace=' + this.namespace
+					else return ""
+				},
+				_toggleOptional: function() {
+					this.optionalOpen = !this.optionalOpen;
+				},
+				_watchOptionalIcon: function() {
+					this.optionalIcon = (this.optionalOpen) ? 'expand-more' : 'chevron-right';
+				},
+				_watchNamespace: function() {
+					this.namespaceLabel = (this.namespace) ? this.namespace : 'None'
 				}
 			});
 		})();

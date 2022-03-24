@@ -31,7 +31,7 @@ limitations under the License.
 <body unresolved>
 	<template is="dom-bind" id="app">
 		<div id="blocker"></div>  <!-- blocker: an element to obscure background-loading content at load time. -->
-		<login-form status="{{status}}" username="{{u}}" url="{{url}}" header="{{header}}" login-response="{{loginResponse}}" loading="{{loading}}" backends="{{backends}}"></login-form>
+		<login-form status="{{status}}" username="{{u}}" url="{{url}}" header="{{header}}" login-response="{{loginResponse}}" loading="{{loading}}" backends="{{backends}}" namespace-label="{{namespaceLabel}}"></login-form>
 		<login-status id="login-status" status="{{status}}" url="{{url}}" header="{{header}}"></login-status>
 		<secrets-init status="{{status}}" header="{{header}}" deferred-requests="{{deferredRequests}}" completed-requests="{{completedRequests}}" folder-route="{{folderRoute}}" login-response="{{loginResponse}}" secrets="{{secrets}}" access="{{access}}" loading="{{loading}}" backends="{{backends}}" index-all-secrets="{{indexAllSecrets}}"></secrets-init>
 
@@ -46,7 +46,7 @@ limitations under the License.
 					<span class="menu-name noselect">Cryptr</span>
 				</paper-toolbar>
 
-				<div style="height: calc(100vh - 100px); overflow: scroll; padding-left: 10px;">
+				<div style="height: calc(100vh - 128px); overflow: scroll; padding-left: 10px;">
 					<span id="drawerMenuText" class="noselect">HOME</span>
 					<paper-menu attr-for-selected="data-route" selected="{{route}}">
 						<a data-route="home" href="{{baseUrl}}" class="noselect">
@@ -85,9 +85,12 @@ limitations under the License.
 
 				</div>
 
-				<!-- <div class="bottom-corner" style="color: #737373;">
-					<paper-icon-button icon="settings"></paper-icon-button>
-				</div> -->
+				<div id="namespaceBar" class="noselect" style="width: {{drawerWidth}}">
+					<paper-item>
+						<iron-icon prefix icon="tab-unselected" style="min-width: 24px; padding-right: 7px;"></iron-icon>
+						<b style="padding-right: 5px;">Namespace:</b> {{namespaceLabel}}
+					</paper-item>
+				</div>
 			</paper-scroll-header-panel>
 
 			<!-- Main Area -->
