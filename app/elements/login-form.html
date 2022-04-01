@@ -188,6 +188,26 @@ limitations under the License.
 					<div>
 						<paper-input id="namespacefield" value="{{namespace}}" label="Namespace" disabled="{{loading}}"></paper-input>
 					</div>
+					<template is="dom-if" if="{{_setMountPath(page, 0)}}">
+						<div>
+							<paper-input value="{{ldapMountPath}}" label="Mount Path" disabled="{{loading}}"></paper-input>
+						</div>
+					</template>
+					<template is="dom-if" if="{{_setMountPath(page, 1)}}">
+						<div>
+							<paper-input value="{{tokenMountPath}}" label="Mount Path" disabled="{{loading}}"></paper-input>
+						</div>
+					</template>
+					<template is="dom-if" if="{{_setMountPath(page, 2)}}">
+						<div>
+							<paper-input value="{{userpassMountPath}}" label="Mount Path" disabled="{{loading}}"></paper-input>
+						</div>
+					</template>
+					<template is="dom-if" if="{{_setMountPath(page, 3)}}">
+						<div>
+							<paper-input value="{{oidcMountPath}}" label="Mount Path" disabled="{{loading}}"></paper-input>
+						</div>
+					</template>
 					<template is="dom-if" if="{{roleVisible}}">
 						<iron-a11y-keys target="[[targetrole]]" keys="enter" on-keys-pressed="_login"></iron-a11y-keys>
 						<paper-input id="rolefield" value="{{role}}" label="Role" disabled="{{loading}}"></paper-input>
@@ -205,6 +225,10 @@ limitations under the License.
 		<app-localstorage-document key="username" data="{{username}}"></app-localstorage-document>
 		<app-localstorage-document key="namespace" data="{{namespace}}"></app-localstorage-document>
 		<app-localstorage-document key="optionalOpen" data="{{optionalOpen}}"></app-localstorage-document>
+		<app-localstorage-document key="ldapMountPath" data="{{ldapMountPath}}"></app-localstorage-document>
+		<app-localstorage-document key="oidcMountPath" data="{{oidcMountPath}}"></app-localstorage-document>
+		<app-localstorage-document key="tokenMountPath" data="{{tokenMountPath}}"></app-localstorage-document>
+		<app-localstorage-document key="userpassMountPath" data="{{userpassMountPath}}"></app-localstorage-document>
 		
 		<paper-toast id="errortoast" class="fit-bottom error" duration="5000">
 			<iron-icon prefix icon="error-outline" style="padding-right: 7px;"></iron-icon>
@@ -349,6 +373,22 @@ limitations under the License.
 					oidcStarted: {
 						type: Boolean,
 						value: false
+					},
+					ldapMountPath: {
+						type: String,
+						value: 'ldap'
+					},
+					oidcMountPath: {
+						type: String,
+						value: 'oidc'
+					},
+					tokenMountPath: {
+						type: String,
+						value: 'token'
+					},
+					userpassMountPath: {
+						type: String,
+						value: 'userpass'
 					}
 				},
 				attached: function() {
@@ -403,7 +443,7 @@ limitations under the License.
 							}
 							this.authMethod = 'POST';
 							this.header = {"X-Cryptr-Version": app.cryptrVersion, "X-Vault-Namespace": this.namespace};
-							this.authURL = this.url + 'v1/auth/ldap/login/' + this.username;
+							this.authURL = this.url + 'v1/auth/' + this.ldapMountPath + '/login/' + this.username;
 							this.body = {"password": this.password };
 						} else if (this.page == 1) {
 							if (!this.token) { //Check field has content
@@ -413,7 +453,7 @@ limitations under the License.
 								return;
 							}
 							this.authMethod = 'GET';
-							this.authURL = this.url + 'v1/auth/token/lookup-self';
+							this.authURL = this.url + 'v1/auth/' + this.tokenMountPath + '/lookup-self';
 							this.header = {"X-Vault-Token": this.token, "X-Cryptr-Version": app.cryptrVersion, "X-Vault-Namespace": this.namespace };
 							this.body = '';
 						} else if (this.page == 2) {
@@ -424,12 +464,12 @@ limitations under the License.
 								return;
 							}
 							this.authMethod = 'POST';
-							this.authURL = this.url + 'v1/auth/userpass/login/' + this.username;
+							this.authURL = this.url + 'v1/auth/' + this.userpassMountPath + '/login/' + this.username;
 							this.header = {"X-Cryptr-Version": app.cryptrVersion, "X-Vault-Namespace": this.namespace};
 							this.body = {"password": this.password };
 						} else if (this.page == 3) {
 							if (this.oidcStarted) {
-								this.oidcURL = this.url + 'v1/auth/oidc/oidc/auth_url';
+								this.oidcURL = this.url + 'v1/auth/' + this.oidcMountPath + '/oidc/auth_url';
 								this.oidcBody = {"redirect_uri": "http://localhost:8250/oidc/callback", "role": this.role}
 								this.header = {"X-Cryptr-Version": app.cryptrVersion, "X-Vault-Namespace": this.namespace};
 								this.loading = true;
@@ -585,7 +625,7 @@ limitations under the License.
 				},
 				_oidcAuth: function(data) {
 					this.authMethod = 'GET';
-					this.authURL = this.url + 'v1/auth/oidc/oidc/callback?code=' + data.code + '&state=' + data.state;
+					this.authURL = this.url + 'v1/auth/' + this.oidcMountPath + '/oidc/callback?code=' + data.code + '&state=' + data.state;
 					this.body = '';
 					this.header = {"X-Cryptr-Version": app.cryptrVersion, "X-Vault-Namespace": this.namespace};
 					this.push('authRequests', this.$.testReq.generateRequest());
@@ -622,6 +662,10 @@ limitations under the License.
 				},
 				_watchNamespace: function() {
 					this.namespaceLabel = (this.namespace) ? this.namespace : 'None'
+				},
+				_setMountPath: function(unused, id) {
+					// 'unused' variable is passed here to trigger updating this function on page changes
+					return id == this.page;
 				}
 			});
 		})();
