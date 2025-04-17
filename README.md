@@ -1,5 +1,7 @@
 # Cryptr
 
+> This GUI is outdated and not maintained anymore. Please use the official Hashicorp [Vault UI](https://developer.hashicorp.com/vault/tutorials/getting-started-ui) if you need a graphical interface for Vault.
+
 Cryptr is a GUI for [Hashicorp's Vault](https://www.vaultproject.io/).
 
 Using Cryptr, a user may manage secrets in their Vault instance: reading, creating, and modifying secrets with ease.
